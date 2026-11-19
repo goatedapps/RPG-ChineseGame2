@@ -1,0 +1,3907 @@
+- questionID: P6-CH-2026-ACSJ-Q3
+  lessonIds: []
+  question: 华语讲故事比赛的报名___止日期是这个星期五。
+  options:
+    - 截
+    - 载
+    - 戴
+    - 裁
+  correct: 截
+- questionID: P6-CH-2026-ACSJ-Q4
+  lessonIds: []
+  question: 我们应该珍___时间，不要浪费。
+  options:
+    - 系
+    - 席
+    - 惜
+    - 悉
+  correct: 惜
+- questionID: P6-CH-2026-ACSJ-Q5
+  lessonIds:
+    - 1
+  question: 外公每天清晨都会到附近的公园___身体。
+  options:
+    - 锻炼
+    - 修理
+    - 照顾
+    - 保护
+  correct: 锻炼
+- questionID: P6-CH-2026-ACSJ-Q6
+  lessonIds: []
+  question: 老师常常___我们要做一个诚实的人，不要说谎。
+  options:
+    - 训练
+    - 教育
+    - 培养
+    - 介绍
+  correct: 教育
+- questionID: P6-CH-2026-AiTong-Q3
+  lessonIds:
+    - 4
+  question: 外公认真地听我说话，脸上带着慈___的笑容。
+  options:
+    - 洋
+    - 祥
+    - 详
+    - 样
+  correct: 祥
+- questionID: P6-CH-2026-AiTong-Q4
+  lessonIds:
+    - 7
+  question: 经过不断练习，她终于成为班上最___害的象棋高手。
+  options:
+    - 力
+    - 厉
+    - 历
+    - 励
+  correct: 厉
+- questionID: P6-CH-2026-AiTong-Q5
+  lessonIds: []
+  question: 他这次预考成绩很不好，妈妈为他的小六会考感到___。
+  options:
+    - 担忧
+    - 麻烦
+    - 打扰
+    - 急忙
+  correct: 担忧
+- questionID: P6-CH-2026-AiTong-Q6
+  lessonIds: []
+  question: 为了___发生交通意外，司机应该小心开车。
+  options:
+    - 阻拦
+    - 克服
+    - 躲过
+    - 避免
+  correct: 避免
+- questionID: P6-CH-2026-HenryPark-Q3
+  lessonIds:
+    - 12
+  question: 马上要___业了，同学们都舍不得和朋友分开。
+  options:
+    - 闭
+    - 币
+    - 必
+    - 毕
+  correct: 毕
+- questionID: P6-CH-2026-HenryPark-Q4
+  lessonIds: []
+  question: 这本新书在上个月出___了。
+  options:
+    - 版
+    - 贩
+    - 板
+    - 饭
+  correct: 版
+- questionID: P6-CH-2026-HenryPark-Q5
+  lessonIds: []
+  question: 他画的小猫很___，就像要从画纸跳出来一样。
+  options:
+    - 整齐
+    - 生动
+    - 巧妙
+    - 清楚
+  correct: 生动
+- questionID: P6-CH-2026-HenryPark-Q6
+  lessonIds: []
+  question: 食物都需要经过___，才能安全食用。
+  options:
+    - 检验
+    - 搅拌
+    - 保温
+    - 调味
+  correct: 检验
+- questionID: P6-CH-2026-HenryPark-Q9
+  lessonIds: []
+  question: 他不努力还想发财，___在做白日梦。
+  options:
+    - 大约
+    - 明明
+    - 简直
+    - 竟然
+  correct: 简直
+- questionID: P6-CH-2026-NanHua-Q3
+  lessonIds:
+    - 2
+  question: 下雨了，妹妹___起了一把小伞。
+  options:
+    - 称
+    - 撑
+    - 乘
+    - 诚
+  correct: 撑
+- questionID: P6-CH-2026-NanHua-Q4
+  lessonIds: []
+  question: 表演结束时，礼堂里响起了热___的掌声。
+  options:
+    - 烈
+    - 列
+    - 例
+    - 裂
+  correct: 烈
+- questionID: P6-CH-2026-NanHua-Q5
+  lessonIds: []
+  question: 我对妈妈摇了摇头，___不想再吃东西了。
+  options:
+    - 告诉
+    - 宣布
+    - 表示
+    - 讲述
+  correct: 表示
+- questionID: P6-CH-2026-NanHua-Q6
+  lessonIds: []
+  question: 看到桌上的奖杯，往事又在我的脑海里___。
+  options:
+    - 浮现
+    - 回忆
+    - 露出
+    - 显示
+  correct: 浮现
+- questionID: P6-CH-2026-Nanyang-Q3
+  lessonIds:
+    - 8
+  question: 红头巾们为社会的发展___献自己的力量。
+  options:
+    - 供
+    - 贡
+    - 功
+    - 宫
+  correct: 贡
+- questionID: P6-CH-2026-Nanyang-Q4
+  lessonIds: []
+  question: 佳佳小心地___起地上那只受伤的小鸟，把它放回鸟窝中。
+  options:
+    - 扶
+    - 托
+    - 拖
+    - 投
+  correct: 扶
+- questionID: P6-CH-2026-Nanyang-Q5
+  lessonIds:
+    - 5
+  question: 这张实木桌子很___，用了十年还是完好如初。
+  options:
+    - 坚持
+    - 坚固
+    - 坚强
+    - 坚定
+  correct: 坚固
+- questionID: P6-CH-2026-Nanyang-Q6
+  lessonIds:
+    - 6
+  question: 战场上，所有的战士都顽强地与敌人___。
+  options:
+    - 克服
+    - 对抗
+    - 攻打
+    - 挣扎
+  correct: 对抗
+- questionID: P6-CH-2026-PLMGS-Q3
+  lessonIds: []
+  question: 哥哥学会如何___隐形眼镜后，高兴不已。
+  options:
+    - 载
+    - 截
+    - 栽
+    - 戴
+  correct: 戴
+- questionID: P6-CH-2026-PLMGS-Q4
+  lessonIds:
+    - 4
+  question: 这个牌子的行李箱___量很好，只是价格比较贵。
+  options:
+    - 智
+    - 至
+    - 制
+    - 质
+  correct: 质
+- questionID: P6-CH-2026-PLMGS-Q5
+  lessonIds: []
+  question: 买食品时，我们要___包装袋上的日期。
+  options:
+    - 检查
+    - 见证
+    - 记录
+    - 申请
+  correct: 检查
+- questionID: P6-CH-2026-PLMGS-Q6
+  lessonIds:
+    - 6
+  question: 这件事不能再___了，你一定要在这个星期把事情办好。
+  options:
+    - 促进
+    - 考虑
+    - 拖延
+    - 怀疑
+  correct: 拖延
+- questionID: P6-CH-2026-Raffles-Q3
+  lessonIds:
+    - 12
+  question: 上个星期五，我们全家一起参加了姐姐的___业典礼。
+  options:
+    - 毕
+    - 闭
+    - 币
+    - 必
+  correct: 毕
+- questionID: P6-CH-2026-Raffles-Q4
+  lessonIds: []
+  question: 这所新加坡北部的体育学校，___养了很多人才。
+  options:
+    - 赔
+    - 陪
+    - 培
+    - 倍
+  correct: 培
+- questionID: P6-CH-2026-Raffles-Q5
+  lessonIds: []
+  question: 这份小组作业的___方式不限，可以画画也可以表演。
+  options:
+    - 展览
+    - 说明
+    - 表示
+    - 呈现
+  correct: 呈现
+- questionID: P6-CH-2026-Raffles-Q6
+  lessonIds: []
+  question: 由于明天有考试，国强还在___是否出席今晚的聚会。
+  options:
+    - 回想
+    - 考虑
+    - 比较
+    - 盼望
+  correct: 考虑
+- questionID: P6-CH-2026-RedSwastika-Q3
+  lessonIds:
+    - 8
+  question: 为了多赚一点钱，爷爷决定把多出来的房间___出去。
+  options:
+    - 组
+    - 助
+    - 阻
+    - 租
+  correct: 租
+- questionID: P6-CH-2026-RedSwastika-Q4
+  lessonIds:
+    - 3
+  question: 那位表演者很棒，他都可以模___别人做的动作。
+  options:
+    - 亿
+    - 仿
+    - 促
+    - 依
+  correct: 仿
+- questionID: P6-CH-2026-RedSwastika-Q5
+  lessonIds:
+    - 1
+  question: 老师对学生的作业要求很___，每一个错别字都不放过。
+  options:
+    - 严格
+    - 细心
+    - 认真
+    - 自豪
+  correct: 严格
+- questionID: P6-CH-2026-RedSwastika-Q6
+  lessonIds:
+    - 4
+  question: 老板和员工们正在开会，我们别进去___他们。
+  options:
+    - 欢迎
+    - 打扰
+    - 吵闹
+    - 帮助
+  correct: 打扰
+- questionID: P6-CH-2026-StNicholas-Q3
+  lessonIds:
+    - 8
+  question: 奶奶在食堂___了一个摊位卖豆花水。
+  options:
+    - 组
+    - 租
+    - 祖
+    - 阻
+  correct: 租
+- questionID: P6-CH-2026-StNicholas-Q4
+  lessonIds: []
+  question: 店内的___售员热情地向顾客介绍商品。
+  options:
+    - 稍
+    - 消
+    - 销
+    - 悄
+  correct: 销
+- questionID: P6-CH-2026-StNicholas-Q5
+  lessonIds: []
+  question: 考试快到了，老师___我们要复习功课。
+  options:
+    - 教导
+    - 命令
+    - 请求
+    - 提醒
+  correct: 提醒
+- questionID: P6-CH-2026-StNicholas-Q6
+  lessonIds: []
+  question: 花木兰在战场上英勇杀敌，___自己的国家。
+  options:
+    - 保管
+    - 保持
+    - 保卫
+    - 保证
+  correct: 保卫
+- questionID: P6-CH-2026-TaoNan-Q3
+  lessonIds: []
+  question: 昨晚发生的地___，并没有对村民造成严重伤害。
+  options:
+    - 震
+    - 雷
+    - 雾
+    - 露
+  correct: 震
+- questionID: P6-CH-2026-TaoNan-Q4
+  lessonIds: []
+  question: 老师看到同学们争先恐后地上校车，便上前维持___序。
+  options:
+    - 智
+    - 质
+    - 志
+    - 秩
+  correct: 秩
+- questionID: P6-CH-2026-TaoNan-Q5
+  lessonIds:
+    - 5
+  question: 听了外婆___的那段往事，我不禁流下了眼泪。
+  options:
+    - 介绍
+    - 讲述
+    - 吩咐
+    - 讨论
+  correct: 讲述
+- questionID: P6-CH-2026-TaoNan-Q6
+  lessonIds: []
+  question: 丽美在科学课上___虫子的特点，并把自己的发现写下来。
+  options:
+    - 测试
+    - 检查
+    - 考虑
+    - 观察
+  correct: 观察
+- questionID: P6-CH-2025-ACSJ-Q3
+  lessonIds:
+    - 3
+    - 11
+  question: 由于交通___塞，我们决定走去上学。
+  options:
+    - 著
+    - 都
+    - 堵
+    - 煮
+  correct: 堵
+  source: ACSJ Primary 6 Chinese 2025, Paper 2; PDF pages 11; P6_Chinese_2025_SA2_acsjunior.pdf
+- questionID: P6-CH-2025-ACSJ-Q4
+  lessonIds:
+    - 8
+  question: 叔叔打算把家里的空房间___给别人住。
+  options:
+    - 组
+    - 租
+    - 阻
+    - 祖
+  correct: 租
+  source: ACSJ Primary 6 Chinese 2025, Paper 2; PDF pages 11; P6_Chinese_2025_SA2_acsjunior.pdf
+- questionID: P6-CH-2025-ACSJ-Q5
+  lessonIds: []
+  question: 保安人员___游客的行李，确保没有危险物品。
+  options:
+    - 收拾
+    - 安排
+    - 检查
+    - 记录
+  correct: 检查
+  source: ACSJ Primary 6 Chinese 2025, Paper 2; PDF pages 12; P6_Chinese_2025_SA2_acsjunior.pdf
+- questionID: P6-CH-2025-ACSJ-Q6
+  lessonIds:
+    - 8
+  question: 活动过后，老师要我们把桌椅放回原来的___。
+  options:
+    - 座位
+    - 位置
+    - 摊位
+    - 地位
+  correct: 位置
+  source: ACSJ Primary 6 Chinese 2025, Paper 2; PDF pages 12; P6_Chinese_2025_SA2_acsjunior.pdf
+- questionID: P6-CH-2025-ACSPrimary-Q3
+  lessonIds:
+    - 6
+    - 8
+  question: 哥哥只顾着玩，把妈妈的___咐忘得一干二净。
+  options:
+    - 扮
+    - 份
+    - 吩
+    - 粉
+  correct: 吩
+  source: ACSPrimary Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_acsprimary.pdf
+- questionID: P6-CH-2025-ACSPrimary-Q4
+  lessonIds:
+    - 4
+  question: 妈妈买的书包___量好，用了很多年都不会坏。
+  options:
+    - 质
+    - 置
+    - 智
+    - 秩
+  correct: 质
+  source: ACSPrimary Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_acsprimary.pdf
+- questionID: P6-CH-2025-ACSPrimary-Q5
+  lessonIds: []
+  question: 知道自己做错了，小丽___地低下了头。
+  options:
+    - 委屈
+    - 惭愧
+    - 害羞
+    - 生气
+  correct: 惭愧
+  source: ACSPrimary Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_acsprimary.pdf
+- questionID: P6-CH-2025-ACSPrimary-Q6
+  lessonIds: []
+  question: 为了___学生的阅读兴趣，老师带学生去图书馆。
+  options:
+    - 产生
+    - 增高
+    - 培养
+    - 添加
+  correct: 培养
+  source: ACSPrimary Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_acsprimary.pdf
+- questionID: P6-CH-2025-AiTong-Q3
+  lessonIds:
+    - 3
+  question: 这只猴子非常聪明，懂得模___人类的动作。
+  options:
+    - 放
+    - 防
+    - 访
+    - 仿
+  correct: 仿
+  source: AiTong Primary 6 Chinese 2025, Paper 2; PDF pages 9; P6_Chinese_2025_SA2_aitong.pdf
+- questionID: P6-CH-2025-AiTong-Q4
+  lessonIds: []
+  question: 树苗在爷爷的细心___育下越长越高。
+  options:
+    - 培
+    - 陪
+    - 倍
+    - 赔
+  correct: 培
+  source: AiTong Primary 6 Chinese 2025, Paper 2; PDF pages 9; P6_Chinese_2025_SA2_aitong.pdf
+- questionID: P6-CH-2025-AiTong-Q5
+  lessonIds:
+    - 1
+  question: 只要你下定决心，一定能___困难。
+  options:
+    - 打败
+    - 克服
+    - 躲开
+    - 避免
+  correct: 克服
+  source: AiTong Primary 6 Chinese 2025, Paper 2; PDF pages 10; P6_Chinese_2025_SA2_aitong.pdf
+- questionID: P6-CH-2025-AiTong-Q6
+  lessonIds:
+    - 4
+  question: 这家公司___的书包，质量好，很受欢迎。
+  options:
+    - 制造
+    - 创造
+    - 建造
+    - 改造
+  correct: 制造
+  source: AiTong Primary 6 Chinese 2025, Paper 2; PDF pages 10; P6_Chinese_2025_SA2_aitong.pdf
+- questionID: P6-CH-2025-Catholic-Q3
+  lessonIds: []
+  question: 文华在作文中巧___地运用佳句，让故事更生动。
+  options:
+    - 妙
+    - 秒
+    - 炒
+    - 抄
+  correct: 妙
+  source: Catholic Primary 6 Chinese 2025, Paper 2; PDF pages 13; P6_Chinese_2025_SA2_catholic.pdf
+- questionID: P6-CH-2025-Catholic-Q4
+  lessonIds:
+    - 4
+  question: 看到志强优秀的表现，小明没有妒___，反而为他感到高兴。
+  options:
+    - 际
+    - 寄
+    - 继
+    - 忌
+  correct: 忌
+  source: Catholic Primary 6 Chinese 2025, Paper 2; PDF pages 13; P6_Chinese_2025_SA2_catholic.pdf
+- questionID: P6-CH-2025-Catholic-Q5
+  lessonIds: []
+  question: 老师要同学们多做善事，___乐于助人的精神。
+  options:
+    - 发扬
+    - 促进
+    - 增添
+    - 提高
+  correct: 发扬
+  source: Catholic Primary 6 Chinese 2025, Paper 2; PDF pages 14; P6_Chinese_2025_SA2_catholic.pdf
+- questionID: P6-CH-2025-Catholic-Q6
+  lessonIds:
+    - 10
+  question: 这本书___了许多新加坡的旅游景点。
+  options:
+    - 说明
+    - 介绍
+    - 体现
+    - 表达
+  correct: 介绍
+  source: Catholic Primary 6 Chinese 2025, Paper 2; PDF pages 14; P6_Chinese_2025_SA2_catholic.pdf
+- questionID: P6-CH-2025-HenryPark-Q3
+  lessonIds: []
+  question: 看着这张旧照片，我不禁想起许多美好的回___。
+  options:
+    - 乙
+    - 艺
+    - 亿
+    - 忆
+  correct: 忆
+  source: HenryPark Primary 6 Chinese 2025, Paper 2; PDF pages 13; P6_Chinese_2025_SA2_henrypark.pdf
+- questionID: P6-CH-2025-HenryPark-Q4
+  lessonIds: []
+  question: 在图书馆里，读完书后要记得放回原来的位___。
+  options:
+    - 罪
+    - 宣
+    - 置
+    - 宜
+  correct: 置
+  source: HenryPark Primary 6 Chinese 2025, Paper 2; PDF pages 13; P6_Chinese_2025_SA2_henrypark.pdf
+- questionID: P6-CH-2025-HenryPark-Q5
+  lessonIds:
+    - 2
+  question: 屋顶上的太阳能板，能把阳光___成能源。
+  options:
+    - 制造
+    - 代替
+    - 变化
+    - 转换
+  correct: 转换
+  source: HenryPark Primary 6 Chinese 2025, Paper 2; PDF pages 14; P6_Chinese_2025_SA2_henrypark.pdf
+- questionID: P6-CH-2025-HenryPark-Q6
+  lessonIds: []
+  question: 他原本想上前阻止那个小偷，但后来却因为害怕而___了。
+  options:
+    - 改变
+    - 退缩
+    - 遮盖
+    - 禁止
+  correct: 退缩
+  source: HenryPark Primary 6 Chinese 2025, Paper 2; PDF pages 14; P6_Chinese_2025_SA2_henrypark.pdf
+- questionID: P6-CH-2025-HenryPark-Q9
+  lessonIds: []
+  question: 小明知道赢这场比赛的机会不大，但还是___试一试。
+  options:
+    - 通过
+    - 思考
+    - 打算
+    - 盼望
+  correct: 打算
+  source: HenryPark Primary 6 Chinese 2025, Paper 2; PDF pages 15; P6_Chinese_2025_SA2_henrypark.pdf
+- questionID: P6-CH-2025-MGS-Q3
+  lessonIds: []
+  question: 这次的讲故事比赛，参赛者能以不同的形式来___现故事。
+  options:
+    - 成
+    - 呈
+    - 承
+    - 盛
+  correct: 呈
+  source: MGS Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_mgs.pdf
+- questionID: P6-CH-2025-MGS-Q4
+  lessonIds:
+    - 8
+  question: 六月假期，我和同学___了脚踏车，然后一起骑到东海岸公园。
+  options:
+    - 组
+    - 阻
+    - 租
+    - 祖
+  correct: 租
+  source: MGS Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_mgs.pdf
+- questionID: P6-CH-2025-MGS-Q5
+  lessonIds: []
+  question: 我给老爷爷让座，乘客们向我投来___的目光。
+  options:
+    - 夸奖
+    - 赞许
+    - 称赞
+    - 尊敬
+  correct: 赞许
+  source: MGS Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_mgs.pdf
+- questionID: P6-CH-2025-MGS-Q6
+  lessonIds: []
+  question: 火灾发生后，叔叔捐了一万元帮助灾民，真___啊！
+  options:
+    - 慷慨
+    - 诚实
+    - 亲切
+    - 幽默
+  correct: 慷慨
+  source: MGS Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_mgs.pdf
+- questionID: P6-CH-2025-NanHua-Q3
+  lessonIds: []
+  question: 妈妈煮菜时放了很多盐，太___了。
+  options:
+    - 咸
+    - 减
+    - 喊
+    - 感
+  correct: 咸
+  source: NanHua Primary 6 Chinese 2025, Paper 2; PDF pages 4; P6_Chinese_2025_SA2_nanhua.pdf
+- questionID: P6-CH-2025-NanHua-Q4
+  lessonIds: []
+  question: 古时候，人们认为飞上天空是一个不可能实现的___想。
+  options:
+    - 还
+    - 换
+    - 幻
+    - 欢
+  correct: 幻
+  source: NanHua Primary 6 Chinese 2025, Paper 2; PDF pages 5; P6_Chinese_2025_SA2_nanhua.pdf
+- questionID: P6-CH-2025-NanHua-Q5
+  lessonIds:
+    - 12
+  question: 他已经___地说了对不起，这次的事情就算了吧。
+  options:
+    - 诚恳
+    - 厉害
+    - 慷慨
+    - 幽默
+  correct: 诚恳
+  source: NanHua Primary 6 Chinese 2025, Paper 2; PDF pages 5; P6_Chinese_2025_SA2_nanhua.pdf
+- questionID: P6-CH-2025-NanHua-Q6
+  lessonIds:
+    - 8
+  question: 军人保卫国家，为大家做出了巨大的___。
+  options:
+    - 作用
+    - 贡献
+    - 前途
+    - 意义
+  correct: 贡献
+  source: NanHua Primary 6 Chinese 2025, Paper 2; PDF pages 5; P6_Chinese_2025_SA2_nanhua.pdf
+- questionID: P6-CH-2025-Nanyang-Q3
+  lessonIds: []
+  question: 这部电影百看不厌，我都看了好几___。
+  options:
+    - 扁
+    - 篇
+    - 骗
+    - 遍
+  correct: 遍
+  source: Nanyang Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_nanyang.pdf
+- questionID: P6-CH-2025-Nanyang-Q4
+  lessonIds: []
+  question: 哥哥喜欢旅游，世界各地都有他留下的足___。
+  options:
+    - 记
+    - 迹
+    - 寄
+    - 季
+  correct: 迹
+  source: Nanyang Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_nanyang.pdf
+- questionID: P6-CH-2025-Nanyang-Q5
+  lessonIds:
+    - 2
+    - 12
+  question: 他们家常常邀请邻居一起庆祝节日，___彼此之间的感情。
+  options:
+    - 连续
+    - 增添
+    - 训练
+    - 促进
+  correct: 促进
+  source: Nanyang Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_nanyang.pdf
+- questionID: P6-CH-2025-Nanyang-Q6
+  lessonIds:
+    - 3
+    - 4
+  question: 商品除了满足大家的需求，也要___好，才能热卖。
+  options:
+    - 品德
+    - 技术
+    - 质量
+    - 主意
+  correct: 质量
+  source: Nanyang Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_nanyang.pdf
+- questionID: P6-CH-2025-PLMGS-Q3
+  lessonIds:
+    - 4
+  question: 哥哥正在为明天的测___认真复习，你别打扰他。
+  options:
+    - 险
+    - 捡
+    - 脸
+    - 验
+  correct: 验
+  source: PLMGS Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_mgspayalebar.pdf
+- questionID: P6-CH-2025-PLMGS-Q4
+  lessonIds: []
+  question: 听了丽丽的话，他恍然大___，自己真的错怪了小月。
+  options:
+    - 物
+    - 悟
+    - 雾
+    - 误
+  correct: 悟
+  source: PLMGS Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_mgspayalebar.pdf
+- questionID: P6-CH-2025-PLMGS-Q5
+  lessonIds: []
+  question: 小华生病了，老师让我___他参加比赛。
+  options:
+    - 挑选
+    - 模仿
+    - 交换
+    - 代替
+  correct: 代替
+  source: PLMGS Primary 6 Chinese 2025, Paper 2; PDF pages 9; P6_Chinese_2025_SA2_mgspayalebar.pdf
+- questionID: P6-CH-2025-PLMGS-Q6
+  lessonIds:
+    - 6
+    - 8
+  question: 妈妈出门前___我要好好照顾弟弟。
+  options:
+    - 吩咐
+    - 联系
+    - 唠叨
+    - 讲述
+  correct: 吩咐
+  source: PLMGS Primary 6 Chinese 2025, Paper 2; PDF pages 9; P6_Chinese_2025_SA2_mgspayalebar.pdf
+- questionID: P6-CH-2025-PeiChun-Q3
+  lessonIds: []
+  question: 每天花一点时间锻___，会让身体更健康。
+  options:
+    - 练
+    - 炼
+    - 连
+    - 链
+  correct: 炼
+  source: PeiChun Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_peichun.pdf
+- questionID: P6-CH-2025-PeiChun-Q4
+  lessonIds: []
+  question: 这条裙子的___样很受欢迎，许多人都喜欢它的设计。
+  options:
+    - 宝
+    - 似
+    - 世
+    - 式
+  correct: 式
+  source: PeiChun Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_peichun.pdf
+- questionID: P6-CH-2025-PeiChun-Q5
+  lessonIds:
+    - 1
+  question: 明强的姐姐喜欢阅读，这对明强___了重要的影响。
+  options:
+    - 改变
+    - 充满
+    - 产生
+    - 增添
+  correct: 产生
+  source: PeiChun Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_peichun.pdf
+- questionID: P6-CH-2025-PeiChun-Q6
+  lessonIds: []
+  question: 每次听到爸爸的___，弟弟都会显得不耐烦。
+  options:
+    - 唠叨
+    - 欢呼
+    - 议论
+    - 表扬
+  correct: 唠叨
+  source: PeiChun Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_peichun.pdf
+- questionID: P6-CH-2025-Raffles-Q3
+  lessonIds: []
+  question: 叔叔去爬山，不小心滚下___坡，受伤了。
+  options:
+    - 鞋
+    - 协
+    - 斜
+    - 谐
+  correct: 斜
+  source: Raffles Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_raffles.pdf
+- questionID: P6-CH-2025-Raffles-Q4
+  lessonIds:
+    - 8
+  question: 我看华文书时，总是会把好词好句___下来。
+  options:
+    - 炒
+    - 吵
+    - 钞
+    - 抄
+  correct: 抄
+  source: Raffles Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_raffles.pdf
+- questionID: P6-CH-2025-Raffles-Q5
+  lessonIds:
+    - 6
+    - 8
+  question: 妈妈出门前，___哥哥要认真完成作业。
+  options:
+    - 保证
+    - 盼望
+    - 吩咐
+    - 指定
+  correct: 吩咐
+  source: Raffles Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_raffles.pdf
+- questionID: P6-CH-2025-Raffles-Q6
+  lessonIds: []
+  question: 武术班的队员在舞台上___了精彩的表演。
+  options:
+    - 呈现
+    - 模仿
+    - 表达
+    - 制造
+  correct: 呈现
+  source: Raffles Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_raffles.pdf
+- questionID: P6-CH-2025-RedSwastika-Q3
+  lessonIds: []
+  question: 王叔叔真___害，把黄瓜丝切得跟头发一样细。
+  options:
+    - 力
+    - 历
+    - 厉
+    - 励
+  correct: 厉
+  source: RedSwastika Primary 6 Chinese 2025, Paper 2; PDF pages 10; P6_Chinese_2025_SA2_redswastika.pdf
+- questionID: P6-CH-2025-RedSwastika-Q4
+  lessonIds: []
+  question: 你能___细地跟我说昨天发生的事吗？
+  options:
+    - 祥
+    - 样
+    - 洋
+    - 详
+  correct: 详
+  source: RedSwastika Primary 6 Chinese 2025, Paper 2; PDF pages 10; P6_Chinese_2025_SA2_redswastika.pdf
+- questionID: P6-CH-2025-RedSwastika-Q5
+  lessonIds: []
+  question: 我们一向都___相处，从来没吵过架。
+  options:
+    - 温柔
+    - 和谐
+    - 热情
+    - 耐心
+  correct: 和谐
+  source: RedSwastika Primary 6 Chinese 2025, Paper 2; PDF pages 11; P6_Chinese_2025_SA2_redswastika.pdf
+- questionID: P6-CH-2025-RedSwastika-Q6
+  lessonIds:
+    - 2
+    - 8
+  question: 爸爸妈妈每天辛苦工作，为家庭做出很大的___。
+  options:
+    - 服务
+    - 尝试
+    - 贡献
+    - 努力
+  correct: 贡献
+  source: RedSwastika Primary 6 Chinese 2025, Paper 2; PDF pages 11; P6_Chinese_2025_SA2_redswastika.pdf
+- questionID: P6-CH-2025-Rosyth-Q3
+  lessonIds:
+    - 6
+    - 11
+  question: 远处的山被雾___住了，使人看不清它的样子。
+  options:
+    - 罗
+    - 罚
+    - 罪
+    - 罩
+  correct: 罩
+  source: Rosyth Primary 6 Chinese 2025, Paper 2; PDF pages 3; P6_Chinese_2025_SA2_rosyth.pdf
+- questionID: P6-CH-2025-Rosyth-Q4
+  lessonIds: []
+  question: 这本故事书很受欢迎，出版后被翻___成多种文字。
+  options:
+    - 艺
+    - 译
+    - 易
+    - 异
+  correct: 译
+  source: Rosyth Primary 6 Chinese 2025, Paper 2; PDF pages 3; P6_Chinese_2025_SA2_rosyth.pdf
+- questionID: P6-CH-2025-Rosyth-Q5
+  lessonIds:
+    - 5
+  question: 为了___能源，叔叔选择多走路、少开车。
+  options:
+    - 回收
+    - 获取
+    - 照顾
+    - 节省
+  correct: 节省
+  source: Rosyth Primary 6 Chinese 2025, Paper 2; PDF pages 4; P6_Chinese_2025_SA2_rosyth.pdf
+- questionID: P6-CH-2025-Rosyth-Q6
+  lessonIds: []
+  question: 老师让同学们分组交流阅读___。
+  options:
+    - 建议
+    - 回忆
+    - 心得
+    - 任务
+  correct: 心得
+  source: Rosyth Primary 6 Chinese 2025, Paper 2; PDF pages 4; P6_Chinese_2025_SA2_rosyth.pdf
+- questionID: P6-CH-2025-SCGS-Q3
+  lessonIds: []
+  question: 你千万不要到水深的地方游泳，太危___了！
+  options:
+    - 检
+    - 捡
+    - 验
+    - 险
+  correct: 险
+  source: SCGS Primary 6 Chinese 2025, Paper 2; PDF pages 6; P6_Chinese_2025_SA2_scgs.pdf
+- questionID: P6-CH-2025-SCGS-Q4
+  lessonIds: []
+  question: 为了准备年底的考试，文华制定了一个复习___划。
+  options:
+    - 极
+    - 计
+    - 纪
+    - 寄
+  correct: 计
+  source: SCGS Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_scgs.pdf
+- questionID: P6-CH-2025-SCGS-Q5
+  lessonIds: []
+  question: 我们输了球赛，老师___地说：“不要紧，你们已经尽力了。”
+  options:
+    - 焦急
+    - 严厉
+    - 兴奋
+    - 温柔
+  correct: 温柔
+  source: SCGS Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_scgs.pdf
+- questionID: P6-CH-2025-SCGS-Q6
+  lessonIds: []
+  question: 我们不应该和别人比，要学会___自己拥有的一切。
+  options:
+    - 保护
+    - 珍惜
+    - 贡献
+    - 照顾
+  correct: 珍惜
+  source: SCGS Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_scgs.pdf
+- questionID: P6-CH-2025-StNicholas-Q3
+  lessonIds: []
+  question: 奶奶不喜欢出门，她喜欢___在家里看电视。
+  options:
+    - 等
+    - 诗
+    - 待
+    - 特
+  correct: 待
+  source: StNicholas Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_chij.pdf
+- questionID: P6-CH-2025-StNicholas-Q4
+  lessonIds: []
+  question: 老虎从草丛跳出来，攻___正在喝水的小羊。
+  options:
+    - 击
+    - 积
+    - 基
+    - 激
+  correct: 击
+  source: StNicholas Primary 6 Chinese 2025, Paper 2; PDF pages 7; P6_Chinese_2025_SA2_chij.pdf
+- questionID: P6-CH-2025-StNicholas-Q5
+  lessonIds:
+    - 10
+  question: 我们两人在比赛中___得很好，最后获得了冠军。
+  options:
+    - 配合
+    - 支持
+    - 联系
+    - 团结
+  correct: 配合
+  source: StNicholas Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_chij.pdf
+- questionID: P6-CH-2025-StNicholas-Q6
+  lessonIds:
+    - 4
+    - 7
+  question: 我的邻居很___，他什么东西都会修理。
+  options:
+    - 强壮
+    - 热心
+    - 勤奋
+    - 厉害
+  correct: 厉害
+  source: StNicholas Primary 6 Chinese 2025, Paper 2; PDF pages 8; P6_Chinese_2025_SA2_chij.pdf
+- questionID: P6-CH-2025-TaoNan-Q3
+  lessonIds: []
+  question: 我们应该从小就___养阅读的好习惯。
+  options:
+    - 陪
+    - 培
+    - 倍
+    - 部
+  correct: 培
+  source: TaoNan Primary 6 Chinese 2025, Paper 2; PDF pages 2; P6_Chinese_2025_SA2_taonan.pdf
+- questionID: P6-CH-2025-TaoNan-Q4
+  lessonIds: []
+  question: 表姐___业后就开始找工作，减轻父母的压力。
+  options:
+    - 闭
+    - 避
+    - 毕
+    - 币
+  correct: 毕
+  source: TaoNan Primary 6 Chinese 2025, Paper 2; PDF pages 2; P6_Chinese_2025_SA2_taonan.pdf
+- questionID: P6-CH-2025-TaoNan-Q5
+  lessonIds:
+    - 6
+    - 8
+  question: 健民只顾着玩耍，把妈妈___他做的事给忘了一干二净。
+  options:
+    - 答应
+    - 劝告
+    - 请教
+    - 吩咐
+  correct: 吩咐
+  source: TaoNan Primary 6 Chinese 2025, Paper 2; PDF pages 4; P6_Chinese_2025_SA2_taonan.pdf
+- questionID: P6-CH-2025-TaoNan-Q6
+  lessonIds: []
+  question: 为了___谢意，我制作了一张感谢卡送给邻居王伯伯。
+  options:
+    - 呈现
+    - 促进
+    - 表达
+    - 发扬
+  correct: 表达
+  source: TaoNan Primary 6 Chinese 2025, Paper 2; PDF pages 4; P6_Chinese_2025_SA2_taonan.pdf
+- questionID: P6-CH-AUTHORED-L1-Q03
+  lessonIds:
+    - 1
+  question: 小文原本害怕在众人面前讲话，经过反复练习，终于___了这种恐惧。
+  options:
+    - 保留
+    - 加深
+    - 克服
+    - 制造
+  correct: 克服
+  source: "Original authored P6 practice; Lesson 1; taught vocabulary: 克服."
+- questionID: P6-CH-AUTHORED-L1-Q04
+  lessonIds:
+    - 1
+  question: 弟弟明明有时间，却连自己的床也不愿整理，真是___。
+  options:
+    - 勇敢
+    - 懒惰
+    - 勤劳
+    - 诚实
+  correct: 懒惰
+  source: "Original authored P6 practice; Lesson 1; taught vocabulary: 懒惰."
+- questionID: P6-CH-AUTHORED-L1-Q05
+  lessonIds:
+    - 1
+  question: 这件衣服的颜色很___，红的、黄的，远远就能看见。
+  options:
+    - 鲜艳
+    - 苍白
+    - 灰暗
+    - 透明
+  correct: 鲜艳
+  source: "Original authored P6 practice; Lesson 1; taught vocabulary: 鲜艳."
+- questionID: P6-CH-AUTHORED-L1-Q06
+  lessonIds:
+    - 1
+  question: 小狗在地上挖了一个洞，把骨头___进泥土里。
+  options:
+    - 浮
+    - 挂
+    - 晒
+    - 埋
+  correct: 埋
+  source: "Original authored P6 practice; Lesson 1; taught vocabulary: 埋."
+- questionID: P6-CH-AUTHORED-L2-Q03
+  lessonIds:
+    - 2
+  question: 发现有人受伤后，叔叔马上___救护车的求助电话。
+  options:
+    - 遮盖
+    - 折叠
+    - 拨打
+    - 涂写
+  correct: 拨打
+  source: "Original authored P6 practice; Lesson 2; taught vocabulary: 拨打."
+- questionID: P6-CH-AUTHORED-L2-Q04
+  lessonIds:
+    - 2
+  question: 雨下得很大，小明没有带伞，跑到家时全身都___了。
+  options:
+    - 磨破
+    - 湿透
+    - 晒干
+    - 冻住
+  correct: 湿透
+  source: "Original authored P6 practice; Lesson 2; taught vocabulary: 湿透."
+- questionID: P6-CH-AUTHORED-L2-Q05
+  lessonIds:
+    - 2
+  question: 过马路时，爸爸紧紧___着妹妹的手，免得她乱跑。
+  options:
+    - 牵
+    - 踢
+    - 拍
+    - 抓挠
+  correct: 牵
+  source: "Original authored P6 practice; Lesson 2; taught vocabulary: 牵."
+- questionID: P6-CH-AUTHORED-L3-Q02
+  lessonIds:
+    - 3
+  question: 妈妈不想加油煎鱼，便把鱼放在盘里，用蒸锅___。
+  options:
+    - 烧烤
+    - 腌制
+    - 清蒸
+    - 油炸
+  correct: 清蒸
+  source: "Original authored P6 practice; Lesson 3; taught vocabulary: 清蒸."
+- questionID: P6-CH-AUTHORED-L3-Q03
+  lessonIds:
+    - 3
+  question: 这块猪肉几乎没有脂肪，妈妈说这是___。
+  options:
+    - 鱼皮
+    - 瘦肉
+    - 肥肉
+    - 骨头
+  correct: 瘦肉
+  source: "Original authored P6 practice; Lesson 3; taught vocabulary: 瘦肉."
+- questionID: P6-CH-AUTHORED-L6-Q01
+  lessonIds:
+    - 6
+  question: 电影快开始了，妈妈___还在房里磨蹭的弟弟赶快出门。
+  options:
+    - 催
+    - 夸
+    - 瞒
+    - 躲
+  correct: 催
+  source: "Original authored P6 practice; Lesson 6; taught vocabulary: 催."
+- questionID: P6-CH-AUTHORED-L7-Q04
+  lessonIds:
+    - 7
+  question: 远处那座山___高耸入云，顶上还有积雪。
+  options:
+    - 蜂
+    - 锋
+    - 缝
+    - 峰
+  correct: 峰
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 峰."
+- questionID: P6-CH-AUTHORED-L7-Q05
+  lessonIds:
+    - 7
+  question: 一年有春、夏、秋、冬四___。
+  options:
+    - 秀
+    - 委
+    - 季
+    - 李
+  correct: 季
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 季."
+- questionID: P6-CH-AUTHORED-L7-Q06
+  lessonIds:
+    - 7
+  question: 夏天城市里十分炎热，我们到凉爽的山村___。
+  options:
+    - 避风
+    - 避暑
+    - 避雨
+    - 避难
+  correct: 避暑
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 避暑."
+- questionID: P6-CH-AUTHORED-L7-Q07
+  lessonIds:
+    - 7
+  question: 这座石桥已有几百年的历史，是值得保护的___。
+  options:
+    - 古迹
+    - 新楼
+    - 玩具
+    - 用品
+  correct: 古迹
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 古迹."
+- questionID: P6-CH-AUTHORED-L7-Q08
+  lessonIds:
+    - 7
+  question: 广场的地面很___，没有高低不平的地方。
+  options:
+    - 陡峭
+    - 狭窄
+    - 弯曲
+    - 平坦
+  correct: 平坦
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 平坦."
+- questionID: P6-CH-AUTHORED-L7-Q09
+  lessonIds:
+    - 7
+  question: 下了一夜的雪，白雪___了屋顶，原来的红瓦已经看不见了。
+  options:
+    - 挖开
+    - 照亮
+    - 覆盖
+    - 穿过
+  correct: 覆盖
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 覆盖."
+- questionID: P6-CH-AUTHORED-L7-Q10
+  lessonIds:
+    - 7
+  question: 这杯水放了两匙盐，那杯只放了一匙，因此这杯水的___较高。
+  options:
+    - 水位
+    - 含盐量
+    - 含糖量
+    - 水温
+  correct: 含盐量
+  source: "Original authored P6 practice; Lesson 7; taught vocabulary: 含盐量."
+- questionID: P6-CH-AUTHORED-L9-Q04
+  lessonIds:
+    - 9
+  question: 我们拉着长长的线，让___在空中越飞越高。
+  options:
+    - 陀螺
+    - 风筝
+    - 小船
+    - 皮球
+  correct: 风筝
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 风筝."
+- questionID: P6-CH-AUTHORED-L9-Q05
+  lessonIds:
+    - 9
+  question: 故事中，___坐在龙椅上，听大臣们报告事情。
+  options:
+    - 皇帝
+    - 渔夫
+    - 商人
+    - 农夫
+  correct: 皇帝
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 皇帝."
+- questionID: P6-CH-AUTHORED-L9-Q06
+  lessonIds:
+    - 9
+  question: 端午节的比赛中，队员们一起划桨，使___冲向终点。
+  options:
+    - 马车
+    - 飞机
+    - 电车
+    - 龙舟
+  correct: 龙舟
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 龙舟."
+- questionID: P6-CH-AUTHORED-L9-Q07
+  lessonIds:
+    - 9
+  question: 连续几个月没有下雨，田里的泥土已经___，出现了一道道裂缝。
+  options:
+    - 融化
+    - 结冰
+    - 干裂
+    - 湿润
+  correct: 干裂
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 干裂."
+- questionID: P6-CH-AUTHORED-L9-Q08
+  lessonIds:
+    - 9
+  question: 农田多年无人耕种，渐渐___了，长满了杂草。
+  options:
+    - 成熟
+    - 荒废
+    - 丰收
+    - 发芽
+  correct: 荒废
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 荒废."
+- questionID: P6-CH-AUTHORED-L9-Q09
+  lessonIds:
+    - 9
+  question: 小明根本没有打破花瓶，却被责怪，他是___的。
+  options:
+    - 无辜
+    - 残忍
+    - 贪财
+    - 懒惰
+  correct: 无辜
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 无辜."
+- questionID: P6-CH-AUTHORED-L9-Q10
+  lessonIds:
+    - 9
+  question: 我们先征求老师同意，老师___后，才离开教室。
+  options:
+    - 拒绝
+    - 禁止
+    - 阻止
+    - 允许
+  correct: 允许
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 允许."
+- questionID: P6-CH-AUTHORED-L9-Q11
+  lessonIds:
+    - 9
+  question: 搬了一整天的家具，大家___，连站起来的力气都快没有了。
+  options:
+    - 精神抖擞
+    - 跃跃欲试
+    - 筋疲力尽
+    - 兴高采烈
+  correct: 筋疲力尽
+  source: "Original authored P6 practice; Lesson 9; taught vocabulary: 筋疲力尽."
+- questionID: P6-CH-AUTHORED-L10-Q02
+  lessonIds:
+    - 10
+  question: 请翻到___为二十五的那一页，阅读上面的短文。
+  options:
+    - 页码
+    - 书名
+    - 作者
+    - 封面
+  correct: 页码
+  source: "Original authored P6 practice; Lesson 10; taught vocabulary: 页码."
+- questionID: P6-CH-AUTHORED-L10-Q03
+  lessonIds:
+    - 10
+  question: 他整天没有吃东西，感到十分___，肚子咕咕直叫。
+  options:
+    - 满足
+    - 凉爽
+    - 兴奋
+    - 饥饿
+  correct: 饥饿
+  source: "Original authored P6 practice; Lesson 10; taught vocabulary: 饥饿."
+- questionID: P6-CH-AUTHORED-L11-Q03
+  lessonIds:
+    - 11
+  question: 太阳升起后，浓雾___散去，远处的楼房越来越清楚。
+  options:
+    - 逐渐
+    - 立刻
+    - 从未
+    - 始终
+  correct: 逐渐
+  source: "Original authored P6 practice; Lesson 11; taught vocabulary: 逐渐."
+- questionID: P6-CH-AUTHORED-L11-Q04
+  lessonIds:
+    - 11
+  question: 这艘货船在海上___了好几天，才到达港口。
+  options:
+    - 飞翔
+    - 奔跑
+    - 爬行
+    - 航行
+  correct: 航行
+  source: "Original authored P6 practice; Lesson 11; taught vocabulary: 航行."
+- questionID: P6-CH-AUTHORED-L11-Q05
+  lessonIds:
+    - 11
+  question: 小狗伸出舌头，___掉了碗边的奶汁。
+  options:
+    - 咬断
+    - 抓破
+    - 舔
+    - 啄
+  correct: 舔
+  source: "Original authored P6 practice; Lesson 11; taught vocabulary: 舔."
+- questionID: P6-CH-AUTHORED-L11-Q06
+  lessonIds:
+    - 11
+  question: 面粉加水后，妈妈用双手___成光滑的面团。
+  options:
+    - 撕
+    - 揉
+    - 剪
+    - 砸
+  correct: 揉
+  source: "Original authored P6 practice; Lesson 11; taught vocabulary: 揉."
+- questionID: P6-CH-AUTHORED-L12-Q03
+  lessonIds:
+    - 12
+  question: 舞台上只有姐姐一个人弹钢琴，她正在表演钢琴___。
+  options:
+    - 伴舞
+    - 独奏
+    - 合奏
+    - 合唱
+  correct: 独奏
+  source: "Original authored P6 practice; Lesson 12; taught vocabulary: 独奏."
+- questionID: P6-CH-AUTHORED-L12-Q04
+  lessonIds:
+    - 12
+  question: 教室有点闷，请把窗户___打开一点，不必全部打开。
+  options:
+    - 稍微
+    - 完全
+    - 始终
+    - 不断
+  correct: 稍微
+  source: "Original authored P6 practice; Lesson 12; taught vocabulary: 稍微."
+- questionID: P6-CH-AUTHORED-L12-Q05
+  lessonIds:
+    - 12
+  question: 学书法不能只练习两三天就停下来，需要___才能进步。
+  options:
+    - 贪心
+    - 疑心
+    - 灰心
+    - 恒心
+  correct: 恒心
+  source: "Original authored P6 practice; Lesson 12; taught vocabulary: 恒心."
+- questionID: P6-CH-AUTHORED-B01-Q01
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 为了了解同学们是否掌握了这三个单元，老师明天会进行一次小___。
+  options:
+    - 演出
+    - 测验
+    - 访问
+    - 聚会
+  correct: 测验
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 测验.'
+- questionID: P6-CH-AUTHORED-B01-Q02
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 小杰平时不复习，直到考试前一晚才熬夜读完整本课本，真是___。
+  options:
+    - 精益求精
+    - 未雨绸缪
+    - 循序渐进
+    - 临时抱佛脚
+  correct: 临时抱佛脚
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 临时抱佛脚.'
+- questionID: P6-CH-AUTHORED-B01-Q03
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 正午的阳光十分___，小文只好眯起眼睛，戴上太阳眼镜。
+  options:
+    - 耀眼
+    - 暗淡
+    - 柔和
+    - 微弱
+  correct: 耀眼
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 耀眼.'
+- questionID: P6-CH-AUTHORED-B01-Q04
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 实验失败了十多次，研究小组仍然___，不断改进方法，再次尝试。
+  options:
+    - 半途而废
+    - 得过且过
+    - 不屈不挠
+    - 知难而退
+  correct: 不屈不挠
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 不屈不挠.'
+- questionID: P6-CH-AUTHORED-B01-Q05
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 姐姐拾到钱包后主动交给老师，她诚实的行为值得我们学习，是我们的好___。
+  options:
+    - 对手
+    - 榜样
+    - 观众
+    - 顾客
+  correct: 榜样
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 榜样.'
+- questionID: P6-CH-AUTHORED-B01-Q06
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 盖房子要先打好地基；学习华文也要先掌握常用字词，打好___。
+  options:
+    - 纪录
+    - 主意
+    - 招呼
+    - 基础
+  correct: 基础
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 基础.'
+- questionID: P6-CH-AUTHORED-B01-Q07
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 桌子的一条腿折断了一截，桌面向左___，杯子差点滑下来。
+  options:
+    - 倾斜
+    - 旋转
+    - 升高
+    - 下沉
+  correct: 倾斜
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 倾斜.'
+- questionID: P6-CH-AUTHORED-B01-Q08
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 老师要求大家马上到操场集合，同学们放下手中的东西，___排好了队。
+  options:
+    - 缓慢
+    - 陆续
+    - 迅速
+    - 迟迟
+  correct: 迅速
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 迅速.'
+- questionID: P6-CH-AUTHORED-B01-Q09
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 说明书写着先关电源，图中却画着插头仍插着，小明感到___，不知道该听哪一个。
+  options:
+    - 满足
+    - 疑惑
+    - 自豪
+    - 轻松
+  correct: 疑惑
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 疑惑.'
+- questionID: P6-CH-AUTHORED-B01-Q10
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 小丽身体不舒服，脸色___，连嘴唇也失去了平时的红润。
+  options:
+    - 黝黑
+    - 红润
+    - 通红
+    - 苍白
+  correct: 苍白
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 苍白.'
+- questionID: P6-CH-AUTHORED-B01-Q11
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 小猫身手___，眨眼间就越过矮墙，跳到了树枝上。
+  options:
+    - 敏捷
+    - 笨拙
+    - 僵硬
+    - 迟钝
+  correct: 敏捷
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 敏捷.'
+- questionID: P6-CH-AUTHORED-B01-Q12
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 许多落叶卡在排水口，把通道___了，雨水积在路上流不出去。
+  options:
+    - 疏通
+    - 扩大
+    - 堵塞
+    - 清理
+  correct: 堵塞
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 堵塞.'
+- questionID: P6-CH-AUTHORED-B01-Q12-L11
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 许多落叶卡在排水口，把通道___了，雨水积在路上流不出去。
+  options:
+    - 疏通
+    - 扩大
+    - 堵塞
+    - 清理
+  correct: 堵塞
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 堵塞.'
+- questionID: P6-CH-AUTHORED-B01-Q13
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 弟弟学着爷爷说话的语气，还照着他的样子走路，正在___爷爷。
+  options:
+    - 提醒
+    - 模仿
+    - 安慰
+    - 责备
+  correct: 模仿
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 模仿.'
+- questionID: P6-CH-AUTHORED-B01-Q14
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 村民没有足够的工具，便运用___，想出用竹筒把泉水引到田里的办法。
+  options:
+    - 体力
+    - 运气
+    - 财富
+    - 智慧
+  correct: 智慧
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 智慧.'
+- questionID: P6-CH-AUTHORED-B01-Q14-L06
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 村民没有足够的工具，便运用___，想出用竹筒把泉水引到田里的办法。
+  options:
+    - 体力
+    - 运气
+    - 财富
+    - 智慧
+  correct: 智慧
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 智慧.'
+- questionID: P6-CH-AUTHORED-B01-Q15
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 这双鞋打折后卖三十元，标签上仍写着打折前的___：五十元。
+  options:
+    - 原价
+    - 数量
+    - 尺寸
+    - 重量
+  correct: 原价
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 原价.'
+- questionID: P6-CH-AUTHORED-B01-Q16
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 调色前，小美把颜料搅拌___，让整杯颜料的颜色深浅一致。
+  options:
+    - 整齐
+    - 牢固
+    - 均匀
+    - 顺利
+  correct: 均匀
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 均匀.'
+- questionID: P6-CH-AUTHORED-B01-Q17
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 为了存钱买电脑，小杰减少零食开销，旧文具还能用就不换，一直___。
+  options:
+    - 挥金如土
+    - 省吃俭用
+    - 铺张浪费
+    - 大手大脚
+  correct: 省吃俭用
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 省吃俭用.'
+- questionID: P6-CH-AUTHORED-B01-Q18
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 我本想帮妹妹解开绳结，没想到___把绳子越拉越紧了。
+  options:
+    - 因此
+    - 果然
+    - 同时
+    - 反而
+  correct: 反而
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 反而.'
+- questionID: P6-CH-AUTHORED-B01-Q19
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 美术课上，小玲提出用废瓶盖拼成一幅海底图，老师称赞这个___很新颖。
+  options:
+    - 创意
+    - 规定
+    - 借口
+    - 命令
+  correct: 创意
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 创意.'
+- questionID: P6-CH-AUTHORED-B01-Q20
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 厚厚的外套能___寒风，让身体保持温暖。
+  options:
+    - 招来
+    - 放出
+    - 抵挡
+    - 传递
+  correct: 抵挡
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 抵挡.'
+- questionID: P6-CH-AUTHORED-B01-Q21
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 小杰坚持说自己没有踢球，老师播放了他踢碎窗户的录像，他顿时___，再也说不出辩解的话。
+  options:
+    - 滔滔不绝
+    - 哑口无言
+    - 振振有词
+    - 口若悬河
+  correct: 哑口无言
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 哑口无言.'
+- questionID: P6-CH-AUTHORED-B01-Q22
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 小明把不及格的成绩单藏起来，就以为自己没有考差，这种自欺欺人的做法真是___。
+  options:
+    - 亡羊补牢
+    - 举一反三
+    - 未雨绸缪
+    - 掩耳盗铃
+  correct: 掩耳盗铃
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 掩耳盗铃.'
+- questionID: P6-CH-AUTHORED-B01-Q23
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 故事里的士兵拒绝了敌人给的钱，始终守护自己的国家，表现得十分___。
+  options:
+    - 忠诚
+    - 贪婪
+    - 虚伪
+    - 懦弱
+  correct: 忠诚
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 忠诚.'
+- questionID: P6-CH-AUTHORED-B01-Q24
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 无论敌人从哪条路进攻，这位将军总能想出不同的计策应对，真是___。
+  options:
+    - 束手无策
+    - 一筹莫展
+    - 足智多谋
+    - 黔驴技穷
+  correct: 足智多谋
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 足智多谋.'
+- questionID: P6-CH-AUTHORED-B01-Q25
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 为了让年幼的妹妹坐下休息，姐姐___自己站着，并没有半句怨言。
+  options:
+    - 拒绝
+    - 甘愿
+    - 责怪
+    - 怀疑
+  correct: 甘愿
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 甘愿.'
+- questionID: P6-CH-AUTHORED-B01-Q26
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 故事里的士兵悄悄___在树林里，等敌军进入山谷后才突然现身。
+  options:
+    - 撤退
+    - 巡逻
+    - 集合
+    - 埋伏
+  correct: 埋伏
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 埋伏.'
+- questionID: P6-CH-AUTHORED-B01-Q27
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 暴雨过后，山上的洪水从狭窄的出口___而下，水势十分凶猛。
+  options:
+    - 倾泻
+    - 渗透
+    - 凝固
+    - 蒸发
+  correct: 倾泻
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 倾泻.'
+- questionID: P6-CH-AUTHORED-B01-Q28
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 近处突然响起___的巨响，我们赶紧捂住耳朵，连彼此说话都听不清。
+  options:
+    - 轻柔悦耳
+    - 若有若无
+    - 震耳欲聋
+    - 细声细气
+  correct: 震耳欲聋
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 震耳欲聋.'
+- questionID: P6-CH-AUTHORED-B01-Q29
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 花园里处处都有美丽的景色，我们逛了很久仍舍不得离开，真是___。
+  options:
+    - 归心似箭
+    - 流连忘返
+    - 兴味索然
+    - 大失所望
+  correct: 流连忘返
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 流连忘返.'
+- questionID: P6-CH-AUTHORED-B01-Q30
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 阅读能增长知识、开阔眼界，对我们有许多___。
+  options:
+    - 损失
+    - 麻烦
+    - 限制
+    - 益处
+  correct: 益处
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 益处.'
+- questionID: P6-CH-AUTHORED-B01-Q31
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 听完爷爷提出的问题，小文没有马上回答，而是___地望着窗外，像在琢磨什么。
+  options:
+    - 若有所思
+    - 手舞足蹈
+    - 怒气冲冲
+    - 惊慌失措
+  correct: 若有所思
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 若有所思.'
+- questionID: P6-CH-AUTHORED-B01-Q32
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 故事里的小动物不用担心食物，也没有危险，每天___地在草地上玩耍。
+  options:
+    - 提心吊胆
+    - 忧心忡忡
+    - 无忧无虑
+    - 愁眉苦脸
+  correct: 无忧无虑
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 无忧无虑.'
+- questionID: P6-CH-AUTHORED-B01-Q33
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 弟弟捧着故事书读得___，连最喜欢的电视节目开始了也不愿放下书。
+  options:
+    - 心不在焉
+    - 津津有味
+    - 索然无味
+    - 不耐烦
+  correct: 津津有味
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 津津有味.'
+- questionID: P6-CH-AUTHORED-B01-Q34
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 花瓶其实是小猫碰倒的，爸爸却责怪妹妹，妹妹委屈地说：“您___我了！”
+  options:
+    - 表扬
+    - 提醒
+    - 安慰
+    - 冤枉
+  correct: 冤枉
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 冤枉.'
+- questionID: P6-CH-AUTHORED-B01-Q35
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 台风过后，村庄___了严重的损失，许多房屋都被毁坏了。
+  options:
+    - 遭受
+    - 获得
+    - 提供
+    - 创造
+  correct: 遭受
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 遭受.'
+- questionID: P6-CH-AUTHORED-B01-Q36
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 大家指出这个办法行不通，他仍然___地坚持己见，怎么劝也不肯改变。
+  options:
+    - 谦虚
+    - 灵活
+    - 固执
+    - 随和
+  correct: 固执
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 固执.'
+- questionID: P6-CH-AUTHORED-B01-Q37
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 连日大雨使河水暴涨，汹涌的洪水___了河上的木桥。
+  options:
+    - 修建
+    - 冲毁
+    - 加固
+    - 架起
+  correct: 冲毁
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 冲毁.'
+- questionID: P6-CH-AUTHORED-B01-Q38
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 小鸟被细网缠住了，不停地拍打翅膀___，想挣脱出来。
+  options:
+    - 歇息
+    - 盘旋
+    - 滑翔
+    - 挣扎
+  correct: 挣扎
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 挣扎.'
+- questionID: P6-CH-AUTHORED-B01-Q39
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 小华想知道哪一页介绍海豚，便翻到书前面的___，查找章节和页码。
+  options:
+    - 目录
+    - 封面
+    - 书签
+    - 插图
+  correct: 目录
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 目录.'
+- questionID: P6-CH-AUTHORED-B01-Q40
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 为了让只懂华文的弟弟看懂这篇英文故事，姐姐把它___成华文。
+  options:
+    - 朗读
+    - 抄写
+    - 翻译
+    - 背诵
+  correct: 翻译
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 翻译.'
+- questionID: P6-CH-AUTHORED-B01-Q41
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 小美___地观察显微镜里的标本，连有人叫她也没有察觉。
+  options:
+    - 三心二意
+    - 全神贯注
+    - 东张西望
+    - 心不在焉
+  correct: 全神贯注
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 全神贯注.'
+- questionID: P6-CH-AUTHORED-B01-Q42
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 图书馆正在维修，___停止开放，下星期修好后就会重新开放。
+  options:
+    - 永久
+    - 始终
+    - 一直
+    - 暂时
+  correct: 暂时
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 暂时.'
+- questionID: P6-CH-AUTHORED-B01-Q43
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 救援人员为了找到失踪的孩子，在树林里仔细___，连草丛也没有放过。
+  options:
+    - 搜索
+    - 参观
+    - 欣赏
+    - 种植
+  correct: 搜索
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 搜索.'
+- questionID: P6-CH-AUTHORED-B01-Q44
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 图书馆里，两名同学靠近彼此的耳边___，只有他们自己听得见。
+  options:
+    - 高声朗读
+    - 大声争吵
+    - 窃窃私语
+    - 放声歌唱
+  correct: 窃窃私语
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 窃窃私语.'
+- questionID: P6-CH-AUTHORED-B01-Q45
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 比赛输了，小杰___地走回座位，低着头，一句话也不想说。
+  options:
+    - 兴高采烈
+    - 垂头丧气
+    - 神采飞扬
+    - 欢天喜地
+  correct: 垂头丧气
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 垂头丧气.'
+- questionID: P6-CH-AUTHORED-B01-Q46
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 为了留到雨季食用，村民把晒干的粮食___在干燥的仓库里。
+  options:
+    - 分发
+    - 丢弃
+    - 消耗
+    - 储存
+  correct: 储存
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 储存.'
+- questionID: P6-CH-AUTHORED-B01-Q47
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 出门前，妈妈再三___我过马路要小心，还细心地提醒我带好水壶。
+  options:
+    - 嘱咐
+    - 责骂
+    - 讥笑
+    - 埋怨
+  correct: 嘱咐
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 嘱咐.'
+- questionID: P6-CH-AUTHORED-B01-Q48
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 看见姐姐能弹出那么动听的曲子，小文十分___，希望自己有一天也能做到。
+  options:
+    - 厌恶
+    - 轻视
+    - 羡慕
+    - 怀疑
+  correct: 羡慕
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 羡慕.'
+- questionID: P6-CH-AUTHORED-B01-Q49
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 我们把柜子的每个角落都清理了一遍，连缝里的灰尘也擦掉了，清洁得很___。
+  options:
+    - 随便
+    - 彻底
+    - 勉强
+    - 马虎
+  correct: 彻底
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 彻底.'
+- questionID: P6-CH-AUTHORED-B01-Q50
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 小杰一边做作业，一边___：“为什么每天都有这么多作业？真烦！”
+  options:
+    - 称赞
+    - 鼓励
+    - 感谢
+    - 抱怨
+  correct: 抱怨
+  source: 'Original authored P6 practice; parent-reviewed batch 1; taught vocabulary: 抱怨.'
+- questionID: P6-CH-AUTHORED-B02-Q001
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 昨晚睡着后，我做了一个会飞的___；早上醒来，才知道那不是真的。
+  options:
+    - 计划
+    - 愿望
+    - 梦
+    - 决定
+  correct: 梦
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 梦.'
+- questionID: P6-CH-AUTHORED-B02-Q002
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 门虽然关上了，门板与门框之间仍留着一道___，冷风从那里吹了进来。
+  options:
+    - 缝
+    - 线
+    - 印
+    - 影
+  correct: 缝
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 缝.'
+- questionID: P6-CH-AUTHORED-B02-Q003
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: ___学校假期，爷爷都会带我去公园；这已经成了我们多年的习惯。
+  options:
+    - 直到
+    - 自从
+    - 尽管
+    - 每逢
+  correct: 每逢
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 每逢.'
+- questionID: P6-CH-AUTHORED-B02-Q004
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 妹妹怕小碗掉下来，张开手掌，从碗底把它___住。
+  options:
+    - 拧
+    - 托
+    - 夹
+    - 拽
+  correct: 托
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 托.'
+- questionID: P6-CH-AUTHORED-B02-Q004-L07
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 妹妹怕小碗掉下来，张开手掌，从碗底把它___住。
+  options:
+    - 拧
+    - 托
+    - 夹
+    - 拽
+  correct: 托
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 托.'
+- questionID: P6-CH-AUTHORED-B02-Q005
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 舞者举手投足都轻柔舒展，动作十分___，像一只缓缓展翅的天鹅。
+  options:
+    - 僵硬
+    - 优雅
+    - 粗鲁
+    - 笨拙
+  correct: 优雅
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 优雅.'
+- questionID: P6-CH-AUTHORED-B02-Q006
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 种下的小树长出了许多根，牢牢伸进泥土，已经在这里___了。
+  options:
+    - 发芽
+    - 开花
+    - 结果
+    - 扎根
+  correct: 扎根
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 扎根.'
+- questionID: P6-CH-AUTHORED-B02-Q007
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 刚长出的幼苗茎又细又软，十分___，一阵小风就把它吹弯了。
+  options:
+    - 柔弱
+    - 粗壮
+    - 坚硬
+    - 结实
+  correct: 柔弱
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 柔弱.'
+- questionID: P6-CH-AUTHORED-B02-Q008
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 天空突然下起___，雨点又大又密，短短几分钟，路面就积满了水。
+  options:
+    - 细雨
+    - 小雨
+    - 暴雨
+    - 毛毛雨
+  correct: 暴雨
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 暴雨.'
+- questionID: P6-CH-AUTHORED-B02-Q008-L09
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 天空突然下起___，雨点又大又密，短短几分钟，路面就积满了水。
+  options:
+    - 细雨
+    - 小雨
+    - 暴雨
+    - 毛毛雨
+  correct: 暴雨
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 暴雨.'
+- questionID: P6-CH-AUTHORED-B02-Q009
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 受伤后，小勇没有被困难打倒，仍然___地面对康复训练，一次次努力站起来。
+  options:
+    - 胆怯
+    - 脆弱
+    - 消极
+    - 坚强
+  correct: 坚强
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 坚强.'
+- questionID: P6-CH-AUTHORED-B02-Q010
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 山上狂风不断，大雨不停，天气十分___，登山活动只好取消。
+  options:
+    - 宜人
+    - 温和
+    - 恶劣
+    - 晴朗
+  correct: 恶劣
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 恶劣.'
+- questionID: P6-CH-AUTHORED-B02-Q011
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 姐姐没有请别人代画，而是___自己的本领完成了这幅作品。
+  options:
+    - 替
+    - 凭
+    - 向
+    - 跟
+  correct: 凭
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 凭.'
+- questionID: P6-CH-AUTHORED-B02-Q012
+  subject: Chinese
+  lessonIds:
+    - 1
+  question: 训练再辛苦，他也坚持到底；这种不轻易动摇的___让教练十分佩服。
+  options:
+    - 意志
+    - 消息
+    - 习惯
+    - 兴趣
+  correct: 意志
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 意志.'
+- questionID: P6-CH-AUTHORED-B02-Q013
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 爷爷牵着孙女到公园散步，这对___一路有说有笑。
+  options:
+    - 祖孙
+    - 父女
+    - 兄妹
+    - 夫妻
+  correct: 祖孙
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 祖孙.'
+- questionID: P6-CH-AUTHORED-B02-Q014
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 小玲从不占别人的便宜，还主动帮助有需要的人，这些都是值得学习的___。
+  options:
+    - 缺点
+    - 美德
+    - 借口
+    - 本领
+  correct: 美德
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 美德.'
+- questionID: P6-CH-AUTHORED-B02-Q015
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 爸爸、妈妈和孩子们组成了一个___，大家一起分担家务，互相关心。
+  options:
+    - 班级
+    - 社团
+    - 家庭
+    - 队伍
+  correct: 家庭
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 家庭.'
+- questionID: P6-CH-AUTHORED-B02-Q016
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 爸爸拿出___，在屏幕上打开地图软件，查找前往图书馆的路线。
+  options:
+    - 计算器
+    - 手电筒
+    - 收音机
+    - 智能手机
+  correct: 智能手机
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 智能手机.'
+- questionID: P6-CH-AUTHORED-B02-Q017
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 小兔子后腿一用力，向前一___，就跳过了小水沟。
+  options:
+    - 爬
+    - 滚
+    - 蹦
+    - 滑
+  correct: 蹦
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 蹦.'
+- questionID: P6-CH-AUTHORED-B02-Q018
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 奶奶走得慢，姐姐把自己的手臂穿过奶奶的臂弯，亲热地___着她一起走。
+  options:
+    - 挽
+    - 背
+    - 推
+    - 抱
+  correct: 挽
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 挽.'
+- questionID: P6-CH-AUTHORED-B02-Q019
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 地上有个水洼，我没看见，一脚___了进去，鞋袜全湿了。
+  options:
+    - 抓
+    - 踢
+    - 扔
+    - 踩
+  correct: 踩
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 踩.'
+- questionID: P6-CH-AUTHORED-B02-Q020
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 乌云挡住了阳光，远处的楼房也看不清，天空显得___的。
+  options:
+    - 红彤彤
+    - 灰蒙蒙
+    - 金灿灿
+    - 蓝湛湛
+  correct: 灰蒙蒙
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 灰蒙蒙.'
+- questionID: P6-CH-AUTHORED-B02-Q021
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 相框左边高、右边低，明显挂___了，我赶紧把它扶正。
+  options:
+    - 满
+    - 歪
+    - 空
+    - 紧
+  correct: 歪
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 歪.'
+- questionID: P6-CH-AUTHORED-B02-Q022
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 看见孙子捧着生日卡片，奶奶___地接过来，嘴角上扬，眼睛弯成了两条细线。
+  options:
+    - 气冲冲
+    - 泪汪汪
+    - 冷冰冰
+    - 笑眯眯
+  correct: 笑眯眯
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 笑眯眯.'
+- questionID: P6-CH-AUTHORED-B02-Q023
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 一直不会游泳的弟弟竟然游完了全程，我十分___，几乎不敢相信自己的眼睛。
+  options:
+    - 惊讶
+    - 厌烦
+    - 失望
+    - 平静
+  correct: 惊讶
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 惊讶.'
+- questionID: P6-CH-AUTHORED-B02-Q024
+  subject: Chinese
+  lessonIds:
+    - 2
+  question: 这件上衣被雨淋湿了，妈妈让我___一件干的再出门。
+  options:
+    - 补
+    - 洗
+    - 换
+    - 叠
+  correct: 换
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 换.'
+- questionID: P6-CH-AUTHORED-B02-Q025
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 饼干一咬就碎，还发出清楚的咔嚓声，口感十分___。
+  options:
+    - 软
+    - 韧
+    - 黏
+    - 脆
+  correct: 脆
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 脆.'
+- questionID: P6-CH-AUTHORED-B02-Q026
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 爸爸把面糊送进专用的电热炉，让干热的空气把蛋糕___熟。
+  options:
+    - 蒸
+    - 煮
+    - 烤
+    - 煎
+  correct: 烤
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 烤.'
+- questionID: P6-CH-AUTHORED-B02-Q027
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 妈妈把豌豆长出的嫩茎和嫩叶炒成一盘菜，这盘菜用的是___。
+  options:
+    - 豆腐
+    - 豆苗
+    - 豆浆
+    - 豆干
+  correct: 豆苗
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 豆苗.'
+- questionID: P6-CH-AUTHORED-B02-Q028
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 妈妈在平底锅里放少量油，把鸡蛋摊开，___到两面金黄。
+  options:
+    - 煎
+    - 炖
+    - 蒸
+    - 煮
+  correct: 煎
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 煎.'
+- questionID: P6-CH-AUTHORED-B02-Q029
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 活动结束后，书店免费___每位参加者一本小册子，不需要付钱。
+  options:
+    - 赠送
+    - 出售
+    - 租借
+    - 回收
+  correct: 赠送
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 赠送.'
+- questionID: P6-CH-AUTHORED-B02-Q030
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 这碗汤加了醋和胡椒，喝起来又酸又辣，原来是一碗___。
+  options:
+    - 绿豆汤
+    - 酸辣汤
+    - 玉米汤
+    - 红豆汤
+  correct: 酸辣汤
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 酸辣汤.'
+- questionID: P6-CH-AUTHORED-B02-Q031
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 奶奶用盐把芥菜腌好，放进罐子里保存，做成了___。
+  options:
+    - 生菜
+    - 甜菜
+    - 咸菜
+    - 白菜
+  correct: 咸菜
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 咸菜.'
+- questionID: P6-CH-AUTHORED-B02-Q032
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 妈妈把米和较多的水慢慢熬煮，煮成一锅稠稠的___。
+  options:
+    - 米饭
+    - 面条
+    - 馒头
+    - 粥
+  correct: 粥
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 粥.'
+- questionID: P6-CH-AUTHORED-B02-Q033
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 他长期在实验室研究植物的生长规律，通过实验寻找答案，是一位___。
+  options:
+    - 售货员
+    - 驾驶员
+    - 科学家
+    - 运动员
+  correct: 科学家
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 科学家.'
+- questionID: P6-CH-AUTHORED-B02-Q034
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 全班三十人中，只有小文缺席；___小文，其余二十九人都到齐了。
+  options:
+    - 除了
+    - 由于
+    - 随着
+    - 为了
+  correct: 除了
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 除了.'
+- questionID: P6-CH-AUTHORED-B02-Q035
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 我喜欢许多球类运动，___篮球、足球和乒乓球。
+  options:
+    - 因此
+    - 然而
+    - 否则
+    - 例如
+  correct: 例如
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 例如.'
+- questionID: P6-CH-AUTHORED-B02-Q036
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 箱子很重，小杰双手抓牢，把全身的力气都用上，___往上提。
+  options:
+    - 随意
+    - 使劲
+    - 轻轻
+    - 悄悄
+  correct: 使劲
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 使劲.'
+- questionID: P6-CH-AUTHORED-B02-Q037
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 这块石头非常___，用手怎么压也压不出凹痕。
+  options:
+    - 软
+    - 硬
+    - 松
+    - 黏
+  correct: 硬
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 硬.'
+- questionID: P6-CH-AUTHORED-B02-Q038
+  subject: Chinese
+  lessonIds:
+    - 3
+  question: 这位医生一生救助无数病人，为人类作出了___的贡献，受到大家敬仰。
+  options:
+    - 微小
+    - 平凡
+    - 有限
+    - 伟大
+  correct: 伟大
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 伟大.'
+- questionID: P6-CH-AUTHORED-B02-Q039
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 家具太大，我们搬不回家，便请商店安排工人明天下午___上门。
+  options:
+    - 送货
+    - 收款
+    - 退货
+    - 订货
+  correct: 送货
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 送货.'
+- questionID: P6-CH-AUTHORED-B02-Q040
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 同款笔在别处卖五元，这里只卖一元，价格真___。
+  options:
+    - 昂贵
+    - 高昂
+    - 便宜
+    - 不菲
+  correct: 便宜
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 便宜.'
+- questionID: P6-CH-AUTHORED-B02-Q041
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 这家商店主要___书包和文具，顾客可以在这里购买这些用品。
+  options:
+    - 修理
+    - 租用
+    - 回收
+    - 销售
+  correct: 销售
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 销售.'
+- questionID: P6-CH-AUTHORED-B02-Q042
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 弟弟把玩具车摔在地上，轮子断了，车子已经___，不能再正常行驶。
+  options:
+    - 修复
+    - 保养
+    - 损坏
+    - 更新
+  correct: 损坏
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 损坏.'
+- questionID: P6-CH-AUTHORED-B02-Q043
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 脚踏车的链条掉了，爸爸拿来工具___，直到它能正常转动。
+  options:
+    - 拆除
+    - 修理
+    - 收藏
+    - 丢弃
+  correct: 修理
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 修理.'
+- questionID: P6-CH-AUTHORED-B02-Q044
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 周末我们不急着买东西，只想在商场里___，看看各家店铺。
+  options:
+    - 逛
+    - 挤
+    - 跑
+    - 搬
+  correct: 逛
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 逛.'
+- questionID: P6-CH-AUTHORED-B02-Q045
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 我刚去了一___图书馆，来回花了半小时。
+  options:
+    - 趟
+    - 幅
+    - 篇
+    - 粒
+  correct: 趟
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 趟.'
+- questionID: P6-CH-AUTHORED-B02-Q046
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 身后突然传来一声巨响，小杰___回头，动作快得把旁边的人吓了一跳。
+  options:
+    - 缓缓
+    - 猛然
+    - 渐渐
+    - 始终
+  correct: 猛然
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 猛然.'
+- questionID: P6-CH-AUTHORED-B02-Q047
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 面对顾客的询问，店员始终耐心解答，服务___十分友善。
+  options:
+    - 数量
+    - 价格
+    - 态度
+    - 距离
+  correct: 态度
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 态度.'
+- questionID: P6-CH-AUTHORED-B02-Q048
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 这只杯子既没有特别的图案，也没有特殊功能，只是一只很___的杯子。
+  options:
+    - 独特
+    - 罕见
+    - 奇异
+    - 普通
+  correct: 普通
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 普通.'
+- questionID: P6-CH-AUTHORED-B02-Q049
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 外面终于停雨了，我们___天还没黑，赶紧步行回家。
+  options:
+    - 被
+    - 向
+    - 趁
+    - 把
+  correct: 趁
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 趁.'
+- questionID: P6-CH-AUTHORED-B02-Q050
+  subject: Chinese
+  lessonIds:
+    - 4
+  question: 老奶奶亲切地摸着孩子的头，脸上带着___的笑容。
+  options:
+    - 慈祥
+    - 严厉
+    - 冷漠
+    - 凶狠
+  correct: 慈祥
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 慈祥.'
+- questionID: P6-CH-AUTHORED-B02-Q051
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 这两本书都很有趣，但我只能借一本，所以必须从中___一本带回家。
+  options:
+    - 归还
+    - 出版
+    - 交换
+    - 选择
+  correct: 选择
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 选择.'
+- questionID: P6-CH-AUTHORED-B02-Q052
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 遇到分歧时，我们没有争吵，而是用讨论的___解决问题。
+  options:
+    - 地点
+    - 方式
+    - 日期
+    - 数量
+  correct: 方式
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 方式.'
+- questionID: P6-CH-AUTHORED-B02-Q053
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 这块肉的脂肪很厚，白色的部分比瘦肉还多，实在太___了。
+  options:
+    - 瘦
+    - 肥
+    - 硬
+    - 柴
+  correct: 肥
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 肥.'
+- questionID: P6-CH-AUTHORED-B02-Q054
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 明明是小杰打破了杯子，他却说自己没有碰过，显然是在___。
+  options:
+    - 道歉
+    - 认错
+    - 作证
+    - 说谎
+  correct: 说谎
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 说谎.'
+- questionID: P6-CH-AUTHORED-B02-Q055
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 天气有些凉，奶奶没有把手伸进袖子，只把外套___在肩上。
+  options:
+    - 披
+    - 挂
+    - 塞
+    - 绑
+  correct: 披
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 披.'
+- questionID: P6-CH-AUTHORED-B02-Q056
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 妈妈打开___的柜门，把小说和字典按类别放到里面的各层架子上。
+  options:
+    - 冰箱
+    - 鞋柜
+    - 书橱
+    - 衣橱
+  correct: 书橱
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 书橱.'
+- questionID: P6-CH-AUTHORED-B02-Q057
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 雨后阳光穿过水滴，天空出现了一道弯弯的___，有红、橙、黄等颜色。
+  options:
+    - 闪电
+    - 乌云
+    - 白雾
+    - 彩虹
+  correct: 彩虹
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 彩虹.'
+- questionID: P6-CH-AUTHORED-B02-Q058
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 这把刀的刀刃十分___，轻轻一切就把纸切开了。
+  options:
+    - 圆滑
+    - 迟钝
+    - 锐利
+    - 柔软
+  correct: 锐利
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 锐利.'
+- questionID: P6-CH-AUTHORED-B02-Q059
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 故事里的商人一心想把别人的钱据为己有，连孤儿的钱也不放过，十分___。
+  options:
+    - 慷慨
+    - 贪财
+    - 节俭
+    - 诚实
+  correct: 贪财
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 贪财.'
+- questionID: P6-CH-AUTHORED-B02-Q060
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 工人举起铁锤，用力把旧砖___，地上只剩下一块块碎片。
+  options:
+    - 砸碎
+    - 磨平
+    - 拼好
+    - 擦净
+  correct: 砸碎
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 砸碎.'
+- questionID: P6-CH-AUTHORED-B02-Q061
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 活动当天才发现忘了订场地，食物也没准备好，情况真___。
+  options:
+    - 糟糕
+    - 理想
+    - 顺利
+    - 圆满
+  correct: 糟糕
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 糟糕.'
+- questionID: P6-CH-AUTHORED-B02-Q061-L10
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 活动当天才发现忘了订场地，食物也没准备好，情况真___。
+  options:
+    - 糟糕
+    - 理想
+    - 顺利
+    - 圆满
+  correct: 糟糕
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 糟糕.'
+- questionID: P6-CH-AUTHORED-B02-Q062
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 突如其来的巨响让妹妹很不舒服，她立刻用双手___耳朵。
+  options:
+    - 竖起
+    - 捂住
+    - 拉长
+    - 贴近
+  correct: 捂住
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 捂住.'
+- questionID: P6-CH-AUTHORED-B02-Q063
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 面条煮熟后，妈妈用漏勺把它们从水里___出来，再放进碗中。
+  options:
+    - 撒
+    - 倒
+    - 捞
+    - 挤
+  correct: 捞
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 捞.'
+- questionID: P6-CH-AUTHORED-B02-Q064
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 虽然有人笑他的衣服旧，小文却___，仍然开开心心地和大家玩。
+  options:
+    - 耿耿于怀
+    - 闷闷不乐
+    - 忧心忡忡
+    - 毫不在意
+  correct: 毫不在意
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 毫不在意.'
+- questionID: P6-CH-AUTHORED-B02-Q065
+  subject: Chinese
+  lessonIds:
+    - 5
+  question: 听到老师喊“马上停下”，小杰___停止了动作，没有再等一秒。
+  options:
+    - 逐渐
+    - 偶尔
+    - 立即
+    - 迟迟
+  correct: 立即
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 立即.'
+- questionID: P6-CH-AUTHORED-B02-Q066
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 这位工程师的成就远远超过同行，屡次获得重要奖项，是一位___的人才。
+  options:
+    - 杰出
+    - 平庸
+    - 普通
+    - 无能
+  correct: 杰出
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 杰出.'
+- questionID: P6-CH-AUTHORED-B02-Q067
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 班上有三十名同学，这里有三十五个面包，数量___大家每人吃一个。
+  options:
+    - 欠
+    - 少
+    - 缺
+    - 够
+  correct: 够
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 够.'
+- questionID: P6-CH-AUTHORED-B02-Q068
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 小杰故意破坏学校的桌椅，老师按校规处理，他因此___，要负责清理和赔偿。
+  options:
+    - 获奖
+    - 受罚
+    - 受邀
+    - 晋级
+  correct: 受罚
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 受罚.'
+- questionID: P6-CH-AUTHORED-B02-Q069
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 弟弟已经明确说不愿交出玩具，哥哥却堵住门，不让他走，硬___他交出来。
+  options:
+    - 请
+    - 逼
+    - 劝
+    - 陪
+  correct: 逼
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 逼.'
+- questionID: P6-CH-AUTHORED-B02-Q070
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 故事里的盗贼多次偷取财物，被认定犯了偷窃___。
+  options:
+    - 功
+    - 奖
+    - 福
+    - 罪
+  correct: 罪
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 罪.'
+- questionID: P6-CH-AUTHORED-B02-Q071
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 清晨，地面附近的小水滴聚在空气中，形成白茫茫的___，近处的树也变得模模糊糊。
+  options:
+    - 雾
+    - 雪
+    - 沙
+    - 烟
+  correct: 雾
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 雾.'
+- questionID: P6-CH-AUTHORED-B02-Q072
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 箱子怕在运输途中散开，爸爸用一根___把它牢牢绑住。
+  options:
+    - 尺子
+    - 钉子
+    - 绳子
+    - 筷子
+  correct: 绳子
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 绳子.'
+- questionID: P6-CH-AUTHORED-B02-Q073
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 将军下令立刻出发，士兵回答：“___！”随后按命令行动。
+  options:
+    - 再见
+    - 恭喜
+    - 抱歉
+    - 遵命
+  correct: 遵命
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 遵命.'
+- questionID: P6-CH-AUTHORED-B02-Q074
+  subject: Chinese
+  lessonIds:
+    - 6
+  question: 运动员拉满弓，把箭朝靶子的中心___了出去。
+  options:
+    - 踢
+    - 扛
+    - 射
+    - 拧
+  correct: 射
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 射.'
+- questionID: P6-CH-AUTHORED-B02-Q075
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 河水流到悬崖边，向下落成一道高高的水帘，形成了壮观的___。
+  options:
+    - 湖泊
+    - 瀑布
+    - 池塘
+    - 溪流
+  correct: 瀑布
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 瀑布.'
+- questionID: P6-CH-AUTHORED-B02-Q076
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 栏架挡在前方，运动员抬高腿，___了栏架，脚没有碰到它。
+  options:
+    - 跨越
+    - 绕行
+    - 穿透
+    - 退让
+  correct: 跨越
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 跨越.'
+- questionID: P6-CH-AUTHORED-B02-Q077
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 远处一座座山峰连成很长的一列，组成了一条___。
+  options:
+    - 山脉
+    - 平原
+    - 盆地
+    - 河流
+  correct: 山脉
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 山脉.'
+- questionID: P6-CH-AUTHORED-B02-Q078
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 爷爷喜欢阅读，不但白天读书，___连等巴士时也拿着一本书。
+  options:
+    - 但是
+    - 甚至
+    - 否则
+    - 由于
+  correct: 甚至
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 甚至.'
+- questionID: P6-CH-AUTHORED-B02-Q079
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 妹妹很想参观画展，___很高，一进展厅就开心地看起每幅画。
+  options:
+    - 费用
+    - 距离
+    - 兴致
+    - 音量
+  correct: 兴致
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 兴致.'
+- questionID: P6-CH-AUTHORED-B02-Q080
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 弟弟摔伤了腿，医生检查后为他___伤口，消毒并包扎。
+  options:
+    - 研究
+    - 记录
+    - 欣赏
+    - 治疗
+  correct: 治疗
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 治疗.'
+- questionID: P6-CH-AUTHORED-B02-Q081
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 医生检查了病人的症状，想确定他究竟患了哪一种___。
+  options:
+    - 药物
+    - 习惯
+    - 疾病
+    - 职业
+  correct: 疾病
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 疾病.'
+- questionID: P6-CH-AUTHORED-B02-Q082
+  subject: Chinese
+  lessonIds:
+    - 7
+  question: 还没走进厨房，我就闻到一___浓浓的饭菜香味。
+  options:
+    - 股
+    - 幅
+    - 枚
+    - 条
+  correct: 股
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 股.'
+- questionID: P6-CH-AUTHORED-B02-Q083
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 展厅的墙上挂着一___山水画，画中的瀑布十分生动。
+  options:
+    - 首
+    - 篇
+    - 座
+    - 幅
+  correct: 幅
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 幅.'
+- questionID: P6-CH-AUTHORED-B02-Q084
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 姐姐利用假期打工，靠自己的劳动___，支付买书的费用。
+  options:
+    - 借钱
+    - 赚钱
+    - 赔钱
+    - 花钱
+  correct: 赚钱
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 赚钱.'
+- questionID: P6-CH-AUTHORED-B02-Q085
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 虽然旅行已经过去半年，那里美丽的景色仍让我记忆深刻，给我留下了难忘的___。
+  options:
+    - 任务
+    - 印象
+    - 消息
+    - 建议
+  correct: 印象
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 印象.'
+- questionID: P6-CH-AUTHORED-B02-Q086
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 这座二十层的___设有许多办公室，员工每天乘电梯上下楼。
+  options:
+    - 亭子
+    - 帐篷
+    - 茅屋
+    - 大厦
+  correct: 大厦
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 大厦.'
+- questionID: P6-CH-AUTHORED-B02-Q087
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 教室之间有一条长长的___，同学们沿着它走到楼梯口。
+  options:
+    - 走廊
+    - 阳台
+    - 操场
+    - 屋顶
+  correct: 走廊
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 走廊.'
+- questionID: P6-CH-AUTHORED-B02-Q088
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 奶奶提着一个用竹条编成的___，把买好的水果放进去。
+  options:
+    - 纸箱
+    - 铁桶
+    - 竹篮
+    - 布袋
+  correct: 竹篮
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 竹篮.'
+- questionID: P6-CH-AUTHORED-B02-Q089
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 工人把木板绑在绳子上，从楼上拉绳，把木板___到二楼。
+  options:
+    - 扛
+    - 滚
+    - 踢
+    - 吊
+  correct: 吊
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 吊.'
+- questionID: P6-CH-AUTHORED-B02-Q090
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 市场里没有店面的小贩，在路边摆了一个卖水果的___。
+  options:
+    - 仓库
+    - 工厂
+    - 摊子
+    - 车间
+  correct: 摊子
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 摊子.'
+- questionID: P6-CH-AUTHORED-B02-Q091
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 我们搬家时，住在隔壁和附近的___都来帮忙，大家相处得很融洽。
+  options:
+    - 远方亲戚
+    - 左邻右舍
+    - 外地游客
+    - 陌生顾客
+  correct: 左邻右舍
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 左邻右舍.'
+- questionID: P6-CH-AUTHORED-B02-Q092
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 妹妹用拇指和食指轻轻___住一小块橡皮泥，把它搓成小圆球。
+  options:
+    - 捏
+    - 劈
+    - 踢
+    - 锯
+  correct: 捏
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 捏.'
+- questionID: P6-CH-AUTHORED-B02-Q093
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 小贩把两个篮子挂在长木杆的两端，再把这根___放在肩上挑起来。
+  options:
+    - 扁担
+    - 拐杖
+    - 扫帚
+    - 门闩
+  correct: 扁担
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 扁担.'
+- questionID: P6-CH-AUTHORED-B02-Q094
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 付钱时，小文伸手进裤袋，从里面___出一枚硬币。
+  options:
+    - 塞
+    - 掏
+    - 抛
+    - 吞
+  correct: 掏
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 掏.'
+- questionID: P6-CH-AUTHORED-B02-Q095
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 阳台边缘装有金属___，可以防止人不小心掉下去。
+  options:
+    - 窗帘
+    - 地毯
+    - 栏杆
+    - 招牌
+  correct: 栏杆
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 栏杆.'
+- questionID: P6-CH-AUTHORED-B02-Q096
+  subject: Chinese
+  lessonIds:
+    - 8
+  question: 唱歌、看电影和玩桌面游戏都是让人放松的___活动。
+  options:
+    - 救援
+    - 医疗
+    - 生产
+    - 娱乐
+  correct: 娱乐
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 娱乐.'
+- questionID: P6-CH-AUTHORED-B02-Q097
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 这场展览介绍新加坡___的传统文化，展品包括春联、剪纸和舞狮用具。
+  options:
+    - 马来族
+    - 印度族
+    - 华族
+    - 欧亚族
+  correct: 华族
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 华族.'
+- questionID: P6-CH-AUTHORED-B02-Q098
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 奶奶说，这个图案象征平安和好运，有___的含义。
+  options:
+    - 吉祥
+    - 凶险
+    - 悲惨
+    - 不幸
+  correct: 吉祥
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 吉祥.'
+- questionID: P6-CH-AUTHORED-B02-Q099
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 为了让教室更有节日气氛，我们用彩带和纸花___教室。
+  options:
+    - 修理
+    - 测量
+    - 拆除
+    - 装饰
+  correct: 装饰
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 装饰.'
+- questionID: P6-CH-AUTHORED-B02-Q100
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 狂风中，海浪上下___，一层接着一层涌向岸边，海面无法平静下来。
+  options:
+    - 凝固
+    - 翻腾
+    - 沉淀
+    - 静止
+  correct: 翻腾
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 翻腾.'
+- questionID: P6-CH-AUTHORED-B02-Q101
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 故事里的坏人明知小动物受伤了，还故意继续伤害它，真是___。
+  options:
+    - 仁慈
+    - 残忍
+    - 善良
+    - 温厚
+  correct: 残忍
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 残忍.'
+- questionID: P6-CH-AUTHORED-B02-Q102
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 故事里的村民把一串串___挂在门外，点燃后发出噼里啪啦的响声。
+  options:
+    - 灯笼
+    - 彩带
+    - 风铃
+    - 爆竹
+  correct: 爆竹
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 爆竹.'
+- questionID: P6-CH-AUTHORED-B02-Q103
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 故事中的国王拥有决定由谁管理城镇的___，臣民必须服从他的命令。
+  options:
+    - 权力
+    - 愿望
+    - 消息
+    - 疑问
+  correct: 权力
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 权力.'
+- questionID: P6-CH-AUTHORED-B02-Q104
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 洪水淹没了田野，放眼望去全是水，原来的农田变成了一片___。
+  options:
+    - 沙漠
+    - 草原
+    - 汪洋
+    - 树林
+  correct: 汪洋
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 汪洋.'
+- questionID: P6-CH-AUTHORED-B02-Q105
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 老人腿脚不便，扶着拐杖___走向座位，每一步都很慢。
+  options:
+    - 匆匆
+    - 飞快
+    - 急忙
+    - 缓缓
+  correct: 缓缓
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 缓缓.'
+- questionID: P6-CH-AUTHORED-B02-Q106
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 狮子张开嘴___一声，响亮的声音传遍山谷，小动物们都吓得躲了起来。
+  options:
+    - 低语
+    - 轻哼
+    - 大吼
+    - 细说
+  correct: 大吼
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 大吼.'
+- questionID: P6-CH-AUTHORED-B02-Q107
+  subject: Chinese
+  lessonIds:
+    - 9
+  question: 坐车时，小杰觉得有些___，头昏昏的，眼前的东西好像在转。
+  options:
+    - 饿
+    - 晕
+    - 渴
+    - 痒
+  correct: 晕
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 晕.'
+- questionID: P6-CH-AUTHORED-B02-Q108
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 校刊登了一篇介绍节水方法的___，里面分段说明了怎样减少浪费。
+  options:
+    - 文章
+    - 歌曲
+    - 图画
+    - 照片
+  correct: 文章
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 文章.'
+- questionID: P6-CH-AUTHORED-B02-Q109
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 老师请小文看着课文，用清楚响亮的声音___给全班同学听。
+  options:
+    - 朗读
+    - 默读
+    - 抄写
+    - 翻译
+  correct: 朗读
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 朗读.'
+- questionID: P6-CH-AUTHORED-B02-Q110
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 决赛中，我们队以三比一___了对手，夺得冠军。
+  options:
+    - 追随
+    - 打败
+    - 迎接
+    - 保护
+  correct: 打败
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 打败.'
+- questionID: P6-CH-AUTHORED-B02-Q111
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 小文想加入合唱团，便填写报名表，向老师正式___参加。
+  options:
+    - 拒绝
+    - 取消
+    - 申请
+    - 退出
+  correct: 申请
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 申请.'
+- questionID: P6-CH-AUTHORED-B02-Q112
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 经过刻苦训练，她终于在比赛中___金牌，领奖时十分激动。
+  options:
+    - 错失
+    - 失去
+    - 退还
+    - 获得
+  correct: 获得
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 获得.'
+- questionID: P6-CH-AUTHORED-B02-Q113
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 这个家庭十分___，连基本的食物和生活用品也常常买不起。
+  options:
+    - 富裕
+    - 阔绰
+    - 贫穷
+    - 宽裕
+  correct: 贫穷
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 贫穷.'
+- questionID: P6-CH-AUTHORED-B02-Q114
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 教室只需要三十把椅子，却搬来了三十五把，___的五把可以放回储藏室。
+  options:
+    - 多余
+    - 缺少
+    - 损坏
+    - 笨重
+  correct: 多余
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 多余.'
+- questionID: P6-CH-AUTHORED-B02-Q115
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 钥匙找了一个下午，我把所有抽屉都翻过后，___在旧外套的口袋里找到了。
+  options:
+    - 尚未
+    - 从未
+    - 依然
+    - 总算
+  correct: 总算
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 总算.'
+- questionID: P6-CH-AUTHORED-B02-Q116
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 柜子太高，妹妹脚跟离开地面，___起脚尖，想看清顶上的玩具。
+  options:
+    - 跺
+    - 踮
+    - 伸
+    - 踩
+  correct: 踮
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 踮.'
+- questionID: P6-CH-AUTHORED-B02-Q117
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 小文一想到黑暗就害怕，始终___夜里的树林，不敢独自走进去。
+  options:
+    - 喜爱
+    - 惧怕
+    - 向往
+    - 欣赏
+  correct: 惧怕
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 惧怕.'
+- questionID: P6-CH-AUTHORED-B02-Q118
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 第一次赢得比赛后，小杰终于尝到了成功的___，心里又高兴又满足。
+  options:
+    - 形状
+    - 重量
+    - 颜色
+    - 滋味
+  correct: 滋味
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 滋味.'
+- questionID: P6-CH-AUTHORED-B02-Q119
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 刚出炉的面包散发出___的香味，让人忍不住想咬一口。
+  options:
+    - 诱人
+    - 刺鼻
+    - 难闻
+    - 恶臭
+  correct: 诱人
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 诱人.'
+- questionID: P6-CH-AUTHORED-B02-Q120
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 弟弟故意把姐姐的笔藏起来，又在她找笔时偷笑，真爱___。
+  options:
+    - 帮忙
+    - 合作
+    - 捣蛋
+    - 学习
+  correct: 捣蛋
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 捣蛋.'
+- questionID: P6-CH-AUTHORED-B02-Q121
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 妈妈双手扶稳汤碗，___着它慢慢走向餐桌，尽量不让汤洒出来。
+  options:
+    - 甩
+    - 抛
+    - 踢
+    - 端
+  correct: 端
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 端.'
+- questionID: P6-CH-AUTHORED-B02-Q122
+  subject: Chinese
+  lessonIds:
+    - 10
+  question: 跑完长跑后，小文从头到脚都湿透了，___都是汗。
+  options:
+    - 脚底
+    - 手心
+    - 浑身
+    - 额头
+  correct: 浑身
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 浑身.'
+- questionID: P6-CH-AUTHORED-B02-Q123
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 故事里，小杰穿上斗篷后，别人再也看不见他，原来斗篷能让他___。
+  options:
+    - 变大
+    - 隐形
+    - 发光
+    - 缩小
+  correct: 隐形
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 隐形.'
+- questionID: P6-CH-AUTHORED-B02-Q124
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 这位工匠懂得怎样操作机器、调节零件，凭着熟练的___修好了设备。
+  options:
+    - 技术
+    - 运气
+    - 口气
+    - 脾气
+  correct: 技术
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 技术.'
+- questionID: P6-CH-AUTHORED-B02-Q125
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 小猫动作太快了，___就钻进草丛，我还没来得及拍照。
+  options:
+    - 一眨眼
+    - 一整天
+    - 一星期
+    - 一小时
+  correct: 一眨眼
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 一眨眼.'
+- questionID: P6-CH-AUTHORED-B02-Q126
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 妹妹知道人不能长出翅膀，却常常___自己像鸟一样飞过城市。
+  options:
+    - 证实
+    - 幻想
+    - 记录
+    - 观察
+  correct: 幻想
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 幻想.'
+- questionID: P6-CH-AUTHORED-B02-Q127
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 我抬头望向树枝，___一只松鼠正抱着果子啃。
+  options:
+    - 听见
+    - 闻到
+    - 瞧见
+    - 摸到
+  correct: 瞧见
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 瞧见.'
+- questionID: P6-CH-AUTHORED-B02-Q128
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 汤煮好后，妈妈用小勺舀了一点，让我___一口，看看咸淡是否合适。
+  options:
+    - 闻
+    - 搅
+    - 吹
+    - 尝
+  correct: 尝
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 尝.'
+- questionID: P6-CH-AUTHORED-B02-Q129
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 往气球里不断打气，气球一点点___大，表面也越来越紧。
+  options:
+    - 缩
+    - 裂
+    - 胀
+    - 扁
+  correct: 胀
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 胀.'
+- questionID: P6-CH-AUTHORED-B02-Q130
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 小杰亲眼看见妹妹把书放进书包，因此他___书就在里面，不用再猜。
+  options:
+    - 确定
+    - 怀疑
+    - 猜测
+    - 否认
+  correct: 确定
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 确定.'
+- questionID: P6-CH-AUTHORED-B02-Q131
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 窗外落着细细的___，一条条像轻柔的线，地面慢慢湿了。
+  options:
+    - 雪片
+    - 冰雹
+    - 尘土
+    - 雨丝
+  correct: 雨丝
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 雨丝.'
+- questionID: P6-CH-AUTHORED-B02-Q132
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 我到车站时，巴士___也到了，时间刚刚好，一分钟也不用等。
+  options:
+    - 尚未
+    - 恰好
+    - 从未
+    - 迟迟
+  correct: 恰好
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 恰好.'
+- questionID: P6-CH-AUTHORED-B02-Q133
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 展品很容易损坏，工作人员提醒大家只用眼睛看，不要用手___。
+  options:
+    - 远望
+    - 触碰
+    - 欣赏
+    - 拍摄
+  correct: 触碰
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 触碰.'
+- questionID: P6-CH-AUTHORED-B02-Q134
+  subject: Chinese
+  lessonIds:
+    - 11
+  question: 小船被一阵阵波浪推得左右___，我们只好扶稳船边。
+  options:
+    - 凝固
+    - 停滞
+    - 沉淀
+    - 晃荡
+  correct: 晃荡
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 晃荡.'
+- questionID: P6-CH-AUTHORED-B02-Q135
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 完成六年的小学课程后，小文即将从小学___，到中学继续学习。
+  options:
+    - 毕业
+    - 入学
+    - 留级
+    - 转学
+  correct: 毕业
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 毕业.'
+- questionID: P6-CH-AUTHORED-B02-Q136
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 我们寄出请柬，___家长下星期来学校参加毕业典礼。
+  options:
+    - 责备
+    - 阻止
+    - 邀请
+    - 拒绝
+  correct: 邀请
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 邀请.'
+- questionID: P6-CH-AUTHORED-B02-Q137
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 升旗时，全体师生肃立，按规定步骤唱国歌，这是庄严的升旗___。
+  options:
+    - 设备
+    - 材料
+    - 工具
+    - 仪式
+  correct: 仪式
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 仪式.'
+- questionID: P6-CH-AUTHORED-B02-Q138
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 毕业典礼上，同学们配合语气和节奏，满怀感情地___一首诗。
+  options:
+    - 默读
+    - 抄写
+    - 朗诵
+    - 翻译
+  correct: 朗诵
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 朗诵.'
+- questionID: P6-CH-AUTHORED-B02-Q139
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 生日那天，一家人围坐在桌旁，轻声说笑，互相关心，气氛十分___。
+  options:
+    - 紧张
+    - 温馨
+    - 冷清
+    - 严肃
+  correct: 温馨
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 温馨.'
+- questionID: P6-CH-AUTHORED-B02-Q140
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 志愿者在柜台为居民提供___，帮他们填写表格、解答问题。
+  options:
+    - 服务
+    - 批评
+    - 考验
+    - 处罚
+  correct: 服务
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 服务.'
+- questionID: P6-CH-AUTHORED-B02-Q141
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 老师说，解题的___是先看清题目要求；这一步弄错，后面的计算也会错。
+  options:
+    - 关键
+    - 借口
+    - 负担
+    - 障碍
+  correct: 关键
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 关键.'
+- questionID: P6-CH-AUTHORED-B02-Q142
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 小文认真地说：“做人要诚实，我___拿不属于自己的东西。”
+  options:
+    - 经常
+    - 绝不
+    - 偶尔
+    - 照样
+  correct: 绝不
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 绝不.'
+- questionID: P6-CH-AUTHORED-B02-Q143
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 同学们把两盆同样的植物分别放在明处和暗处，进行___，比较光照对生长的影响。
+  options:
+    - 表演
+    - 旅行
+    - 实验
+    - 访问
+  correct: 实验
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 实验.'
+- questionID: P6-CH-AUTHORED-B02-Q144
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 科学家多年收集资料、分析数据，深入___植物怎样在干旱环境中生存。
+  options:
+    - 宣布
+    - 命令
+    - 庆祝
+    - 研究
+  correct: 研究
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 研究.'
+- questionID: P6-CH-AUTHORED-B02-Q145
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 典礼前，老师们___，一会儿布置礼堂，一会儿检查座位，几乎没有休息。
+  options:
+    - 无所事事
+    - 悠闲自在
+    - 忙忙碌碌
+    - 游手好闲
+  correct: 忙忙碌碌
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 忙忙碌碌.'
+- questionID: P6-CH-AUTHORED-B02-Q146
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 椅子拖过地板后，留下了两道细长的___，擦了几次也没有完全消失。
+  options:
+    - 痕迹
+    - 声音
+    - 气味
+    - 影子
+  correct: 痕迹
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 痕迹.'
+- questionID: P6-CH-AUTHORED-B02-Q147
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 拼图虽然很难，小文却没有___，仍然一块一块地尝试，直到完成。
+  options:
+    - 坚持
+    - 继续
+    - 努力
+    - 放弃
+  correct: 放弃
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 放弃.'
+- questionID: P6-CH-AUTHORED-B02-Q148
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 故事里的船长摇响铃铛，___船员们到甲板集合，大家听到后纷纷赶来。
+  options:
+    - 驱赶
+    - 召唤
+    - 责骂
+    - 阻拦
+  correct: 召唤
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 召唤.'
+- questionID: P6-CH-AUTHORED-B02-Q149
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 老师希望我们努力学习，将来能够发挥才能，拥有光明的___。
+  options:
+    - 过去
+    - 前途
+    - 回忆
+    - 往事
+  correct: 前途
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 前途.'
+- questionID: P6-CH-AUTHORED-B02-Q150
+  subject: Chinese
+  lessonIds:
+    - 12
+  question: 村民们轮流在高处___，仔细观察四周，一发现危险就通知大家。
+  options:
+    - 闲逛
+    - 打盹
+    - 奔跑
+    - 守望
+  correct: 守望
+  source: 'Original authored P6 practice; parent-reviewed batch 2; taught vocabulary: 守望.'
