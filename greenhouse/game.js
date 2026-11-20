@@ -86,6 +86,7 @@ let last = null;
 let responseTimer;
 let voiceTween;
 let panelVoiceStatus;
+let backdropPointer = null;
 
 function save() {
   try {
@@ -208,7 +209,10 @@ function showCuePart(showingLead, announce, autoAdvance = false) {
   cueParts.showingLead = Boolean(showingLead && cueParts.lead);
   cue = cueParts.showingLead ? cueParts.lead : cueParts.task;
   $('#cue-text').textContent = cue.cn;
-  resetTranslation($('#cue-en'), $('#cue-translation'), cue.en);
+  const previousTarget = state.tutorialDone && state.phase === 'explore' && !cueParts.showingLead
+    ? missions[state.mission].actions[state.action - 1]?.target : null;
+  const clueEnglish = evidence[previousTarget]?.lines.map(([, english]) => english).join(' ');
+  resetTranslation($('#cue-en'), $('#cue-translation'), [cue.en, clueEnglish].filter(Boolean).join('\n\n'));
   const step = $('#cue-step');
   step.hidden = !cueParts.lead;
   step.textContent = cueParts.showingLead ? '看任务' : '回看线索';
@@ -344,32 +348,59 @@ function clearPanel() {
   voice.stop();
 }
 
-function openPanel(label, title) {
+function presentPanel(content, focusTarget, inspection = false) {
   clearPanel();
   clearTimeout(cueTimer);
   desk.classList.remove('wide-writing');
-  const top = node('div', '', 'panel-top');
-  top.append(node('p', label, 'label'), makeButton('×', 'icon-button', () => desk.close(), '返回场景'));
-  const heading = node('h2', title);
-  heading.id = 'panel-title';
-  heading.tabIndex = -1;
-  panel.replaceChildren(top, heading);
-  const opened = !desk.open;
-  if (opened) {
+  desk.classList.toggle('artifact-inspection', inspection);
+  panel.replaceChildren(content);
+  if (!desk.open) {
     engine?.setActive(false);
     desk.showModal();
     $('#response').hidden = true;
     reticle.hidden = true;
     interact.hidden = true;
-    animate(desk, { opacity: 0, y: 13 }, { opacity: 1, y: 0 });
+    if (!inspection) animate(desk, { opacity: 0, y: 13 }, { opacity: 1, y: 0 });
   }
   desk.scrollTop = 0;
-  heading.focus({ preventScroll: true });
-  return { top, heading };
+  focusTarget.focus({ preventScroll: true });
 }
+
+function openPanel(label, title) {
+  const top = node('div', '', 'panel-top');
+  const header = node('div');
+  if (label) header.append(node('p', label, 'label'));
+  const heading = node('h2', title);
+  heading.id = 'panel-title';
+  heading.tabIndex = -1;
+  header.append(heading);
+  top.append(header, makeButton('×', 'icon-button', () => desk.close(), '返回场景'));
+  presentPanel(top, heading);
+  return heading;
+}
+
+desk.addEventListener('pointerdown', (event) => {
+  // Touch browsers can retarget a tap near the paper edge to the paper itself.
+  if (event.button === 0 && desk.classList.contains('artifact-inspection') &&
+    document.elementFromPoint(event.clientX, event.clientY) === desk) {
+    backdropPointer = event.pointerId;
+  }
+});
+
+desk.addEventListener('pointerup', (event) => {
+  if (event.pointerId !== backdropPointer) return;
+  backdropPointer = null;
+  if (document.elementFromPoint(event.clientX, event.clientY) === desk) desk.close();
+});
+
+desk.addEventListener('pointercancel', (event) => {
+  if (event.pointerId === backdropPointer) backdropPointer = null;
+});
 
 desk.addEventListener('close', () => {
   if (desk.open) return;
+  backdropPointer = null;
+  desk.classList.remove('artifact-inspection');
   clearPanel();
   if (started) {
     engine?.setActive(true);
@@ -404,31 +435,35 @@ function addTranslation(parent, english) {
 
 function showEvidence(id, next) {
   const item = evidence[id];
-  openPanel('查看物品', item.title);
-  const sheet = node('article', '', item.kind === 'paper' ? 'evidence-sheet paper-sheet' : 'evidence-sheet');
-  if (item.cover) {
-    const cover = node('img');
-    cover.src = new URL('./art/' + item.cover + '.webp', import.meta.url).href;
-    cover.alt = '';
-    sheet.append(cover);
+  const sheet = node('article', '', 'artifact-sheet artifact-' + item.kind);
+  sheet.tabIndex = -1;
+  const monitor = item.kind === 'monitor';
+  if (item.art) {
+    const art = node('img', '', 'artifact-art');
+    art.width = monitor ? 960 : 640;
+    art.height = monitor ? 640 : 800;
+    art.src = new URL('./art/' + item.art + '.webp', import.meta.url).href;
+    art.alt = item.alt ?? '';
+    sheet.append(art);
   }
-  const content = node('div', '', 'evidence-content');
-  content.append(node('p', item.label, 'evidence-label'));
-  for (const [chinese] of item.lines) content.append(node('p', chinese, 'evidence-line'));
+  const content = node('div', '', 'artifact-ink');
+  const label = node('p', item.label ?? item.title, 'artifact-label');
+  label.id = 'panel-title';
+  label.hidden = !item.label;
+  content.append(label);
+  for (const [chinese] of item.lines) content.append(node('p', chinese, 'artifact-line'));
   sheet.append(content);
-  panel.append(sheet);
-  const actions = row(makeButton('收起', 'primary', () => desk.close()),
-    makeButton('朗读', 'text-button', () => voice.speak(item.lines.map(([chinese]) => chinese).join(' '))));
-  addTranslation(actions, item.lines.map(([, english]) => english).join('\n'));
-  voiceMessage();
-  if (next) afterClose = next;
-  audio.cue('paper');
-  animate(sheet, { opacity: 0, rotationX: item.kind === 'paper' ? -45 : -12, y: 16, scale: .94 },
-    { opacity: 1, rotationX: 0, y: 0, scale: 1 }, .42);
+  presentPanel(sheet, sheet, true);
+  afterClose = next;
+  audio.cue(monitor ? 'relay' : 'paper');
+  const enter = monitor ? { opacity: 0, scale: .91 } : {
+    opacity: 0, transformPerspective: 900, rotationX: item.kind === 'note' ? -70 : -35, scaleY: .73, y: 18,
+  };
+  animate(sheet, enter, { opacity: 1, scale: 1, scaleY: 1, rotationX: 0, y: 0 }, .44);
 }
 
 function showQuestion(item, label, onNext, context) {
-  openPanel(label, '读懂线索');
+  openPanel(label, item.cn).classList.add('question-title');
   const english = [item.en, ...item.choices.map((choice, i) => (i + 1) + '. ' + choice.en)].filter(Boolean).join('\n');
   const support = translation(english);
   const replay = makeButton('重听', 'text-button', () => voice.speak(item.cn));
@@ -461,7 +496,6 @@ function showQuestion(item, label, onNext, context) {
     layout.classList.add('with-figure');
   }
   const content = node('div', '', 'question-content');
-  content.append(node('p', item.cn, 'body'));
   const choices = node('div', '', 'choices');
   const feedback = node('p', '', 'feedback');
   feedback.setAttribute('role', 'status');
@@ -555,14 +589,14 @@ function openTask(context) {
   const mission = missions[state.mission];
   if (!mission) return showEnding();
   if (state.phase === 'question') {
-    showQuestion(mission.question, '任务交接 · ' + mission.titleCN, () => {
+    showQuestion(mission.question, mission.titleCN, () => {
       state.phase = 'dictation';
       save();
       return { label: '开始听写', run: openTask };
     }, context ?? { cn: mission.actions.at(-1).resultCN, en: mission.actions.at(-1).resultEN });
   } else if (state.phase === 'dictation') {
     const entry = mission.dictation[state.wordIndex];
-    showWord(entry, mission.titleCN + ' · 听写 ' + (state.wordIndex + 1) + ' / ' + mission.dictation.length, (guided) => {
+    showWord(entry, mission.titleCN + ' · ' + (state.wordIndex + 1) + ' / ' + mission.dictation.length, (guided) => {
       record(entry.word, guided);
       state.wordIndex += 1;
       if (state.wordIndex === mission.dictation.length) state.phase = 'handover';
@@ -597,24 +631,22 @@ function finishMission() {
 }
 
 function showEnding() {
-  openPanel('六年级 · 第一课', '温室准备就绪');
+  openPanel(null, '温室准备就绪');
   panel.append(node('p', '窗缝堵好了，幼苗也安全了。科学展可以开始了！', 'body'));
   const guided = Object.values(state.written).filter((value) => value === 'guided').length;
   panel.append(node('p', guided ? `24 个词已收录。其中 ${guided} 个用过描写提示，可以在手册中再试听写。` : '24 个词都已收录。回到词语手册，可以重听和复习。', 'body'));
-  const controls = row(makeButton('打开词语手册', 'primary', showBook),
-    makeButton('返回展示室', 'text-button', () => desk.close()),
-    makeButton('重玩任务', 'text-button', replay));
+  const controls = row(makeButton('打开词语手册', 'primary', showBook), makeButton('重玩任务', 'text-button', replay));
   addTranslation(controls, 'The window is sealed, the seedling is safe, and the science fair can open. All 24 words are in your notebook.');
   voiceMessage();
   voice.speak('交接完成。窗缝堵好了，幼苗也到了安全的地方。科学展准备就绪！');
 }
 
 function showBook() {
-  openPanel('六年级 · 第一课', '词语手册');
+  openPanel(null, '词语手册');
   const known = discovered();
   const controls = row(makeButton('练习题库', 'primary', () => showBank(0, 0)));
   addTranslation(controls, 'Vocabulary notebook. Entries appear as you discover them. Tap the speaker to hear a word or tap its question mark for its English meaning.');
-  panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。点击发音按钮，听一听词语怎么念。`, 'body'));
+  panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。`, 'body'));
   voiceMessage();
   const list = node('ol', '', 'vocab');
   for (const [index, entry] of entries.entries()) {
@@ -658,20 +690,19 @@ function showBank(index, total) {
 }
 
 function showHelp() {
-  openPanel('科学楼', '操作帮助');
+  openPanel(null, '操作帮助');
   const help = [
     '电脑：用 W、A、S、D 或方向键移动。点击场景后，用鼠标转向。也可以按住画面拖动。',
     '平板：用左下角摇杆行走，用手指拖动画面转向。对准物品后，点按出现的按钮。',
     '对准物品后按 E 互动。按 Esc 释放鼠标。按 P 打开词语手册，按 R 重听任务；任务旁的问号可以打开英文翻译。',
   ];
   help.forEach((line) => panel.append(node('p', line, 'body')));
-  const controls = row(makeButton('返回科学楼', 'primary', () => desk.close()));
   const sound = makeButton(effectsEnabled ? '关闭音效' : '开启音效', 'text-button', () => {
     effectsEnabled = !effectsEnabled;
     audio.setEnabled(effectsEnabled);
     sound.textContent = effectsEnabled ? '关闭音效' : '开启音效';
   });
-  controls.append(sound);
+  const controls = row(sound);
   if (state.phase === 'done') controls.append(makeButton('重玩任务', 'text-button', replay));
   addTranslation(controls, 'Desktop: use WASD or arrows, click the scene for mouse look, or click and drag. Tablet: move with the left joystick and drag the scene to look. Aim at objects and press E or tap the action button. Escape releases the mouse. P opens the notebook and R replays the current task. Question-mark buttons show English help.');
 }

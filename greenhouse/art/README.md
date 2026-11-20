@@ -79,3 +79,82 @@ The paper fills the frame.
 The top and corners have visible folded creases and soft wrinkles, central 72 percent stays very pale and quiet enough to place dark readable Chinese text on top.
 Tactile real fibrous paper, neutral warm morning illumination, authentic gently used piece of a school lab notepad.
 Absolutely blank, no text, no handwriting, no ruled lines, no logos, no numbers, no marks and no objects.
+
+## Clue handwriting
+
+`note-handwriting.woff2` is a web subset of [LXGW WenKai Regular v1.530](https://github.com/lxgw/LxgwWenKai/releases/tag/v1.530), with the font family renamed to Greenhouse Note.
+The original [SIL Open Font License 1.1](note-handwriting-OFL.txt) accompanies the subset.
+When a handwritten clue changes, regenerate the subset with `fonttools subset` using the note and page entries’ Chinese titles, labels, and lines in `greenhouse/evidence.js`, and preserve the Greenhouse Note family name.
+
+## Artifact close-ups
+
+These six transparent cutouts were created with the built-in image generator and optimized as WebP.
+The game draws the original clue wording over the artwork as live text.
+
+### Page artwork
+
+Shared prompt
+
+One isolated portrait 4:5 gameplay inspection cutout, flat top-down orthographic view, nearly straight edges, entire object filling the image with a margin no more than 4% on each side, clean actually transparent background around the object.
+Match the tactile stylized realism of a 3D school greenhouse game.
+Generate the physical prop only, with no UI, atmospheric background, desk, letters, Chinese characters, numerals, fake text, branding or watermark.
+The game will add exact live handwriting: leave a light, clean writing area all the way across from 16% to 86% width and from 47% to 87% height.
+All salient artwork stays above 38% height or on the edges.
+
+`page-diary.webp`
+
+Show the open page of a child's private diary, with a thin warm terracotta binding and a few underlying sheet edges, one large warm ivory page dominating the view, subtle paper fibre and faint simple horizontal guides.
+In the upper area, a small dreamy child's coloured pencil doodle of a very tall bean seedling towering above a recognizable little school building, tiny warm gray moon and soft pale forest green.
+The doodle is in the page itself, with human, imperfect drawing.
+There is no second main page and no separate cover image.
+Keep the central and lower block of this page open for handwriting.
+
+`page-exercise.webp`
+
+Show the real open page of a student's blue cloth-bound early-morning exercise log.
+One large cream page, hints of dark indigo bookcloth and edge of binding around it and narrow sheet edges, soft horizontal blue exercise-book lines.
+A small freehand indigo pencil doodle in the upper area of a running sneaker beside two loops of a school running track, and a tiny sunrise, naturally drawn directly on the page.
+One natural inward binding edge, no second main page and no separate cover image.
+Open lower half for handwriting, thin lines only.
+
+`page-quiz.webp`
+
+Show a loose cream school science assessment sheet with slight corner curl and small binder impressions along the left side.
+In the upper third only, faint printed line drawings of a small seedling with roots, tiny empty exam checkboxes, a little red teacher's check near the top right, one tiny handwritten red circle with nothing inside it.
+The central and lower part is light clean paper with the quietest faint ruled guides so added large dark handwriting will be instantly readable.
+No educational text, placeholder lines of text, readable print, large borders or ornament.
+
+`page-exhibit.webp`
+
+Show a slightly creased warm off-white sheet of science exhibition planning paper with one small bit of translucent mint drafting tape on an edge and a faint fine grid.
+In the upper third only, draw a friendly true-to-life colored pencil plan of an exhibition table, with a potted green seedling in its centre, a small blank forward-facing label in front of the pot, and a low angled desk lamp at the right shining a pale yellow beam towards the leaves of that central plant.
+No hands or people.
+The charcoal and muted sage sketch should feel like the student's own planning note.
+Leave all the space below untouched except the faint paper grid.
+
+### Monitor artwork
+
+Shared prompt
+
+Use case illustration-story.
+Create a close-up asset for a first-person browser game set in a modern Singapore primary-school greenhouse.
+One isolated clean dark teal school lab widescreen monitor viewed perfectly straight-on, border only a thin dark body with softly worn corners, screen occupies nearly the entire area with zero perspective. 3:2 wide composition, entire monitor visible, fills the canvas with margins no greater than 4% and clean fully transparent area beyond.
+No base/stand or surrounding room outside the monitor.
+Draw actual content on the glass right up to the inner bezel, lit contrast and stylized photorealistic school-room 3D game look, no printed labels, no writing anywhere, no numbers, no logos or watermarks.
+Keep lower 20 percent of display darker and simple for centered subtitles to be added by the game.
+
+`screen-roots.webp`
+
+On screen: a real classroom root-camera feed, a side-on cross section of a small bean seedling growing through damp earth, with a strong sharp branching network of pale living roots clearly spreading out and anchoring the plant.
+The small lovely green stem and two leaves in upper third on soft pale teal.
+Section of dark wet soil below, clearly branching natural beige roots through the middle not all the way to the bottom.
+No captions, educational cutaway tells the story by itself.
+
+`screen-rehearsal.webp`
+
+On screen: a snapshot from a recovered student rehearsal recording, inside a cosy Singapore school science display room.
+At center, a composed twelve-year-old Chinese Singaporean schoolgirl with tied-back hair and a white school polo with subtle forest-green trim is gracefully demonstrating a potted bean plant: keep the pot safely set on a pale plywood science exhibition table, one hand gently open palm beside the pot as she presents it.
+A neat plant tag and a warm desk lamp directed at the leaves.
+Show her hands, plant and attentive expression, frame waist up with the central seedling sharp.
+A reddish indicator light on the physical monitor corner, no time code or letterforms.
+Use quiet dark foreground towards the bottom for subtitles.

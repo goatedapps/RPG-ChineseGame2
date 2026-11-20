@@ -12,4 +12,5 @@ Keep mission cues short, and show dictation sentences with the target word blank
 Use the question bank’s lesson tags when selecting practice questions, with untagged questions eligible anywhere in the same primary level.
 Keep Hanzi stroke data and its attribution together under `stage/vendor/`.
 Keep generated 3D surface textures as small WebP assets under `greenhouse/art/`.
+Keep object close-ups in `greenhouse/evidence.js` with live text over their artwork and no surrounding workbench controls.
 If a recorded radio line changes, regenerate its matching MP3 from `greenhouse/radio-lines.js`.

@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Greenhouse Note";
+  src: url("art/note-handwriting.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
   font: 16px/1.5 "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
@@ -77,9 +84,32 @@ kbd { display: inline-grid; place-items: center; min-width: 1.3rem; padding: .12
 dialog { width: min(47rem, calc(100% - 2rem)); max-height: min(91dvh, 54rem); overflow: auto; padding: clamp(1.15rem, 4vw, 2.5rem); background: #10262aeF; color: var(--cream); border: 1px solid #97c0ac80; border-radius: 1rem; box-shadow: 0 12px 90px #0009; overscroll-behavior: contain; }
 dialog::backdrop { background: #031416a8; }
 dialog.wide-writing { width: min(65rem, calc(100% - 2rem)); }
-.panel-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+#workbench.artifact-inspection[open] {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  touch-action: manipulation;
+}
+#workbench.artifact-inspection #panel { display: contents; }
+#workbench.artifact-inspection::backdrop { background: #0314168c; }
+#app:has(#workbench.artifact-inspection[open]) :is(.hud, .mission, .play-controls) { visibility: hidden; }
+.panel-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.panel-top > .icon-button { flex-shrink: 0; }
+.panel-top .label { margin-bottom: .35rem; }
 dialog h2 { font: 700 clamp(1.75rem,5vw,2.65rem)/1.21 "STSong", "Songti SC", SimSun, serif; margin-bottom: .8rem; letter-spacing: .02em; }
 dialog h2:focus { outline: none; }
+dialog .question-title { font-family: inherit; font-size: clamp(1.25rem, 3.8vw, 1.65rem); line-height: 1.45; }
 dialog .body { margin-top: .6rem; }
 .button-row { display: flex; gap: .6rem .8rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; }
 .text-button { border: 0; background: transparent; color: var(--jade); min-height: 2.5rem; text-decoration: underline; text-underline-offset: .22em; }
@@ -91,12 +121,42 @@ dialog .body { margin-top: .6rem; }
 .choice.wrong { color: #ffd0b2; background: #d388681f; }
 .feedback { margin-top: .7rem; color: var(--sun); }
 .clue-note { margin-top: .6rem; color: var(--muted); font-size: .93rem; }
-.evidence-sheet { display: flex; align-items: flex-start; gap: clamp(.7rem, 3vw, 1.45rem); padding: clamp(1.4rem, 4.3vw, 2.7rem); margin-top: .8rem; max-width: 42rem; color: #20302a; background: #f4ead5; border-radius: .32rem; box-shadow: 0 9px 27px #0006; transform-origin: center top; }
-.paper-sheet { background: #f6ead0 url("art/paper-crumpled.webp") center / 100% 100%; }
-.evidence-sheet img { width: min(27%, 7.2rem); max-height: 9rem; object-fit: cover; border: 1px solid #baa986; border-radius: .2rem; }
-.evidence-label { color: #426351; font-weight: 700; font-size: .84rem; border-bottom: 1px solid #42635157; padding-bottom: .45rem; margin-bottom: .6rem; }
-.evidence-line { font-size: clamp(1.06rem, 2.8vw, 1.3rem); line-height: 1.5; }
-.evidence-line + .evidence-line { margin-top: .55rem; }
+.artifact-sheet {
+  position: relative;
+  container-type: inline-size;
+  outline: none;
+}
+.artifact-note, .artifact-page {
+  color: #262b27;
+  font-family: "Greenhouse Note", "Kaiti SC", STKaiti, KaiTi, serif;
+  transform-origin: center 28%;
+}
+.artifact-note {
+  width: min(100%, 37rem);
+  padding: clamp(1.6rem, 5.8vw, 3.25rem);
+  border-radius: .15rem .45rem .2rem .4rem / .35rem .15rem .5rem .15rem;
+  background: #f6ead0 url("art/paper-crumpled.webp") center / 100% 100%;
+  box-shadow: 0 15px 30px #0007;
+}
+.artifact-page { width: min(100%, 28rem, calc((100dvh - 2rem) * .8)); }
+.artifact-monitor { width: min(100%, 46rem, calc((100dvh - 2rem) * 1.5)); color: #fff9e4; }
+.artifact-art { display: block; width: 100%; height: auto; filter: drop-shadow(0 12px 18px #0007); }
+.artifact-ink { font-size: clamp(1rem, 5.3cqi, 1.55rem); line-height: 1.5; }
+.artifact-note .artifact-ink { font-size: clamp(1.3rem, 5.1vw, 2rem); line-height: 1.6; }
+.artifact-page .artifact-ink { position: absolute; inset: 46% 14% auto 16%; }
+.artifact-monitor .artifact-ink {
+  position: absolute;
+  inset: auto 10% 10%;
+  color: #fff9e4;
+  font-size: clamp(.8rem, 3.55cqi, 1.25rem);
+  text-align: center;
+  text-shadow: 0 1px 2px #000, 0 2px 6px #000;
+  background: radial-gradient(ellipse at center, #061614cf, #06161480 58%, transparent 76%);
+}
+.artifact-label { color: #3e523f; font-size: .83em; margin-bottom: .62em; }
+.artifact-line { text-wrap: balance; }
+.artifact-line + .artifact-line { margin-top: .5em; }
+.artifact-monitor .artifact-line + .artifact-line { margin-top: .15em; }
 .question-layout.with-figure { display: grid; grid-template-columns: minmax(10rem, .8fr) minmax(0, 1.25fr); gap: 1.25rem; align-items: start; }
 .question-figure { margin: .6rem 0 0; }
 .question-figure img { display: block; width: 100%; height: auto; border-radius: .4rem; background: #ece7d8; }
