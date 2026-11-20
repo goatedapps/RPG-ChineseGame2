@@ -14,6 +14,7 @@ function getStrokeData() {
 
 export function createWriting(grid, word, guided, onComplete, onError, onMistake) {
   const characters = [...word];
+  grid.dataset.length = String(characters.length);
   const squares = characters.map((_, index) => {
     const square = document.createElement('div');
     square.className = 'writing-square';
@@ -30,13 +31,15 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
     if (!Writer || characters.some((character) => !data[character])) throw new Error('Missing handwriting asset');
     writers = characters.map((character, index) => {
       const size = Math.max(58, Math.floor(squares[index].getBoundingClientRect().width) - 2);
-      return Writer.create(squares[index], character, {
+      const writer = Writer.create(squares[index], character, {
         width: size, height: size, padding: 7, leniency: 1.3,
         showCharacter: false, showOutline: guided,
         strokeColor: '#1b4135', outlineColor: '#8da991', drawingColor: '#294f3e',
         highlightColor: '#759a52',
         charDataLoader: (char, ready) => ready(data[char]),
       });
+      squares[index].querySelector('svg')?.setAttribute('viewBox', `0 0 ${size} ${size}`);
+      return writer;
     });
     function begin(index) {
       if (cancelled) return;

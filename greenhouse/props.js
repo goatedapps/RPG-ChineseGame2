@@ -10,6 +10,7 @@ export function createKit(THREE, scene) {
   const leafGeometry = createLeaf(THREE);
   const batches = new Map();
   const transform = new THREE.Object3D();
+  const images = new THREE.TextureLoader();
 
   function material(color, options = {}) {
     return new THREE.MeshStandardMaterial({ color, roughness: .76, ...options });
@@ -70,14 +71,58 @@ export function createKit(THREE, scene) {
     return map;
   }
 
+  function imageTexture(file, ready) {
+    const url = new URL('./art/' + file, import.meta.url);
+    images.load(url.href, (map) => {
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.anisotropy = 4;
+      ready(map);
+    }, undefined, () => {});
+  }
+
+  function metricSurface(file, fallback, tint, tilesPerMeter, options) {
+    const surface = material(fallback, options);
+    imageTexture(file, (map) => {
+      map.wrapS = THREE.MirroredRepeatWrapping;
+      map.wrapT = THREE.MirroredRepeatWrapping;
+      map.repeat.set(...tilesPerMeter);
+      surface.map = map;
+      surface.color.set(tint);
+      surface.onBeforeCompile = (shader) => {
+        // Unit boxes share one geometry; project in local meters so instanced faces retain the same texel density.
+        shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>', `
+          #include <uv_vertex>
+          #ifdef USE_MAP
+            mat4 surfaceModel = modelMatrix;
+            #ifdef USE_INSTANCING
+              surfaceModel = surfaceModel * instanceMatrix;
+            #endif
+            vec3 extent = vec3(length(surfaceModel[0].xyz), length(surfaceModel[1].xyz), length(surfaceModel[2].xyz));
+            vec3 meters = (position + 0.5) * extent;
+            vec2 faceUv = abs(normal.y) > 0.5 ? meters.xz : (abs(normal.x) > 0.5 ? meters.zy : meters.xy);
+            vMapUv = (mapTransform * vec3(faceUv, 1.0)).xy;
+          #endif
+        `);
+      };
+      surface.needsUpdate = true;
+    });
+    return surface;
+  }
+
   function flooring(color, grout, repeat = 1) {
-    const map = texture((ctx, w, h) => {
+    function draw(ctx, w, h, art) {
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 10500; i += 1) {
-        const opacity = noise(i + 19) * .10;
-        ctx.fillStyle = i % 2 ? 'rgba(19,26,30,' + opacity + ')' : 'rgba(238,240,211,' + opacity + ')';
-        ctx.fillRect(noise(i + 1223) * w, noise(i + 284) * h, 1 + noise(i + 26) * 3, 1 + noise(i + 101) * 2);
+      if (art) {
+        ctx.globalAlpha = .78;
+        ctx.drawImage(art, 0, 0, w, h);
+        ctx.globalAlpha = 1;
+      } else {
+        for (let i = 0; i < 2600; i += 1) {
+          const opacity = noise(i + 19) * .10;
+          ctx.fillStyle = i % 2 ? 'rgba(19,26,30,' + opacity + ')' : 'rgba(238,240,211,' + opacity + ')';
+          ctx.fillRect(noise(i + 1223) * w, noise(i + 284) * h, 1 + noise(i + 26) * 2, 1 + noise(i + 101) * 2);
+        }
       }
       ctx.strokeStyle = grout;
       ctx.lineWidth = 2;
@@ -85,11 +130,19 @@ export function createKit(THREE, scene) {
       ctx.strokeStyle = '#f0e5c239';
       ctx.lineWidth = 1;
       ctx.strokeRect(3.5, 3.5, w - 7, h - 7);
-    });
+    }
+    const map = texture(draw, 256, 256);
     map.wrapS = THREE.RepeatWrapping;
     map.wrapT = THREE.RepeatWrapping;
     map.repeat.set(repeat, repeat);
-    return material('#ffffff', { map });
+    return {
+      surface: material('#ffffff', { map }),
+      setImage(image) {
+        const canvas = map.image;
+        draw(canvas.getContext('2d'), canvas.width, canvas.height, image);
+        map.needsUpdate = true;
+      },
+    };
   }
 
   function plate(text, width, height, at, angle = 0, options = {}) {
@@ -170,7 +223,7 @@ export function createKit(THREE, scene) {
   }
 
   return {
-    group, material, texture, plate, flooring, iconScreen, finish,
+    group, material, texture, imageTexture, metricSurface, plate, flooring, iconScreen, finish,
     box: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, boxGeometry),
     tube: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, tubeGeometry),
     pot: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, taperedGeometry),

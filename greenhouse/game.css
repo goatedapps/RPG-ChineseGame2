@@ -49,7 +49,9 @@ a { color: var(--jade); text-decoration-thickness: 1px; text-underline-offset: .
 .mission-line > div:nth-child(2) { flex: 1; }
 .mission-line h2 { font-size: 1.08rem; }
 .mission .label { font-size: .72rem; }
-.cue-text { margin-top: .65rem; line-height: 1.52; }
+.cue-window { overflow: hidden; margin-top: .6rem; padding-block: .08rem; }
+.cue-text { line-height: 1.5; }
+.cue-actions { display: flex; gap: .9rem; }
 .quiet-link { border: 0; background: transparent; color: var(--jade); font-size: .81rem; padding: .3rem 0; text-decoration: underline; text-underline-offset: .24em; }
 .mission .quiet-link { margin-top: .32rem; }
 .radio-wave { width: 30px; display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; color: var(--jade); }
@@ -74,6 +76,7 @@ kbd { display: inline-grid; place-items: center; min-width: 1.3rem; padding: .12
 .joystick, .touch-instruction { display: none; }
 dialog { width: min(47rem, calc(100% - 2rem)); max-height: min(91dvh, 54rem); overflow: auto; padding: clamp(1.15rem, 4vw, 2.5rem); background: #10262aeF; color: var(--cream); border: 1px solid #97c0ac80; border-radius: 1rem; box-shadow: 0 12px 90px #0009; overscroll-behavior: contain; }
 dialog::backdrop { background: #031416a8; }
+dialog.wide-writing { width: min(65rem, calc(100% - 2rem)); }
 .panel-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 dialog h2 { font: 700 clamp(1.75rem,5vw,2.65rem)/1.21 "STSong", "Songti SC", SimSun, serif; margin-bottom: .8rem; letter-spacing: .02em; }
 dialog h2:focus { outline: none; }
@@ -87,9 +90,15 @@ dialog .body { margin-top: .6rem; }
 .choice.correct { color: #d8ffdc; background: #a8e3bb25; }
 .choice.wrong { color: #ffd0b2; background: #d388681f; }
 .feedback { margin-top: .7rem; color: var(--sun); }
-.clue-note { margin-top: .8rem; color: var(--muted); font-size: .93rem; }
-.writing-grid { display: flex; gap: .45rem; flex-wrap: wrap; margin-top: 1rem; }
-.writing-square { position: relative; flex: 0 0 clamp(72px, 13vw, 106px); aspect-ratio: 1; touch-action: none; overflow: hidden; border: 1px solid #a4bea8; border-radius: .25rem; background: linear-gradient(0deg,transparent 49%, #4d685b2c 50%, transparent 51%), linear-gradient(90deg,transparent 49%, #4d685b2c 50%, transparent 51%), #e6edd6; }
+.clue-note { margin-top: .6rem; color: var(--muted); font-size: .93rem; }
+.question-layout.with-figure { display: grid; grid-template-columns: minmax(10rem, .8fr) minmax(0, 1.25fr); gap: 1.25rem; align-items: start; }
+.question-figure { margin: .6rem 0 0; }
+.question-figure img { display: block; width: 100%; height: auto; border-radius: .4rem; background: #ece7d8; }
+.question-content { min-width: 0; }
+.sentence { color: var(--cream); font-size: clamp(1.08rem, 2.5vw, 1.45rem); margin-top: .65rem; line-height: 1.55; }
+.sentence-gap { display: inline-block; min-width: calc(var(--characters) * .93em); margin-inline: .12em; height: .9em; border-bottom: 2px solid var(--sun); vertical-align: .01em; }
+.writing-grid { --gap: .65rem; --square-size: clamp(99px, 19vw, 165px); display: flex; gap: var(--gap); flex-wrap: wrap; margin-top: 1rem; }
+.writing-square { position: relative; flex: 0 0 var(--square-size); aspect-ratio: 1; touch-action: none; overflow: hidden; border: 1px solid #a4bea8; border-radius: .3rem; background: linear-gradient(0deg,transparent 49%, #4d685b2c 50%, transparent 51%), linear-gradient(90deg,transparent 49%, #4d685b2c 50%, transparent 51%), #e6edd6; }
 .writing-square svg { display: block; width: 100%; height: 100%; }
 .writing-square.current { outline: 2px solid #e6c286; outline-offset: 2px; }
 .writing-square.complete { border-color: var(--jade); opacity: .76; }
@@ -121,6 +130,13 @@ dialog .body { margin-top: .6rem; }
   .vocab li { grid-template-columns: 1fr auto; }
   .vocab .definition { grid-row: 2; }
   .vocab .row-buttons { grid-row: 1 / 3; grid-column: 2; }
+}
+@media (max-width: 925px) {
+  .writing-grid:is([data-length="4"], [data-length="5"]) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(100%, calc(var(--square-size) * 3 + var(--gap) * 2)); }
+}
+@media (max-width: 545px) {
+  .question-layout.with-figure { grid-template-columns: 1fr; gap: .12rem; }
+  .question-figure { width: min(58%, 13rem); }
 }
 @media (max-height: 510px) {
   .splash { padding-block: 4rem 1.4rem; }

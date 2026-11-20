@@ -23,9 +23,9 @@ const roomNames = {
   brightLamp: '储藏室', deskLamp: '储藏室', vividTape: '储藏室', tray: '储藏室',
   weakPlant: '温室', sturdyPlant: '温室', fan: '温室', seedJar: '温室', soilPot: '温室', rootCam: '温室',
   diary: '准备室', exerciseLog: '准备室', testSheet: '准备室', rehearsalTape: '准备室',
-  rehearsalScreen: '展览室', backupNotes: '展览室', exhibitStand: '展览室', handoverDesk: '展览室',
+  rehearsalScreen: '展示室', backupNotes: '展示室', exhibitStand: '展示室', handoverDesk: '展示室',
 };
-const englishRooms = { 准备室: 'prep room', 储藏室: 'storeroom', 温室: 'greenhouse', 展览室: 'exhibition room' };
+const englishRooms = { 准备室: 'prep room', 储藏室: 'storeroom', 温室: 'greenhouse', 展示室: 'exhibition room' };
 const actionWords = [
   [['每逢', '暴雨', '恶劣', '缝'], [], []],
   [['耀眼'], ['鲜艳'], ['严格', '托']],
@@ -73,6 +73,9 @@ let walked = 0;
 let turned = 0;
 let currentTarget = null;
 let cue = { cn: '', en: '' };
+let cueParts = { lead: null, task: cue, showingLead: false };
+let cueTimer;
+let cueRevision = 0;
 let cleanup = () => {};
 let afterClose = null;
 let last = null;
@@ -195,15 +198,40 @@ function updateInterface() {
   worldState();
 }
 
-function setCue({ cn, en }, announce = true, prefix = '') {
-  cue = { cn, en, prefix };
-  $('#cue-text').textContent = cn;
-  resetTranslation($('#cue-en'), $('#cue-translation'), en);
-  animate($('#cue-text'), { opacity: .25, y: -3 }, { opacity: 1, y: 0 });
-  if (announce) voice.speak(prefix ? prefix + ' ' + cn : cn);
+function showCuePart(showingLead, announce, autoAdvance = false) {
+  clearTimeout(cueTimer);
+  const revision = ++cueRevision;
+  cueParts.showingLead = Boolean(showingLead && cueParts.lead);
+  cue = cueParts.showingLead ? cueParts.lead : cueParts.task;
+  $('#cue-text').textContent = cue.cn;
+  resetTranslation($('#cue-en'), $('#cue-translation'), cue.en);
+  const step = $('#cue-step');
+  step.hidden = !cueParts.lead;
+  step.textContent = cueParts.showingLead ? '看任务' : '回看线索';
+  animate($('#cue-text'), { opacity: .25, y: 10 }, { opacity: 1, y: 0 }, .32);
+  if (!announce) return;
+
+  function followTask() {
+    if (revision !== cueRevision || desk.open || !$('#cue-translation').hidden) return;
+    showCuePart(false, true);
+  }
+  const rolling = cueParts.showingLead && autoAdvance;
+  const startedAt = performance.now();
+  if (rolling) cueTimer = setTimeout(followTask, Math.min(12500, Math.max(5200, cue.cn.length * 265)));
+  voice.speak(cue.cn, .87, (status) => {
+    if (!rolling || revision !== cueRevision || !['idle', 'unavailable'].includes(status)) return;
+    clearTimeout(cueTimer);
+    const minimum = Math.min(7200, Math.max(2400, cue.cn.length * 165));
+    cueTimer = setTimeout(followTask, Math.max(550, minimum - (performance.now() - startedAt)));
+  });
 }
 
-function objective(announce = true, briefing = false, previous = '') {
+function setCue(task, announce = true, lead = null) {
+  cueParts = { task, lead: lead?.cn && lead.cn !== task.cn ? lead : null, showingLead: false };
+  showCuePart(Boolean(cueParts.lead && announce), announce, true);
+}
+
+function objective(announce = true, briefing = false, previous = null) {
   const status = $('#mission-number');
   const title = $('#mission-name');
   if (!state.tutorialDone) {
@@ -213,14 +241,14 @@ function objective(announce = true, briefing = false, previous = '') {
   } else if (state.phase === 'done') {
     status.textContent = '六项任务已完成';
     title.textContent = '温室准备就绪';
-    setCue({ cn: '展览室已经布置好。你可以继续参观，或打开词语手册复习。', en: 'The exhibition room is ready. Keep exploring or open the vocabulary notebook to review.' }, announce);
+    setCue({ cn: '展示室准备好了。打开词语手册复习吧！', en: 'The exhibition room is ready. Open the vocabulary notebook to review.' }, announce);
   } else {
     const mission = missions[state.mission];
     status.textContent = '任务 ' + (state.mission + 1) + ' / ' + missions.length;
     title.textContent = mission.titleCN;
     if (state.phase === 'explore') {
       const action = mission.actions[state.action];
-      setCue(briefing ? { cn: mission.cn + ' ' + action.cn, en: mission.en + ' ' + action.en } : action, announce, previous);
+      setCue(action, announce, briefing ? { cn: mission.cn, en: mission.en } : previous);
     } else {
       setCue({ cn: '打开交接记录，完成这一项任务的理解题和听写。', en: 'Open the handover notes to finish this task’s question and dictation.' }, announce);
     }
@@ -293,8 +321,8 @@ function useObject(target) {
   }
   save();
   audio.cue(action.action === 'pickup' ? 'dew' : 'correct');
-  response(action.resultCN, action.resultEN);
-  objective(true, false, action.resultCN);
+  $('#response').hidden = true;
+  objective(true, false, { cn: action.resultCN, en: action.resultEN });
 }
 
 function clearPanel() {
@@ -306,6 +334,8 @@ function clearPanel() {
 
 function openPanel(label, title) {
   clearPanel();
+  clearTimeout(cueTimer);
+  desk.classList.remove('wide-writing');
   const top = node('div', '', 'panel-top');
   top.append(node('p', label, 'label'), makeButton('×', 'icon-button', () => desk.close(), '返回场景'));
   const heading = node('h2', title);
@@ -362,12 +392,39 @@ function addTranslation(parent, english) {
 
 function showQuestion(item, label, onNext, context) {
   openPanel(label, '读懂线索');
-  const english = [context?.en, item.en, ...item.choices.map((choice, i) => (i + 1) + '. ' + choice.en)].filter(Boolean).join('\n');
+  const english = [item.en, ...item.choices.map((choice, i) => (i + 1) + '. ' + choice.en)].filter(Boolean).join('\n');
   const support = translation(english);
-  row(makeButton('重听提问', 'text-button', () => voice.speak(item.cn)), support.control);
+  const replay = makeButton('重听', 'text-button', () => voice.speak(item.cn));
+  const controls = row(replay, support.control);
   panel.append(support.block);
-  if (context?.cn) panel.append(node('p', context.cn, 'clue-note'));
-  panel.append(node('p', item.cn, 'body'));
+  if (context?.cn && !item.image) {
+    const note = node('div', '', 'clue-note');
+    const hint = translation(context.en);
+    const clue = makeButton('回看线索', 'text-button', () => {
+      note.hidden = !note.hidden;
+      clue.setAttribute('aria-expanded', String(!note.hidden));
+      if (!note.hidden) voice.speak(context.cn);
+    });
+    clue.setAttribute('aria-expanded', 'false');
+    note.hidden = true;
+    note.append(node('p', context.cn), hint.control, hint.block);
+    controls.append(clue);
+    panel.append(note);
+  }
+  const layout = node('div', '', 'question-layout');
+  if (item.image === 'tray-guide') {
+    const figure = node('figure', '', 'question-figure');
+    const image = node('img');
+    image.src = new URL('./art/tray-guide.webp', import.meta.url).href;
+    image.alt = '两只手从下方托住花盆的底部。';
+    image.width = 660;
+    image.height = 440;
+    figure.append(image);
+    layout.append(figure);
+    layout.classList.add('with-figure');
+  }
+  const content = node('div', '', 'question-content');
+  content.append(node('p', item.cn, 'body'));
   const choices = node('div', '', 'choices');
   const feedback = node('p', '', 'feedback');
   feedback.setAttribute('role', 'status');
@@ -394,25 +451,39 @@ function showQuestion(item, label, onNext, context) {
     });
     choices.append(option);
   }
-  panel.append(choices, feedback);
+  content.append(choices, feedback);
+  layout.append(content);
+  panel.append(layout);
   voiceMessage();
-  voice.speak([context?.cn, item.cn].filter(Boolean).join(' '));
+  voice.speak(item.cn);
+}
+
+function sentenceWithGap(sentence, word) {
+  const line = node('p', '', 'sentence');
+  for (const [index, fragment] of sentence.split(word).entries()) {
+    if (index) {
+      const gap = node('span', '', 'sentence-gap');
+      gap.style.setProperty('--characters', String([...word].length));
+      gap.setAttribute('role', 'img');
+      gap.setAttribute('aria-label', '空格');
+      line.append(gap);
+    }
+    line.append(document.createTextNode(fragment));
+  }
+  return line;
 }
 
 function showWord(entry, label, complete, guided = false, announce = true) {
-  openPanel(label, guided ? '照着笔顺练习' : '听写记录');
-  const guide = guided ? '按笔顺书写。每写完一个字，下一格会亮起。'
-    : (entry.instructionCN ?? '先听一句话，再听要写的词语。请按笔顺把它写在方格里。');
-  const guideEN = guided ? 'Write in stroke order. The next square lights up when a character is complete.'
-    : (entry.instructionEN ?? 'Listen to the sentence and then the target word. Write it in stroke order.');
-  panel.append(node('p', guide, 'body'));
+  openPanel(label, guided ? '练写' : '听写');
+  desk.classList.toggle('wide-writing', [...entry.word].length >= 4);
+  panel.append(sentenceWithGap(entry.sentence, entry.word));
+  if (!guided && entry.instructionCN) panel.append(node('p', entry.instructionCN, 'minor'));
   if (guided) panel.append(node('p', entry.word + ' · ' + lexicon[entry.word].pinyin, 'ink-word'));
   const spoken = entry.spokenTarget ?? entry.word + '。';
   const audioLine = entry.sentence + ' 要写的是：' + spoken;
-  const play = (slow) => voice.speak(audioLine, slow ? .68 : .85);
-  const buttons = row(makeButton('播放听写', 'primary', () => play(false)),
-    makeButton('慢速播放', 'text-button', () => play(true)));
-  addTranslation(buttons, guideEN + (entry.en ? '\n句意 / Sentence: ' + entry.en : ''));
+  const play = () => voice.speak(audioLine, .85);
+  const buttons = row(makeButton('重听', 'primary', play, '重听听写'));
+  addTranslation(buttons, [entry.instructionEN, entry.en].filter(Boolean).join('\n'));
   voiceMessage();
   const grid = node('div', '', 'writing-grid');
   const status = node('p', '', 'feedback');
@@ -420,7 +491,7 @@ function showWord(entry, label, complete, guided = false, announce = true) {
   panel.append(grid, status);
   const helper = row();
   if (!guided) {
-    helper.append(makeButton('显示词语，先练习', 'text-button', () => showWord(entry, label, complete, true, false)));
+    helper.append(makeButton('看字练写', 'text-button', () => showWord(entry, label, complete, true, false)));
   }
   cleanup = createWriting(grid, entry.word, guided, () => {
     audio.cue('correct');
@@ -434,7 +505,7 @@ function showWord(entry, label, complete, guided = false, announce = true) {
   }, () => {
     status.textContent = guided ? '再试一笔。也可以看看亮起的笔画。' : '这一笔的位置或笔顺不对，请再试。';
   });
-  if (announce) play(false);
+  if (announce) play();
 }
 
 function record(word, guided) {
@@ -494,7 +565,7 @@ function showEnding() {
   const guided = Object.values(state.written).filter((value) => value === 'guided').length;
   panel.append(node('p', guided ? `24 个词已收录。其中 ${guided} 个用过描写提示，可以在手册中再试听写。` : '24 个词都已收录。回到词语手册，可以重听和复习。', 'body'));
   const controls = row(makeButton('打开词语手册', 'primary', showBook),
-    makeButton('返回展览室', 'text-button', () => desk.close()),
+    makeButton('返回展示室', 'text-button', () => desk.close()),
     makeButton('重玩任务', 'text-button', replay));
   addTranslation(controls, 'The window is sealed, the seedling is safe, and the exhibit is ready for tomorrow. All 24 words are in your notebook.');
   voiceMessage();
@@ -587,10 +658,13 @@ function nudge() {
 }
 
 function replayCue() {
-  voice.speak([cue.prefix, cue.cn].filter(Boolean).join(' '));
+  clearTimeout(cueTimer);
+  cueRevision += 1;
+  voice.speak(cue.cn);
 }
 
 $('#replay-cue').addEventListener('click', replayCue);
+$('#cue-step').addEventListener('click', () => showCuePart(!cueParts.showingLead, true));
 $('#nudge').addEventListener('click', nudge);
 $('#book').addEventListener('click', showBook);
 $('#help').addEventListener('click', showHelp);

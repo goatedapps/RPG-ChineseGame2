@@ -8,34 +8,22 @@ export function createWorld(THREE) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#183442');
   scene.fog = new THREE.Fog('#294856', 17, 33);
-  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, flooring, iconScreen, finish } = createKit(THREE, scene);
+  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, imageTexture, metricSurface, flooring, iconScreen, finish } = createKit(THREE, scene);
   const targets = new Map();
   const colliders = [];
   const leaves = [];
   const outsideRain = [];
+  const tiledFloors = [];
   let clock = 0;
 
-  const wallMap = texture((ctx, w, h) => {
-    ctx.fillStyle = '#bac3af';
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 1; i <= 3600; i += 1) {
-      ctx.fillStyle = i % 2 ? '#e0dfca2f' : '#37453e17';
-      ctx.fillRect((i * 197 % 3691) / 3691 * w, ((i * i * 71) % 4093) / 4093 * h, 2, 2);
-    }
-    const tone = ctx.createLinearGradient(0, 0, 0, h);
-    tone.addColorStop(0, '#e8dcc063');
-    tone.addColorStop(.38, '#e8dcc024');
-    tone.addColorStop(1, '#1e35493d');
-    ctx.fillStyle = tone;
-    ctx.fillRect(0, 0, w, h);
-  });
-  const wall = material('#ffffff', { map: wallMap });
+  const wall = metricSurface('wall-plaster.webp', '#bac3af', '#fff7ed', [.46, .46], { roughness: .89 });
   const wallLow = material('#57716a');
   const navy = material('#183039');
   const ceilingMat = material('#657469', { emissive: '#182126', emissiveIntensity: .21 });
   const trim = material('#365454', { metalness: .19 });
   const metal = material('#284140', { metalness: .24 });
-  const counter = material('#a08866');
+  const counter = metricSurface('worktop-wood.webp', '#a08866', '#fff4df', [.63, 1.18], { roughness: .61 });
+  const enamel = metricSurface('cabinet-enamel.webp', '#4c6963', '#b1c0b8', [.77, .77], { roughness: .65 });
   const wood = material('#735e4a');
   const ceramic = material('#bbc7a8');
   const soil = material('#382e24');
@@ -107,7 +95,9 @@ export function createWorld(THREE) {
   }
 
   function floor(x, z, color, grout) {
-    plane([10, 10, 1], [x, 0, z], flooring(color, grout, 7), null, [-Math.PI / 2, 0, 0]);
+    const tiles = flooring(color, grout, 7);
+    tiledFloors.push(tiles);
+    plane([10, 10, 1], [x, 0, z], tiles.surface, null, [-Math.PI / 2, 0, 0]);
     box([10, .18, 10], [x, CEILING, z], ceilingMat);
     for (const lx of [-3.4, -.3, 2.8]) box([.15, .17, 9.8], [x + lx, CEILING - .16, z], trim);
     for (const lz of [-3.15, 2.4]) {
@@ -164,9 +154,9 @@ export function createWorld(THREE) {
     box([width, .11, depth], [x, .98, z], counter);
     box([width - .06, .055, depth - .05], [x, .895, z], wood);
     if (cabinet) {
-      box([width - .13, .78, depth - .12], [x, .43, z], wallLow);
+      box([width - .13, .78, depth - .12], [x, .43, z], enamel);
       for (let local = -width / 2 + .35; local < width / 2 - .14; local += .62) {
-        box([.565, .56, .035], [x + local, .46, z + depth / 2 - .055], trim);
+        box([.565, .56, .035], [x + local, .46, z + depth / 2 - .055], enamel);
         box([.19, .037, .036], [x + local, .61, z + depth / 2 - .027], ceramic);
       }
     } else {
@@ -193,7 +183,7 @@ export function createWorld(THREE) {
       const b = Math.cos(angle);
       box(size, [x + localX * b + localZ * a, y, z - localX * a + localZ * b], mat, null, [0, angle, 0]);
     }
-    for (const y of [.19, .87, 1.55, 2.23]) row(0, y, 0, [width, .07, depth], metal);
+    for (const y of [.19, .87, 1.55, 2.23]) row(0, y, 0, [width, .07, depth], enamel);
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) row(sx * (width / 2 - .035), 1.17, sz * (depth / 2 - .035), [.07, 2.35, .07], trim);
     }
@@ -237,6 +227,10 @@ export function createWorld(THREE) {
   floor(5, 5, '#8c8f7c', '#4d554c');
   floor(-5, -5, '#637d6e', '#3b5954');
   floor(5, -5, '#9a947e', '#575648');
+  imageTexture('floor-terrazzo.webp', (map) => {
+    tiledFloors.forEach((tile) => tile.setImage(map.image));
+    map.dispose();
+  });
   interior('z', -5, ['温室', '准备室'], true);
   interior('z', 5, ['展示室', '储藏室'], false);
   interior('x', -5, ['温室', '展示室'], true);
@@ -368,6 +362,16 @@ export function createWorld(THREE) {
     box([.057, .06, .52], [side * .33, .05, 0], metal, tray);
     box([.69, .06, .057], [0, .05, side * .25], metal, tray);
   }
+  const guide = group(6.76, 1.34, 4.52, -.16);
+  guide.rotation.x = -.16;
+  box([.81, .60, .042], [0, 0, 0], navy, guide);
+  const guideLabel = plate('托住盆底', .75, .54, [0, 0, .025], 0, { size: 52, parent: guide });
+  imageTexture('tray-guide.webp', (map) => {
+    const ratio = map.image.width / map.image.height;
+    const width = Math.min(.75, .54 * ratio);
+    guideLabel.visible = false;
+    plane([width, width / ratio, 1], [0, 0, .027], new THREE.MeshBasicMaterial({ map, toneMapped: false }), guide);
+  });
   shelves(6.73, 8.95, 3.35, .83);
   shelves(9.18, 4.86, 2.83, .70, Math.PI / 2);
   for (let shelf = 0; shelf < 3; shelf += 1) {
@@ -446,7 +450,7 @@ export function createWorld(THREE) {
   book('backupNotes', '备用布置图', 3.72, -8.19, paper, -.13);
   const diorama = interact('exhibitStand', '科学展台', [5.68, 0, -5.90]);
   box([1.98, .17, 1.46], [0, .081, 0], navy, diorama);
-  box([1.55, 1.04, 1.10], [0, .64, 0], trim, diorama);
+  box([1.55, 1.04, 1.10], [0, .64, 0], enamel, diorama);
   box([1.82, .095, 1.37], [0, 1.19, 0], counter, diorama);
   box([1.79, .035, 1.31], [0, 1.252, 0], yellow, diorama);
   plate('种子的力量', 1.245, .37, [0, .813, .567], 0, { size: 61, accent: AMBER, parent: diorama });
@@ -463,11 +467,9 @@ export function createWorld(THREE) {
   const posterPanel = group(9.835, 2.28, -6.94, -Math.PI / 2);
   box([2.22, 2.62, .1], [0, 0, 0], wood, posterPanel);
   plate('植物观察', 2.11, 2.48, [0, 0, .056], 0, { size: 68, secondary: '扎根 · 成长', parent: posterPanel });
-  const posterURL = new URL('./art/science-poster.webp', import.meta.url);
-  new THREE.TextureLoader().load(posterURL.href, (map) => {
-    map.colorSpace = THREE.SRGBColorSpace;
+  imageTexture('science-poster.webp', (map) => {
     plane([2.08, 2.45, 1], [0, 0, .069], new THREE.MeshBasicMaterial({ map, toneMapped: false }), posterPanel);
-  }, undefined, () => {});
+  });
   plant(group(8.82, 0, -8.13, .21), 2.16, false, true);
   const display = group(9.82, 2.23, -4.54, -Math.PI / 2);
   box([.92, .72, .071], [0, 0, 0], trim, display);

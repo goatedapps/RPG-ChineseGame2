@@ -49,10 +49,13 @@
       <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><span aria-hidden="true">◖))</span></button>
       <button id="cue-en" type="button" class="icon-button" aria-expanded="false" aria-label="当前任务的英文翻译" title="English">?</button>
     </div>
-    <p id="cue-text" class="cue-text"></p>
+    <div class="cue-window"><p id="cue-text" class="cue-text" aria-live="polite"></p></div>
     <p id="cue-translation" class="translation" lang="en" hidden></p>
     <p id="voice-status" class="voice-status" role="status" hidden></p>
-    <button id="nudge" type="button" class="quiet-link">需要线索？</button>
+    <div class="cue-actions">
+      <button id="cue-step" type="button" class="quiet-link" hidden></button>
+      <button id="nudge" type="button" class="quiet-link">提示</button>
+    </div>
   </section>
 
   <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
