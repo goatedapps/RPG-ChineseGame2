@@ -8,7 +8,8 @@
   <title>暴雨后的温室 · P6 华文</title>
   <link rel="stylesheet" href="greenhouse/game.css">
   <link rel="stylesheet" href="greenhouse/comic.css">
-  <link rel="preload" href="greenhouse/art/comic-1.webp" as="image">
+  <link rel="stylesheet" href="greenhouse/title.css">
+  <link rel="preload" href="greenhouse/art/storm-cover.webp" as="image">
   <script defer src="greenhouse/vendor/gsap.min.js"></script>
   <script defer src="stage/vendor/hanzi-writer.min.js"></script>
   <script type="module" src="greenhouse/game.js"></script>
@@ -30,27 +31,36 @@
   </header>
 
   <section id="splash" class="splash" aria-labelledby="game-title">
-    <div class="splash-content">
-      <p class="subheading">六年级 · 第一课</p>
-      <h1 id="game-title">暴雨后的<br>温室</h1>
-      <p>科学展快开始了。暴雨刚过，一株幼苗还在等你。</p>
-      <div class="button-row">
-        <button id="start" type="button" class="primary">进入科学楼</button>
-        <button id="replay-intro" type="button" class="text-button" hidden>看序幕</button>
-        <button id="intro-en" type="button" class="icon-button" aria-expanded="false" aria-label="英文说明" title="English">?</button>
+    <img class="cover-art" src="greenhouse/art/storm-cover.webp" alt="" fetchpriority="high">
+    <div class="cover-copy">
+      <p class="cover-edition">六年级华文 · 第一课</p>
+      <h1 id="game-title"><span>暴雨后的</span><span>温室</span></h1>
+      <p class="cover-warning"><span aria-hidden="true"></span>科学展快开门了。西窗还在漏水！</p>
+      <div class="cover-actions">
+        <button id="start" type="button" class="cover-start"><span id="start-label">进入科学楼</span><span aria-hidden="true">→</span></button>
+        <button id="replay-intro" type="button" class="cover-replay" hidden>重看序幕</button>
       </div>
-      <p id="intro-translation" class="translation" lang="en" hidden>The science fair is about to open. The storm has passed, and a seedling needs your help. Enter the science wing to begin.</p>
-      <p id="start-status" class="minor" role="status">正在准备科学楼……</p>
-      <a href="stormroot.html" class="archive-link">打开旧版屋顶关卡</a>
+      <p id="start-status" role="status">正在准备科学楼……</p>
     </div>
+    <footer class="cover-footer">
+      <div class="cover-tools">
+        <button id="title-music" type="button" class="cover-tool" aria-pressed="false" aria-label="播放背景音乐">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13M9 18c0 1.7-1.6 3-3.5 3S2 20.2 2 19s1.6-2.5 3.5-2.5c1.6 0 2.7.5 3.5 1.5Zm11-2c0 1.7-1.6 3-3.5 3S13 18.2 13 17s1.6-2.5 3.5-2.5c1.6 0 2.7.5 3.5 1.5Z"/></svg>
+          <span id="music-label">开启音乐</span>
+        </button>
+        <button id="intro-en" type="button" class="cover-tool translation-button" aria-expanded="false" aria-label="英文说明" title="English">EN</button>
+      </div>
+      <p id="intro-translation" class="translation" lang="en" hidden>The science fair is about to open. The west window is still leaking. Head into the science wing.</p>
+      <a href="stormroot.html" class="cover-archive">旧版屋顶关卡</a>
+    </footer>
   </section>
 
   <section id="mission-ui" class="mission" aria-label="当前任务" hidden>
     <div class="mission-line">
       <div class="radio-wave" id="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div><p id="mission-number" class="label"></p><h2 id="mission-name"></h2></div>
-      <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><span aria-hidden="true">◖))</span></button>
-      <button id="cue-en" type="button" class="icon-button" aria-expanded="false" aria-label="当前任务的英文翻译" title="English">?</button>
+      <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><svg class="speaker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+      <button id="cue-en" type="button" class="icon-button translation-button" aria-expanded="false" aria-label="当前任务的英文翻译" title="English">EN</button>
     </div>
     <div class="cue-window"><p id="cue-text" class="cue-text" aria-live="polite"></p></div>
     <p id="cue-translation" class="translation" lang="en" hidden></p>
@@ -64,7 +74,7 @@
   <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
   <div id="response" class="response" role="status" aria-live="polite" hidden>
     <span id="response-text"></span>
-    <button id="response-en" type="button" class="icon-button" aria-label="互动反馈的英文翻译" aria-expanded="false" title="English">?</button>
+    <button id="response-en" type="button" class="icon-button translation-button" aria-label="互动反馈的英文翻译" aria-expanded="false" title="English">EN</button>
     <p id="response-translation" class="translation" lang="en" hidden></p>
   </div>
 

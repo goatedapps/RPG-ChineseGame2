@@ -38,22 +38,75 @@ Refer to a careful two-handed offering/scooping posture.
 Simple elegant classroom safety-manual illustration, clear contour, flat soft jade shadows and soft earthy colours, large uncluttered readable subject, soft educational diagram.
 No text, lettering, arrows, labels, signs, diagrams inset, border, or decorative marks.
 
-## Comic prelude
+## Storm comic and title cover
 
-`comic-1.webp` through `comic-4.webp` are the four 760 × 505 panels.
-The built-in image generator provided the artwork, which was cropped and compressed to WebP.
+The built-in image generator produced `storm-cover.webp` and `comic-storm-1.webp` through `comic-storm-4.webp`.
+The cover is 1280 × 720 and the four comic panels are 1050 × 700 WebPs.
+Chinese and opt-in English are typeset as live dialogue within the illustrated balloons.
 
-Create a single wide 3:2 comic artwork CONTACT SHEET containing exactly four continuous edge-to-edge landscape images in an exactly even 2-by-2 grid, no frame, no margins, no gutter, no text, no letters, no bubbles.
-Each quadrant is a complete cinematic shot with its focal point safely in the middle.
-Story is a cozy contemporary Singapore primary school science wing, glass partitions, deep jade painted trim, warm wood worktops.
-Two recurring eleven-year-old East Asian classmates wear the same school clothes in every appearance: A Ning has a black chin-length bob and a muted teal school vest over an ivory shirt, her partner has short black hair, a white shirt and a warm saffron canvas school bag.
-A real small bean seedling in a terracotta pot recurs.
-TOP LEFT: afternoon wide shot, both children excitedly prepare a science exhibit, arranging bright tape and blank illustrated plant posters on a classroom bench, sunlight and warm atmosphere.
-TOP RIGHT: closer quietly hopeful shot, they carefully set the seedling on the display table by the glass, warm late afternoon.
-BOTTOM LEFT: same science wing at night long after pupils went home, wide rain on the glass, a shallow puddle on the windowsill and a tipped empty marker roll, seedling still visible and safe, blue storm ambience, no danger or destruction.
-BOTTOM RIGHT: the next morning after the storm, low first-person style close-medium shot from inside the prep room, camera looking toward an inviting teal handheld school radio on the wood counter, rainwater beads on the window and a bit of early warm daylight; a small white light on radio.
-Hand painted modern illustrated children's adventure book, sophisticated warm-cool lighting, detailed uncluttered ink and gouache, easy facial expression, no dense UI, no words, no letters, no digits anywhere.
-Original creative style, clean 2x2 composition.
+### Shared comic direction
+
+Original Western adventure comic art with expressive school-kid characters, big slightly exaggerated emotions and cinematic perspective, bold dark ink contours, glossy flat cel shading, occasional hand-printed halftone grain, structured color masses, punchy composition and clean professional comic storytelling.
+Palette deep petroleum blues, mint-jade lab trim, golden orange comic highlights, silver wet rain.
+Set in a contemporary Singapore primary-school greenhouse with teal painted window frames, dark rainy glass, amber wood lab tables, and a small bean seedling in a terracotta pot.
+No recognizable franchise character, branding, words or lettering.
+A Ning is an eleven-year-old Chinese Singaporean pupil with a black chin-length bob, white short-sleeve school polo, green science vest, and amber lanyard; her classmate has short tousled black hair, a white school shirt and warm orange backpack.
+3:2 landscape single full-bleed comic panel, no gutters.
+The scene includes one solid warm-white unlettered comic speech balloon with a thick black comic outline and open center, centered at normalized x=29% for panels 1 and 3, or x=71% for panels 2 and 4, y=22%, approximately 37% wide and 23% high relative to the whole canvas.
+Keep its entire empty white interior plain and unobstructed.
+A small tail can be outside that safe center.
+This balloon is where the game separately types its dialogue.
+Keep action readable outside the bubble.
+No painted letters, fake letters, sound-effect words or logos anywhere.
+
+### comic-storm-1
+
+Late afternoon and everyone is feverishly setting up tomorrow's science fair.
+Character focus center and right in an exaggerated comic perspective.
+A Ning in the center-right is lifting the terracotta seedling above a cluttered oak workbench and speaking enthusiastically; classmate is jumping on tiptoe on the right to hang a little three-leaf pennant and grinning.
+A Ning's elbow, plant and face expressive, amber sunlight cuts through tall lab glass.
+Speech balloon upper left points down-right toward A Ning.
+Keep top-left bubble clear.
+
+### comic-storm-2
+
+Night storm hero panel.
+Dramatic low view from INSIDE the empty greenhouse, frame faces tall deep teal window panes with an enormous angular lightning bolt outside at upper left, cobalt rain and wind slashing diagonally.
+A narrow leak and splash fan out toward a real little bean seedling on an oak workbench lower left; no danger to a person.
+Put a single unlettered jagged pale warm-white lightning sound-effect speech burst in upper right centered as specified, with a generous inner white field for two large Chinese words.
+Arresting pace and foreshortening.
+
+### comic-storm-3
+
+Early next morning, urgency close-up.
+A Ning in lower right is looking down at water splashing over the windowsill towards the drooping bean plant on the workbench, with wide eyes and one eyebrow raised, raindrops and simple motion ink emphasis.
+Her classmate blurred at the far right starting to run towards the prep room.
+Cold rain blue meets warm early light on the wet terracotta pot.
+One unlettered warm-white balloon up and left with tail to A Ning down-right.
+
+### comic-storm-4
+
+Urgent handheld-radio close-up, low table-height cinematic Dutch angle.
+Physical dark jade rugged walkie-talkie in lower left foreground, antenna and red-orange transmit light active, echoed tilted signal marks, a schoolchild's reaching hand entering lower right, background wet glass and laboratory out of focus.
+Dry printed comic inks, cool night ink and lightning teal cut by golden transmit light.
+One solid unlettered warm-white jagged radio balloon at upper RIGHT with a short spike tail toward the radio lower-left.
+The lower part has an implied motion into the scene.
+No legible screen digits.
+
+### storm-cover
+
+16:9 landscape game title cover artwork.
+Original Western adventure comic art with expressive school-kid characters, big slightly exaggerated emotions and cinematic perspective, bold dark ink contours, glossy flat cel shading, occasional hand-printed halftone grain, structured color masses, punchy composition and clean professional comic storytelling.
+Palette deep petroleum blues, mint-jade lab trim, golden orange comic highlights, silver wet rain.
+Set in a contemporary Singapore primary-school greenhouse with teal painted window frames, dark rainy glass, amber wood lab tables, and a small bean seedling in a terracotta pot.
+No recognizable franchise character, branding, words or lettering.
+Original striking comic issue cover composition for a school adventure, full bleed.
+On the RIGHT 55 percent, a pupil's hand extends from the foreground holding a chunky green walkie-talkie with one amber LED into the rain-streaked greenhouse, with the seedling on a bench beyond against moonlit aqua light and diagonal storm motion.
+School urgency, hand/radio immediate protagonist, fern shapes and dynamic brush work.
+In the upper left 44 percent build a dramatic flat dark navy purple ink area from shadowed greenhouse and halftone lighting, low contrast and empty so a large Chinese title and controls can be typeset there.
+Strong diagonally offset composition.
+No framing, title, text, words, logos, badges, signage, speech balloons or letters.
+No heavy gradients; use original sharply cut comic color shapes and small print-texture details.
 
 ## Object covers
 

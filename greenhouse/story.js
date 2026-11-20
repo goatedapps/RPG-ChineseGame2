@@ -1,8 +1,8 @@
 export const tutorial = [
   {
     id: 'walk',
-    cn: '走几步：按方向键或拖动摇杆。',
-    en: 'Walk a few steps with the arrow keys, WASD, or the joystick.',
+    cn: '对讲机在响！按方向键或拖动摇杆，走过去。',
+    en: 'The radio is calling! Walk towards it with the arrow keys, WASD, or the joystick.',
   },
   {
     id: 'look',

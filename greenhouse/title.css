@@ -1,0 +1,145 @@
+#splash {
+  z-index: 5;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: max(1.2rem, env(safe-area-inset-top)) max(1.4rem, 6vw) max(1rem, env(safe-area-inset-bottom));
+  overflow: auto;
+  background: #1b1e36;
+  color: #faf3df;
+}
+.cover-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% center;
+  z-index: -2;
+}
+#splash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(90deg, #141428ef, #14142858 40%, transparent 64%),
+    linear-gradient(0deg, #111427dc, transparent 24%);
+}
+.cover-copy { width: min(100%, 36rem); }
+.cover-edition {
+  display: inline-block;
+  padding: .24rem .64rem;
+  transform: rotate(-3deg);
+  background: #f0c56b;
+  color: #282036;
+  font-size: .86rem;
+  font-weight: 800;
+}
+#splash #game-title {
+  width: fit-content;
+  margin: .18em 0 .27em .01em;
+  color: #fff2d5;
+  font: 950 clamp(3.9rem, 8.9vw, 9rem)/.96 "Arial Black", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  letter-spacing: -.065em;
+  transform: rotate(-4deg) skewX(-6deg);
+  text-shadow: .035em .056em #171523, .063em .079em #7b4978;
+}
+#game-title span { display: block; }
+.cover-warning {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  max-width: 24rem;
+  font-size: clamp(.95rem, 1.45vw, 1.15rem);
+  font-weight: 700;
+  text-shadow: 0 2px 6px #0e1023;
+}
+.cover-warning span {
+  flex: none;
+  width: .52rem;
+  height: .52rem;
+  margin-block-start: .1em;
+  background: #ff925d;
+  box-shadow: 0 0 13px #ff875c99;
+  transform: rotate(45deg);
+  animation: cover-signal .65s ease-in-out 4 alternate;
+}
+@keyframes cover-signal { to { opacity: .36; box-shadow: 0 0 4px #ff875c66; } }
+.cover-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.1rem; margin-block-start: 1.15rem; }
+.cover-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.45rem;
+  min-height: 3rem;
+  padding: .5rem 1.05rem;
+  border: 2px solid #20182c;
+  border-radius: .12rem;
+  background: #ffd36c;
+  box-shadow: 4px 4px #20182c, 5px 5px #d18a77;
+  color: #211a2f;
+  font-weight: 900;
+  transition: translate .14s, background .14s, box-shadow .14s;
+}
+.cover-start span[aria-hidden] { font: 900 1.25rem/1 system-ui, sans-serif; }
+.cover-start:not(:disabled):hover { background: #ffe49d; translate: 0 -2px; }
+.cover-start:not(:disabled):active { translate: 2px 2px; box-shadow: 2px 2px #20182c, 3px 3px #d18a77; }
+.cover-replay {
+  min-height: 2.75rem;
+  padding: 0 .28rem;
+  border: 0;
+  background: none;
+  color: #fff2d5;
+  text-decoration: underline;
+  text-decoration-color: #f3c97694;
+  text-underline-offset: .28em;
+}
+#start-status:not(:empty) { margin-block-start: .7rem; color: #ffe2ad; font-size: .84rem; }
+.cover-footer {
+  align-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  flex-wrap: wrap;
+}
+.cover-tools { display: inline-flex; gap: .48rem; }
+.cover-tools .cover-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .38rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 .58rem;
+  border: 1px solid #e6c7a466;
+  border-radius: .16rem;
+  background: #1a182dc9;
+  color: #faeddc;
+  font-size: .8rem;
+}
+.cover-tools .cover-tool svg { width: 1.14rem; height: 1.14rem; }
+.cover-tools .cover-tool:is(:hover,[aria-pressed='true'],[aria-expanded='true']) { border-color: #ffcb7f; color: #ffda9b; }
+.cover-archive { margin-inline-start: auto; color: #faeddc; font-size: .78rem; text-decoration-color: #f1d8bf90; }
+#intro-translation { order: 2; flex-basis: 100%; margin: 0; color: #fff2df; border-color: #f0c56b; background: #201c32f3; }
+
+@media (max-aspect-ratio: 1/1) {
+  #splash { align-items: end; }
+  .cover-art { height: 78%; object-position: 69% center; }
+  #splash::before {
+    background: linear-gradient(0deg, #1a182e 12%, #1a182e 23%, #1a182ebe 36%, #1a182e20 66%, transparent);
+  }
+  #splash #game-title { font-size: clamp(3.5rem, 12vw, 7.25rem); }
+}
+@media (max-height: 535px) and (min-aspect-ratio: 1/1) {
+  #splash { padding-block: .6rem; gap: .35rem; }
+  #splash #game-title { font-size: clamp(2.8rem, 14vh, 5rem); }
+  .cover-actions { margin-block-start: .7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-warning span { animation: none; }
+  .cover-start { transition: none; }
+}

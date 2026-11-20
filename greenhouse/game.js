@@ -19,6 +19,7 @@ const audio = createGreenhouseAudio();
 const entries = missions.flatMap((mission) => mission.dictation);
 const lessonWords = new Set(entries.map(({ word }) => word));
 const storageKey = 'greenhouse-p6-lesson1-v1';
+const musicKey = 'greenhouse-background-music';
 const actions = { inspect: '查看', pickup: '拿起', use: '使用', place: '摆放' };
 const roomNames = {
   radio: '准备室', westWindow: '温室', westNote: '温室', eastWindow: '温室', seal: '储藏室',
@@ -75,6 +76,8 @@ let walked = 0;
 let turned = 0;
 let footstepDistance = 0;
 let effectsEnabled = true;
+let musicEnabled = storedMusic();
+let audioStarted = false;
 let currentTarget = null;
 let cue = { cn: '', en: '' };
 let cueParts = { lead: null, task: cue, showingLead: false };
@@ -87,6 +90,38 @@ let responseTimer;
 let voiceTween;
 let panelVoiceStatus;
 let backdropPointer = null;
+
+function storedMusic() {
+  try {
+    return localStorage.getItem(musicKey) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+function updateTitleMusic() {
+  const playing = audioStarted && musicEnabled;
+  $('#title-music').setAttribute('aria-pressed', String(playing));
+  $('#title-music').setAttribute('aria-label', playing ? '关闭背景音乐' : '播放背景音乐');
+  $('#music-label').textContent = playing ? '关闭音乐' : '开启音乐';
+}
+
+function startAudio() {
+  if (!audio.start() || audioStarted) return;
+  audioStarted = true;
+  updateTitleMusic();
+}
+
+function setMusicPreference(enabled) {
+  musicEnabled = enabled;
+  audio.setMusicEnabled(enabled);
+  updateTitleMusic();
+  try {
+    localStorage.setItem(musicKey, enabled ? 'on' : 'off');
+  } catch {
+    // Background music remains available for the current session.
+  }
+}
 
 function save() {
   try {
@@ -111,6 +146,21 @@ function makeButton(text, className, click, label) {
   return result;
 }
 
+function speakerButton(click, label) {
+  const button = makeButton('', 'icon-button speaker-button', click, label);
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const icon = document.createElementNS(svgNS, 'svg');
+  icon.setAttribute('class', 'speaker-icon');
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(svgNS, 'path');
+  path.setAttribute('d', 'M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12');
+  icon.append(path);
+  button.append(icon);
+  button.title = label;
+  return button;
+}
+
 function animate(target, from, to, duration = .26) {
   const gsap = window.gsap;
   if (!gsap || motion.matches) return;
@@ -125,6 +175,7 @@ function resetTranslation(button, body, text) {
 }
 
 function connectTranslation(button, body) {
+  if (body.id) button.setAttribute('aria-controls', body.id);
   button.addEventListener('click', () => {
     body.hidden = !body.hidden;
     button.setAttribute('aria-expanded', String(!body.hidden));
@@ -132,12 +183,17 @@ function connectTranslation(button, body) {
   });
 }
 
+let translationId = 0;
+
 function translation(text) {
   const block = node('p', text, 'translation');
+  block.id = 'english-help-' + ++translationId;
   block.lang = 'en';
   block.hidden = true;
   block.dataset.translation = '';
-  const control = makeButton('?', 'icon-button', () => {}, '英文翻译');
+  const control = node('button', 'EN', 'icon-button translation-button');
+  control.type = 'button';
+  control.setAttribute('aria-label', '英文翻译');
   control.title = 'English';
   control.setAttribute('aria-expanded', 'false');
   connectTranslation(control, block);
@@ -351,7 +407,7 @@ function clearPanel() {
 function presentPanel(content, focusTarget, inspection = false) {
   clearPanel();
   clearTimeout(cueTimer);
-  desk.classList.remove('wide-writing');
+  delete desk.dataset.practice;
   desk.classList.toggle('artifact-inspection', inspection);
   panel.replaceChildren(content);
   if (!desk.open) {
@@ -366,7 +422,7 @@ function presentPanel(content, focusTarget, inspection = false) {
   focusTarget.focus({ preventScroll: true });
 }
 
-function openPanel(label, title) {
+function openPanel(label, title, practice) {
   const top = node('div', '', 'panel-top');
   const header = node('div');
   if (label) header.append(node('p', label, 'label'));
@@ -376,7 +432,7 @@ function openPanel(label, title) {
   header.append(heading);
   top.append(header, makeButton('×', 'icon-button', () => desk.close(), '返回场景'));
   presentPanel(top, heading);
-  return heading;
+  if (practice) desk.dataset.practice = practice;
 }
 
 desk.addEventListener('pointerdown', (event) => {
@@ -412,25 +468,30 @@ desk.addEventListener('close', () => {
   next?.();
 });
 
-function voiceMessage() {
+function voiceMessage(parent = panel) {
   panelVoiceStatus = node('p', '', 'voice-status');
   panelVoiceStatus.setAttribute('role', 'status');
   panelVoiceStatus.hidden = true;
-  panel.append(panelVoiceStatus);
+  parent.append(panelVoiceStatus);
+}
+
+function buttonRow(...buttons) {
+  const controls = node('div', '', 'button-row');
+  controls.append(...buttons);
+  return controls;
 }
 
 function row(...buttons) {
-  const controls = node('div', '', 'button-row');
-  controls.append(...buttons);
+  const controls = buttonRow(...buttons);
   panel.append(controls);
   return controls;
 }
 
-function addTranslation(parent, english) {
+function addTranslation(parent, english, placement = panel) {
   if (!english) return;
   const { control, block } = translation(english);
   parent.append(control);
-  panel.append(block);
+  placement.append(block);
 }
 
 function showEvidence(id, next) {
@@ -463,10 +524,10 @@ function showEvidence(id, next) {
 }
 
 function showQuestion(item, label, onNext, context) {
-  openPanel(label, item.cn).classList.add('question-title');
+  openPanel(label, item.cn, 'question');
   const english = [item.en, ...item.choices.map((choice, i) => (i + 1) + '. ' + choice.en)].filter(Boolean).join('\n');
   const support = translation(english);
-  const replay = makeButton('重听', 'text-button', () => voice.speak(item.cn));
+  const replay = speakerButton(() => voice.speak(item.cn), '重听');
   const controls = row(replay, support.control);
   panel.append(support.block);
   if (context?.cn && !item.image) {
@@ -479,7 +540,9 @@ function showQuestion(item, label, onNext, context) {
     });
     clue.setAttribute('aria-expanded', 'false');
     note.hidden = true;
-    note.append(node('p', context.cn), hint.control, hint.block);
+    const clueLine = node('div', '', 'clue-line');
+    clueLine.append(node('p', context.cn), hint.control);
+    note.append(clueLine, hint.block);
     controls.append(clue);
     panel.append(note);
   }
@@ -501,8 +564,9 @@ function showQuestion(item, label, onNext, context) {
   feedback.setAttribute('role', 'status');
   let correct = false;
   for (const [index, choice] of item.choices.entries()) {
-    const option = makeButton((index + 1) + '. ' + choice.cn, 'choice', () => {
+    const option = makeButton('', 'choice', () => {
       if (correct) return;
+      choices.querySelector('.wrong')?.classList.remove('wrong');
       if (index !== item.answer) {
         option.classList.add('wrong');
         feedback.textContent = '还不对。再想一想你刚才听见或看见的线索。';
@@ -520,6 +584,10 @@ function showQuestion(item, label, onNext, context) {
         buttons.firstElementChild.focus();
       }
     });
+    const number = node('span', String(index + 1), 'choice-number');
+    number.setAttribute('aria-hidden', 'true');
+    option.setAttribute('aria-label', (index + 1) + '. ' + choice.cn);
+    option.append(number, node('span', choice.cn));
     choices.append(option);
   }
   content.append(choices, feedback);
@@ -545,22 +613,41 @@ function sentenceWithGap(sentence, word) {
 }
 
 function showWord(entry, label, complete, guided = false, announce = true) {
-  openPanel(label, guided ? '练写' : '听写');
-  desk.classList.toggle('wide-writing', [...entry.word].length >= 4);
-  panel.append(sentenceWithGap(entry.sentence, entry.word));
-  if (!guided && entry.instructionCN) panel.append(node('p', entry.instructionCN, 'minor'));
-  if (guided) panel.append(node('p', entry.word + ' · ' + lexicon[entry.word].pinyin, 'ink-word'));
+  openPanel(label, guided ? '练写' : '听写', 'writing');
+  const layout = node('div', '', 'dictation-layout');
+  const directions = node('div', '', 'dictation-directions');
+  directions.append(sentenceWithGap(entry.sentence, entry.word));
+  if (!guided && entry.instructionCN) directions.append(node('p', entry.instructionCN, 'minor'));
+  if (guided) directions.append(node('p', entry.word + ' · ' + lexicon[entry.word].pinyin, 'ink-word'));
   const spoken = entry.spokenTarget ?? entry.word + '。';
   const audioLine = entry.sentence + ' 要写的是：' + spoken;
   const play = () => voice.speak(audioLine, .85);
-  const buttons = row(makeButton('重听', 'primary', play, '重听听写'));
-  addTranslation(buttons, [entry.instructionEN, entry.en].filter(Boolean).join('\n'));
-  voiceMessage();
+  const buttons = buttonRow(speakerButton(play, '重听听写'));
+  directions.append(buttons);
+  addTranslation(buttons, [entry.instructionEN, entry.en].filter(Boolean).join('\n'), directions);
+  voiceMessage(directions);
+  const workspace = node('div', '', 'writing-workspace');
   const grid = node('div', '', 'writing-grid');
+  const characters = [...entry.word];
+  const progress = node('ol', '', 'writing-progress');
+  progress.setAttribute('aria-label', '听写进度');
+  const markers = characters.map((_, index) => node('li', String(index + 1)));
+  progress.append(...markers);
+  function updateProgress(completed) {
+    markers.forEach((marker, index) => {
+      marker.textContent = index < completed ? characters[index] : String(index + 1);
+      marker.classList.toggle('complete', index < completed);
+      if (index === completed) marker.setAttribute('aria-current', 'step');
+      else marker.removeAttribute('aria-current');
+    });
+  }
+  updateProgress(0);
   const status = node('p', '', 'feedback');
   status.setAttribute('role', 'status');
-  panel.append(grid, status);
-  const helper = row();
+  const helper = buttonRow();
+  workspace.append(grid, progress, status, helper);
+  layout.append(directions, workspace);
+  panel.append(layout);
   if (!guided) {
     helper.append(makeButton('看字练写', 'text-button', () => showWord(entry, label, complete, true, false)));
   }
@@ -575,6 +662,9 @@ function showWord(entry, label, complete, guided = false, announce = true) {
     helper.append(makeButton('重新载入书写格', 'text-button', () => showWord(entry, label, complete, guided, false)));
   }, () => {
     status.textContent = guided ? '再试一笔。也可以看看亮起的笔画。' : '这一笔的位置或笔顺不对，请再试。';
+  }, (completed) => {
+    status.textContent = '';
+    updateProgress(completed);
   });
   if (announce) play();
 }
@@ -645,7 +735,7 @@ function showBook() {
   openPanel(null, '词语手册');
   const known = discovered();
   const controls = row(makeButton('练习题库', 'primary', () => showBank(0, 0)));
-  addTranslation(controls, 'Vocabulary notebook. Entries appear as you discover them. Tap the speaker to hear a word or tap its question mark for its English meaning.');
+  addTranslation(controls, 'Vocabulary notebook. Entries appear as you discover them. Tap the speaker to hear a word or tap EN for its English meaning.');
   panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。`, 'body'));
   voiceMessage();
   const list = node('ol', '', 'vocab');
@@ -661,7 +751,7 @@ function showBook() {
       const definition = node('span', data.cn, 'definition');
       const buttons = node('span', '', 'row-buttons');
       const hint = translation(data.en);
-      const speak = makeButton('◖))', 'icon-button', () => voice.speak(data.spoken ?? entry.word), '听' + entry.word + '的发音');
+      const speak = speakerButton(() => voice.speak(data.spoken ?? entry.word), '听' + entry.word + '的发音');
       const review = makeButton('写', 'icon-button', () => showWord(entry, '词语复习', (guided) => {
         record(entry.word, guided);
         return { label: '返回词语手册', run: showBook };
@@ -694,17 +784,23 @@ function showHelp() {
   const help = [
     '电脑：用 W、A、S、D 或方向键移动。点击场景后，用鼠标转向。也可以按住画面拖动。',
     '平板：用左下角摇杆行走，用手指拖动画面转向。对准物品后，点按出现的按钮。',
-    '对准物品后按 E 互动。按 Esc 释放鼠标。按 P 打开词语手册，按 R 重听任务；任务旁的问号可以打开英文翻译。',
+    '对准物品后按 E 互动。按 Esc 释放鼠标。按 P 打开词语手册，按 R 重听任务。点击 EN 看英文翻译。',
   ];
   help.forEach((line) => panel.append(node('p', line, 'body')));
   const sound = makeButton(effectsEnabled ? '关闭音效' : '开启音效', 'text-button', () => {
     effectsEnabled = !effectsEnabled;
     audio.setEnabled(effectsEnabled);
+    if (effectsEnabled) startAudio();
     sound.textContent = effectsEnabled ? '关闭音效' : '开启音效';
   });
-  const controls = row(sound);
+  const music = makeButton(musicEnabled ? '关闭音乐' : '开启音乐', 'text-button', () => {
+    setMusicPreference(!musicEnabled);
+    if (musicEnabled) startAudio();
+    music.textContent = musicEnabled ? '关闭音乐' : '开启音乐';
+  });
+  const controls = row(sound, music);
   if (state.phase === 'done') controls.append(makeButton('重玩任务', 'text-button', replay));
-  addTranslation(controls, 'Desktop: use WASD or arrows, click the scene for mouse look, or click and drag. Tablet: move with the left joystick and drag the scene to look. Aim at objects and press E or tap the action button. Escape releases the mouse. P opens the notebook and R replays the current task. Question-mark buttons show English help.');
+  addTranslation(controls, 'Desktop: use WASD or arrows, click the scene for mouse look, or click and drag. Tablet: move with the left joystick and drag the scene to look. Aim at objects and press E or tap the action button. Escape releases the mouse. P opens the notebook and R replays the current task. Tap EN for English help.');
 }
 
 function replay() {
@@ -753,8 +849,9 @@ window.addEventListener('keydown', (event) => {
 function begin() {
   if (unavailable || !engine || started) return;
   started = true;
-  audio.setEnabled(effectsEnabled);
+  audio.setMusic('game');
   audio.setAmbience(true);
+  if (!state.tutorialDone) audio.cue('radio');
   $('#splash').hidden = true;
   $('#toolbar').hidden = false;
   $('#mission-ui').hidden = false;
@@ -800,13 +897,37 @@ for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
 }
 
 function beginWithComic() {
-  if (!unavailable && engine && !started && $('#comic-overlay').hidden) playComic($('#comic-overlay'), begin);
+  if (unavailable || !engine || started || !$('#comic-overlay').hidden) return;
+  audio.setMusic('comic');
+  playComic($('#comic-overlay'), begin, {
+    onPage(page) {
+      if (page === 2) audio.cue('storm');
+      else if (page === 4) audio.cue('radio');
+      else if (page > 1) audio.cue('page');
+    },
+  });
 }
+
+audio.setEnabled(effectsEnabled);
+audio.setMusicEnabled(musicEnabled);
+audio.setMusic('title');
+$('#title-music').addEventListener('click', () => {
+  setMusicPreference(!audioStarted || !musicEnabled);
+  startAudio();
+  audio.cue('ui');
+});
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element)) return;
+  const button = event.target.closest('button');
+  if (button?.id === 'title-music') return;
+  startAudio();
+  if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
+}, true);
 
 $('#start').addEventListener('click', () => state.tutorialDone ? begin() : beginWithComic());
 $('#replay-intro').addEventListener('click', beginWithComic);
 if (state.tutorialDone) {
-  $('#start').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
+  $('#start-label').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
   $('#replay-intro').hidden = false;
 }
 

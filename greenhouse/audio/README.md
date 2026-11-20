@@ -10,6 +10,17 @@ The mix was rendered at 44.1 kHz and encoded with LAME as stereo MP3 at 96 kbps 
 The game starts the audio graph after a player gesture, lowers the rain and effects while dialogue plays, and stops background audio on blur or when the tab is hidden.
 The rain repeats an eight-second region within the MP3 to avoid codec padding.
 
+## Opening and gameplay music
+
+The `music/` tracks are an original synthesis of felt keys, soft pads, mallets, and low percussion.
+The title introduces the melody, the comic adds quicker pulses, and the greenhouse uses a quieter arrangement with more space for instructions.
+The music tracks loop over 19.2, 9.6, and 24 seconds, respectively.
+They are encoded as stereo MP3 at 44.1 kHz and 64 kbps, totaling approximately 430 KB.
+The interface cues `ui-click`, `comic-snap`, and `storm-hit` use the same stereo effects format as the existing cues.
+Render the editable score and cues with `python greenhouse/audio/render_music.py` in an environment with NumPy, SciPy, and lameenc.
+Music playback starts after a player gesture and can be switched separately from effects.
+The score fades between scenes and lowers while Mandarin speech plays.
+
 ## Radio dialogue
 
 The `voice/` MP3s were generated locally using [MeloTTS Chinese](https://huggingface.co/myshell-ai/MeloTTS-Chinese), with the [sherpa-onnx conversion](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html#vits-melo-tts-zh-en-chinese-english-1-speaker).

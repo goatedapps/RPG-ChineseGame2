@@ -7,7 +7,8 @@
 - A future menu will link the lessons and let players choose any supported level (P2, P3, P5, or P6), then progress through that level in order from Lesson 1.
 - Give each lesson a coherent storyline with one overarching mission and a series of related objectives.
 - Start each storyline with a short, picture-led prelude that establishes the situation before play begins.
-- Reveal comic panels or equivalent story beats one at a time with GSAP.
+- Put dialogue inside comic panels and reveal story beats one at a time with GSAP when the player clicks or taps the scene.
+- Use the title, prelude, and first playable moments to establish what is at stake and why the mission needs attention.
 - Introduce walking, looking around, and interacting in a short hands-on tutorial.
 
 ## Gameplay and presentation
@@ -35,14 +36,15 @@
 - Write primarily in Chinese for second-language learners and read all key task instructions aloud in Mandarin.
 - Keep prompts short, omit instructions that are clear from the interaction, and break longer passages into chunks that appear as needed.
 - Use a short text reveal or scroll animation when it helps players follow longer instructions.
-- Make English help available on demand, such as through a question-mark button.
+- Make English help available on demand through a quiet EN control and use a loudspeaker icon for replaying speech.
 - Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, and a pronunciation control.
 - Use the browser's Speech Synthesis API for Mandarin dictation and Hanzi Writer for stroke-by-stroke practice.
-- Give players large handwriting boxes for both touch and mouse input.
+- Give players one large active handwriting box for both touch and mouse input, with progress shown separately for multi-character words.
 - Show the sentence while it is read aloud, with the target word blanked out.
 - Offer normal-speed replay as the only dictation playback option.
 - Use natural-sounding prerecorded Mandarin for story dialogue, such as walkie-talkie conversations, where practical.
 - Use stereo MP3s for sound effects.
+- Use background music and short interaction sounds to support the scene, with separate music and sound-effect controls and lower music during speech.
 
 ## Current reference implementation
 
