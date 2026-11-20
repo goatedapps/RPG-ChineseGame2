@@ -1,4 +1,5 @@
 import { createKit } from './props.js';
+import { createLabFurniture } from './lab-furniture.js';
 
 const HALF = 10;
 const CEILING = 3.85;
@@ -8,7 +9,8 @@ export function createWorld(THREE) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#183442');
   scene.fog = new THREE.Fog('#294856', 17, 33);
-  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, imageTexture, imageMaterial, metricSurface, flooring, iconScreen, crumpledPaper, finish } = createKit(THREE, scene);
+  const kit = createKit(THREE, scene);
+  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, imageTexture, imageMaterial, metricSurface, flooring, crumpledPaper, finish } = kit;
   const targets = new Map();
   const colliders = [];
   const leaves = [];
@@ -16,21 +18,25 @@ export function createWorld(THREE) {
   const tiledFloors = [];
   let clock = 0;
 
-  const wall = metricSurface('wall-plaster.webp', '#bac3af', '#fff7ed', [.46, .46], { roughness: .89 });
-  const wallLow = material('#57716a');
-  const navy = material('#183039');
-  const ceilingMat = material('#657469', { emissive: '#182126', emissiveIntensity: .21 });
-  const trim = material('#365454', { metalness: .19 });
-  const metal = material('#284140', { metalness: .24 });
-  const counter = metricSurface('worktop-wood.webp', '#a08866', '#fff4df', [.63, 1.18], { roughness: .61 });
-  const enamel = metricSurface('cabinet-enamel.webp', '#4c6963', '#b1c0b8', [.77, .77], { roughness: .65 });
-  const wood = material('#735e4a');
-  const ceramic = material('#bbc7a8');
-  const soil = material('#382e24');
-  const dark = material('#122224');
+  const labSurface = (name, fallback, tint, scale, options) =>
+    metricSurface('lab/' + name + '.webp', fallback, tint, scale, options);
+  const wall = labSurface('ivory-plaster', '#bac3af', '#fff9ed', [.55, .55], { roughness: .91 });
+  const wallLow = labSurface('sage-enamel', '#57716a', '#a0b3a6', [.54, .9], { roughness: .79 });
+  const navy = labSurface('powder-coated-steel', '#183039', '#728b94', [1.1, 1.1]);
+  const ceilingMat = labSurface('acoustic-ceiling', '#657469', '#c6d0c5', [2.3, 2.3],
+    { emissive: '#182126', emissiveIntensity: .12 });
+  const trim = labSurface('powder-coated-steel', '#365454', '#e4ece6', [1.45, 1.45], { metalness: .15 });
+  const metal = labSurface('instrument-body', '#284140', '#e3e6df', [1.8, 1.8], { metalness: .2 });
+  const counter = labSurface('tabletop', '#a08866', '#fff2da', [.67, 1.18], { roughness: .61 });
+  const enamel = labSurface('sage-enamel', '#4c6963', '#e8f0e5', [1.05, 1.05], { roughness: .65 });
+  const wood = labSurface('honey-oak', '#735e4a', '#d4b189', [1.35, 1.75]);
+  const ceramic = imageMaterial('lab/speckled-ceramic.webp', '#bbc7a8', { roughness: .42 });
+  const terracotta = imageMaterial('lab/terracotta.webp', '#a87452', { roughness: .88 });
+  const soil = labSurface('potting-soil', '#382e24', '#eee0d1', [6, 6], { roughness: .96 });
+  const dark = labSurface('instrument-body', '#122224', '#747e87', [2.5, 2.5]);
   const glass = material('#80b6b4', { transparent: true, opacity: .21, depthWrite: false, roughness: .18 });
   const windowGlass = material('#537f93', { transparent: true, opacity: .32, depthWrite: false, roughness: .27 });
-  const rubber = material('#303c31');
+  const rubber = labSurface('rubber-grip', '#303c31', '#c3cac5', [4, 4]);
   const amber = material('#de9b4f', { emissive: '#a35e23', emissiveIntensity: .35 });
   const tape = material('#ee8b3c', { emissive: '#ff8e43', emissiveIntensity: .19 });
   const marker = material('#943c37');
@@ -41,9 +47,14 @@ export function createWorld(THREE) {
   const bright = new THREE.MeshBasicMaterial({ color: '#fff5c3' });
   const dim = new THREE.MeshBasicMaterial({ color: '#849187' });
   const stems = [material('#426a41'), material('#577c42')];
-  const leafOptions = { vertexColors: true, side: THREE.DoubleSide, roughness: .61 };
-  const greenLeaf = ['#386845', '#578a4e', '#719b50'].map((color) => material(color, leafOptions));
-  const goldenLeaf = ['#679447', '#91ad4e', '#5f864b'].map((color) => material(color, leafOptions));
+  const leafOptions = { vertexColors: true, side: THREE.DoubleSide, alphaTest: .45, roughness: .62 };
+  const matureLeaf = imageMaterial('lab/leaf-mature.webp', '#386845', leafOptions);
+  const youngLeaf = imageMaterial('lab/leaf-young.webp', '#719b50', leafOptions);
+  const droopingLeaf = imageMaterial('lab/leaf-drooping.webp', '#87964f', leafOptions);
+  const deepLeaf = imageMaterial('lab/leaf-deep.webp', '#467149', leafOptions);
+  const greenLeaf = [matureLeaf, deepLeaf, youngLeaf];
+  const goldenLeaf = [youngLeaf, matureLeaf, deepLeaf];
+  const droopingLeaves = [droopingLeaf, youngLeaf, droopingLeaf];
   const floorShadow = new THREE.MeshBasicMaterial({
     map: texture((ctx, w, h) => {
       const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
@@ -61,31 +72,20 @@ export function createWorld(THREE) {
   const fill = new THREE.DirectionalLight('#ffdcac', .58);
   fill.position.set(5, 3, 9);
   scene.add(fill);
-  const windowWeather = new THREE.MeshBasicMaterial({
-    map: texture((ctx, w, h) => {
-      const veil = ctx.createLinearGradient(0, 0, 0, h);
-      veil.addColorStop(0, '#91bed11d');
-      veil.addColorStop(.64, '#6aabba00');
-      veil.addColorStop(1, '#91c4cb57');
-      ctx.fillStyle = veil;
-      ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 73; i += 1) {
-        const x = ((i * 47) % 103) / 103 * w;
-        const y = ((i * 43) % 107) / 107 * h;
-        ctx.strokeStyle = i % 4 === 0 ? '#bcdeea69' : '#b3dbe830';
-        ctx.lineWidth = i % 6 === 0 ? 1.5 : .8;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x - 2 - i % 5, y + 5 + i % 14);
-        ctx.stroke();
-      }
-    }, 420, 220),
-    transparent: true, opacity: .47, depthWrite: false,
+  const windowWeather = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+  imageTexture('lab/rain-glass.webp', (map) => {
+    map.wrapS = THREE.RepeatWrapping;
+    map.repeat.x = 3;
+    windowWeather.map = map;
+    windowWeather.opacity = .32;
+    windowWeather.needsUpdate = true;
   });
 
   function obstacle(x, z, w, d) {
     colliders.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2 });
   }
+
+  const { bench, crate, shelves } = createLabFurniture(kit, obstacle, { floorShadow, counter, wood, enamel, metal, trim });
 
   function interact(id, label, at, angle = 0) {
     const object = group(...at, angle);
@@ -145,59 +145,21 @@ export function createWorld(THREE) {
       plate(labels[side > 0 ? 0 : 1], 1.56, .43,
         [x + (alongX ? 0 : side * .162), 3.32, z + (alongX ? side * .162 : 0)],
         alongX ? (side > 0 ? 0 : Math.PI) : side * Math.PI / 2,
-        { color: '#eaf0db', bg: '#1a3939', accent: '#b9c996', size: 59 });
+        { color: '#eaf0db', bg: '#1a3939', accent: '#b9c996', size: 59, art: 'lab/nameplate.webp' });
     }
-  }
-
-  function bench(x, z, width, depth, cabinet = false) {
-    plane([width * 1.52, depth * 2.62, 1], [x, .008, z], floorShadow, null, [-Math.PI / 2, 0, 0]);
-    box([width, .11, depth], [x, .98, z], counter);
-    box([width - .06, .055, depth - .05], [x, .895, z], wood);
-    if (cabinet) {
-      box([width - .13, .78, depth - .12], [x, .43, z], enamel);
-      for (let local = -width / 2 + .35; local < width / 2 - .14; local += .62) {
-        box([.565, .56, .035], [x + local, .46, z + depth / 2 - .055], enamel);
-        box([.19, .037, .036], [x + local, .61, z + depth / 2 - .027], ceramic);
-      }
-    } else {
-      for (const sx of [-1, 1]) {
-        for (const sz of [-1, 1]) {
-          box([.095, .88, .095], [x + sx * (width / 2 - .115), .44, z + sz * (depth / 2 - .11)], metal);
-        }
-      }
-      box([width * .94, .065, depth * .8], [x, .26, z], trim);
-    }
-    obstacle(x, z, width, depth);
-  }
-
-  function crate(x, y, z, width, height, depth, color = wood) {
-    box([width, height, depth], [x, y, z], color);
-    box([width * 1.04, .074, depth * 1.04], [x, y + height * .48, z], trim);
-    for (const dx of [-width * .37, width * .37]) box([.042, height * .75, .026], [x + dx, y, z + depth / 2], wood);
-  }
-
-  function shelves(x, z, width, depth, angle = 0) {
-    const alongX = Math.abs(angle) < .4;
-    function row(localX, y, localZ, size, mat) {
-      const a = Math.sin(angle);
-      const b = Math.cos(angle);
-      box(size, [x + localX * b + localZ * a, y, z - localX * a + localZ * b], mat, null, [0, angle, 0]);
-    }
-    for (const y of [.19, .87, 1.55, 2.23]) row(0, y, 0, [width, .07, depth], enamel);
-    for (const sx of [-1, 1]) {
-      for (const sz of [-1, 1]) row(sx * (width / 2 - .035), 1.17, sz * (depth / 2 - .035), [.07, 2.35, .07], trim);
-    }
-    obstacle(x, z, alongX ? width : depth, alongX ? depth : width);
   }
 
   function plant(parent, size = 1, droop = false, brightLeaves = false) {
-    pot([.33 * size, .26 * size, .33 * size], [0, .13 * size, 0], droop ? wood : ceramic, parent);
+    const vessel = droop ? terracotta : ceramic;
+    pot([.33 * size, .26 * size, .33 * size], [0, .13 * size, 0], vessel, parent);
+    tube([.346 * size, .029 * size, .346 * size], [0, .244 * size, 0], vessel, parent);
     tube([.29 * size, .026 * size, .29 * size], [0, .257 * size, 0], soil, parent);
     const canopy = group(0, .27 * size, 0, 0, parent);
-    const palette = brightLeaves ? goldenLeaf : greenLeaf;
+    const palette = droop ? droopingLeaves : (brightLeaves ? goldenLeaf : greenLeaf);
     const silhouette = droop ? .74 : 1.1;
     const count = droop ? 4 : 7;
-    tube([.025 * size, .32 * size * silhouette, .025 * size], [0, .156 * size * silhouette, 0],
+    const stemWidth = (droop ? .013 : .019) * size;
+    tube([stemWidth, .32 * size * silhouette, stemWidth], [0, .156 * size * silhouette, 0],
       stems[0], canopy, [0, 0, droop ? -.13 : .025]);
     for (let i = 0; i < count; i += 1) {
       const angle = i * 2.4 + .4;
@@ -206,7 +168,8 @@ export function createWorld(THREE) {
       const offset = length * .46;
       const tip = droop ? -.49 : (i % 3 === 0 ? .37 : .18);
       const pivot = group(rise * size * (droop ? .12 : 0), rise * size * silhouette, 0, angle, canopy);
-      const blade = leaf([length, length, (.117 - i * .005) * size], [offset, Math.sin(tip) * offset, 0],
+      const width = ((droop ? .106 : .151) - i * .006) * size;
+      const blade = leaf([length, length, width], [offset, Math.sin(tip) * offset, 0],
         palette[i % palette.length], pivot, [0, 0, tip]);
       leaves.push({ leaf: blade, base: tip, phase: i + leaves.length });
     }
@@ -223,7 +186,7 @@ export function createWorld(THREE) {
     }
     box([.35, .012, .46], [0, .042, 0], color, object);
     if (coverImage) {
-      const cover = imageMaterial(coverImage, color.color.getStyle(), { roughness: .82 });
+      const cover = imageMaterial(coverImage, color.color.getStyle(), { alphaTest: .4, roughness: .82 });
       plane([.345, .451, 1], [0, .050, 0], cover, object, [-Math.PI / 2, 0, 0]);
     } else {
       plate(label, .28, .17, [0, .05, -.093], 0, {
@@ -260,7 +223,8 @@ export function createWorld(THREE) {
     box([width * 1.012, .11, .37], [0, 1.08, .052], trim, frame);
     box([width, .105, .28], [0, 2.05, .06], navy, frame);
     for (let i = 0; i < 5; i += 1) box([.064, 2.18, .27], [(i / 4 - .5) * width, 2.20, .08], trim, frame);
-    if (label) plate(label, .71, .29, [leak ? .40 : -.45, 1.49, .119], 0, { size: 65, parent: frame });
+    if (label) plate(label, .71, .29, [leak ? .40 : -.45, 1.49, .119], 0,
+      { size: 65, parent: frame, art: 'lab/nameplate.webp' });
     for (let i = 0; i < 15; i += 1) {
       const x = ((i * 41 % 101) / 101 - .5) * (width - .10);
       const y = 1.22 + (i * 109 % 101) / 101 * 1.95;
@@ -293,18 +257,36 @@ export function createWorld(THREE) {
   crumpledPaper([.289, .143, .352], [0, 0, 0], noteSurface, westNote);
   outsideWindow('z', -HALF, -5, 10, 'eastWindow', '东窗');
   outsideWindow('z', -HALF, 5, 10);
-  const distant = [material('#354f5f'), material('#476778'), material('#2b4253')];
-  for (let i = 0; i < 14; i += 1) {
-    const height = 2.8 + (i * 19 % 41) / 10;
-    const step = -23 + i * 3.45;
-    box([2.26, height, 1.36], [step, height / 2 - 3.28, -17.4 - (i % 3)], distant[i % 3]);
-    box([1.42, height, 2.25], [-16.3 - (i % 3), height / 2 - 3.28, step], distant[(i + 1) % 3]);
-  }
+  const courtyard = new THREE.MeshBasicMaterial({ color: '#294856', fog: false, toneMapped: false });
+  const sideCourtyard = courtyard.clone();
+  imageTexture('lab/school-courtyard.webp', (map) => {
+    courtyard.color.set('#c3d4d9');
+    courtyard.map = map;
+    courtyard.needsUpdate = true;
+    const westMap = map.clone();
+    westMap.repeat.x = -1;
+    westMap.offset.x = 1;
+    westMap.needsUpdate = true;
+    sideCourtyard.color.copy(courtyard.color);
+    sideCourtyard.map = westMap;
+    sideCourtyard.needsUpdate = true;
+  });
+  plane([40, 20.8, 1], [1.5, 1.1, -17.6], courtyard);
+  plane([37, 19.2, 1], [-16.9, 1.05, -10], sideCourtyard, null, [0, Math.PI / 2, 0]);
 
   const spawn = { x: -5.35, z: 8.7, yaw: 0 };
   const contact = material('#102a29', { transparent: true, opacity: .22, depthWrite: false });
   const LEDs = new THREE.MeshBasicMaterial({ color: '#91f2a7' });
   const rubberTan = material('#876846');
+  const instrumentBody = metricSurface('lab/instrument-body.webp', '#28413f', '#dce8de', [2.6, 2.6], {
+    roughness: .63, metalness: .24,
+  });
+  const radioFace = imageMaterial('lab/radio-face.webp', '#3b5750', { roughness: .54 });
+  const cork = imageMaterial('lab/cork-board.webp', '#9f774c', { roughness: .93 });
+  const noticePaper = imageMaterial('paper-crumpled.webp', '#ded2b4', { roughness: .91 });
+  const tapeSurface = imageMaterial('lab/marking-tape.webp', '#ee8b3c', { roughness: .78 });
+  const traySurface = imageMaterial('lab/tray-surface.webp', '#a39e7c', { roughness: .7 });
+  const sealSurface = imageMaterial('lab/weatherstrip.webp', '#373b34', { roughness: .86 });
   bench(-5.35, 5.87, 2.46, .90, true);
   const prep = new THREE.PointLight('#ffdeb0', 3.1, 6.5, 2);
   prep.position.set(-5.55, 3.26, 6.52);
@@ -312,29 +294,32 @@ export function createWorld(THREE) {
   plane([4.8, 3.6, 1], [-5.6, .012, 7.37], contact, null, [-Math.PI / 2, 0, 0]);
   for (let i = 0; i < 9; i += 1) box([.105, .015, .036], [-5.81 + i * .12, .025, 7.52], yellow, null, [0, .55, 0]);
   const radio = interact('radio', '对讲机', [-5.35, 1.04, 6.00], -.1);
-  box([.34, .45, .155], [0, .25, 0], dark, radio);
-  box([.33, .071, .159], [0, .432, 0], trim, radio);
+  box([.34, .45, .155], [0, .25, 0], instrumentBody, radio);
+  box([.33, .065, .159], [0, .446, 0], rubber, radio);
   tube([.036, .27, .036], [-.103, .58, -.047], rubber, radio);
-  box([.234, .125, .024], [0, .327, .083], blue, radio);
-  for (let i = 0; i < 7; i += 1) box([.219, .008, .020], [0, .103 + i * .017, .08], trim, radio);
-  const radioLED = round([.037, .037, .023], [.092, .41, .089], LEDs, radio);
-  box([.22, .024, .21], [.55, .019, .17], rubber, radio);
+  tube([.046, .037, .046], [.102, .491, -.04], rubber, radio);
+  plane([.323, .404, 1], [0, .249, .08], radioFace, radio);
+  box([.022, .087, .053], [-.173, .303, .006], rubber, radio);
+  const radioLED = round([.037, .037, .023], [.099, .424, .083], LEDs, radio);
+  box([.22, .024, .21], [.55, .019, .17], instrumentBody, radio);
   plate('从这里开始', 1.06, .25, [-5.35, .935, 6.323], 0, { size: 53, color: '#f9e2a7', bg: '#312a23', accent: AMBER });
   box([2.34, .97, .10], [-5.35, 2.53, 3.89], navy);
-  plate('校内科学展', 2.22, .82, [-5.35, 2.53, 3.951], 0, { accent: AMBER, bg: '#152d32', size: 68, secondary: '科学组 · 展前准备' });
+  plate('校内科学展', 2.22, .82, [-5.35, 2.53, 3.951], 0,
+    { accent: AMBER, size: 68, secondary: '科学组 · 展前准备', art: 'lab/chalkboard.webp' });
   box([.15, 1.74, .15], [-6.36, 1.70, 3.86], trim);
   box([.15, 1.74, .15], [-4.33, 1.70, 3.86], trim);
   crate(-6.1, .51, 1.92, .56, .38, .61);
   crate(-3.2, .27, 3.14, .62, .38, .56, wallLow);
   const wallBoard = group(-9.838, 2.28, 4.01, Math.PI / 2);
   box([1.72, 1.00, .07], [0, 0, 0], wood, wallBoard);
-  box([1.65, .92, .037], [0, 0, .051], rubberTan, wallBoard);
-  plate('今天的值勤', 1.15, .23, [0, .296, .080], 0, { size: 53, parent: wallBoard, accent: AMBER });
+  plane([1.63, .92, 1], [0, 0, .052], cork, wallBoard);
+  plate('今天的值勤', 1.15, .23, [0, .296, .080], 0,
+    { size: 53, parent: wallBoard, accent: AMBER, art: 'lab/nameplate.webp' });
   for (let i = 0; i < 4; i += 1) {
     const dx = i * .32 - .51;
     const dy = i % 2 ? -.09 : -.16;
-    box([.213, .32, .009], [dx, dy, .078], i % 2 ? paper : ceramic, wallBoard, [0, 0, (i % 3 - 1) * .07]);
-    box([.062, .04, .013], [dx, dy + .145, .093], i % 2 ? tape : blue, wallBoard);
+    plane([.213, .32, 1], [dx, dy, .078], noticePaper, wallBoard, [0, 0, (i % 3 - 1) * .07]);
+    round([.032, .035, .033], [dx, dy + .133, .096], i % 2 ? tape : blue, wallBoard);
     for (let row = 0; row < 3; row += 1) box([.125 - row * .014, .009, .013], [dx, dy + .035 - row * .056, .093], trim, wallBoard);
   }
   bench(-7.88, 2.75, 2.55, .98);
@@ -345,7 +330,7 @@ export function createWorld(THREE) {
   const reelCover = imageMaterial('book-rehearsal.webp', '#ae7857', { roughness: .84 });
   box([.319, .022, .433], [-.006, .005, -.08], wood, reel);
   plane([.319, .433, 1], [-.006, .018, -.08], reelCover, reel, [-Math.PI / 2, 0, 0]);
-  box([.34, .046, .215], [0, .025, 0], dark, reel);
+  box([.34, .046, .215], [0, .025, 0], instrumentBody, reel);
   box([.258, .018, .13], [0, .051, -.008], yellow, reel);
   for (const dx of [-.076, .075]) tube([.078, .027, .078], [dx, .056, .015], paper, reel);
   plate('准备记录', 1.09, .38, [-8.0, 2.22, .16], 0, { size: 62 });
@@ -357,28 +342,47 @@ export function createWorld(THREE) {
 
   bench(5.66, 4.81, 3.96, 1.26, true);
   const workLight = interact('brightLamp', '检修灯', [4.08, 1.06, 5.08], -.07);
-  box([.31, .069, .22], [0, .037, 0], metal, workLight);
+  box([.31, .069, .22], [0, .037, 0], instrumentBody, workLight);
   tube([.048, .37, .048], [0, .23, -.045], dark, workLight);
-  box([.38, .26, .18], [0, .48, 0], rubberTan, workLight);
-  const bulbFace = box([.30, .184, .018], [0, .48, .098], bright, workLight);
+  box([.38, .26, .18], [0, .48, 0], instrumentBody, workLight);
+  for (const x of [-.178, .178]) {
+    box([.028, .232, .043], [x, .48, .084], rubber, workLight);
+    round([.033, .035, .027], [x, .48, .116], metal, workLight);
+  }
+  const bulbFace = plane([.317, .198, 1], [0, .48, .109], bright, workLight);
+  imageTexture('lab/work-light.webp', (map) => {
+    for (const face of [bright, dim]) {
+      face.map = map;
+      face.needsUpdate = true;
+    }
+  });
   const workLightGlow = new THREE.PointLight('#ffe2a1', .91, 2.25);
   workLightGlow.position.set(4.09, 1.51, 5.32);
   scene.add(workLightGlow);
   const ordinaryLamp = interact('deskLamp', '台灯', [5.08, 1.06, 4.61], .13);
-  tube([.31, .055, .31], [0, .04, 0], trim, ordinaryLamp);
-  tube([.034, .35, .034], [0, .24, 0], metal, ordinaryLamp);
-  pot([.34, .25, .34], [.03, .44, .013], navy, ordinaryLamp, [0, 0, Math.PI]);
-  tube([.31, .025, .31], [.03, .312, .013], dim, ordinaryLamp);
+  const lampReflector = imageMaterial('lab/desk-light.webp', '#c4b486', {
+    roughness: .63, emissive: '#987b51', emissiveIntensity: .24,
+  });
+  tube([.31, .055, .31], [0, .04, 0], instrumentBody, ordinaryLamp);
+  tube([.034, .35, .034], [0, .24, 0], metal, ordinaryLamp, [0, 0, -.17]);
+  pot([.34, .235, .34], [.03, .435, .013], navy, ordinaryLamp, [0, 0, Math.PI]);
+  tube([.337, .024, .337], [.03, .31, .013], lampReflector, ordinaryLamp);
+  round([.055, .018, .03], [.086, .073, .071], rubber, ordinaryLamp);
   const tapeRoll = interact('vividTape', '彩色记号带', [5.51, 1.10, 5.13], .29);
-  tube([.29, .117, .29], [0, .072, 0], tape, tapeRoll);
-  tube([.14, .018, .14], [0, .134, 0], dark, tapeRoll);
-  box([.12, .02, .24], [-.049, .011, .16], tape, tapeRoll, [0, .17, 0]);
+  tube([.29, .117, .29], [0, .072, 0], tapeSurface, tapeRoll);
+  tube([.155, .014, .155], [0, .134, 0], paper, tapeRoll);
+  tube([.122, .011, .122], [0, .143, 0], dark, tapeRoll);
+  box([.12, .02, .24], [-.049, .011, .16], tapeSurface, tapeRoll, [0, .17, 0]);
   const tray = interact('tray', '搬运托盘', [6.48, 1.056, 5.07], -.04);
   box([.65, .056, .44], [0, .03, 0], trim, tray);
-  box([.61, .019, .41], [0, .064, 0], yellow, tray);
+  box([.61, .019, .41], [0, .064, 0], traySurface, tray);
   for (const side of [-1, 1]) {
-    box([.057, .06, .52], [side * .33, .05, 0], metal, tray);
+    box([.057, .06, .52], [side * .33, .05, 0], instrumentBody, tray);
     box([.69, .06, .057], [0, .05, side * .25], metal, tray);
+    box([.028, .039, .20], [side * .403, .08, 0], rubber, tray);
+    for (const z of [-.087, .087]) {
+      box([.095, .034, .034], [side * .366, .08, z], metal, tray);
+    }
   }
   const guide = group(6.76, 1.34, 4.52, -.16);
   guide.rotation.x = -.16;
@@ -396,9 +400,12 @@ export function createWorld(THREE) {
     for (let i = 0; i < 4; i += 1) crate(5.53 + i * .793, .39 + shelf * .68, 8.90, .53, .32, .59, (i + shelf) % 2 ? wallLow : wood);
   }
   const seal = interact('seal', '密封条', [8.99, 1.61, 4.77], -Math.PI / 2);
-  box([.42, .18, .13], [0, .10, 0], amber, seal);
-  box([.36, .119, .014], [0, .108, .074], rubber, seal);
-  box([.24, .045, .013], [0, .105, .083], paper, seal);
+  box([.42, .18, .13], [0, .10, 0], noticePaper, seal);
+  box([.36, .119, .018], [0, .115, .076], sealSurface, seal);
+  box([.40, .026, .034], [0, .046, .072], amber, seal);
+  plate('密封条', .165, .049, [0, .103, .088], 0, {
+    size: 54, color: '#1e3029', bg: '#ded2b3', accent: '#bb995e', parent: seal,
+  });
   crate(9.15, .44, 4.02, .41, .37, .61, wood);
   crate(9.15, .44, 5.48, .45, .37, .52, navy);
   crate(9.12, 1.10, 4.02, .43, .36, .52, rubberTan);
@@ -418,19 +425,32 @@ export function createWorld(THREE) {
   plant(sturdy, 1.65, false, true);
   const jar = interact('seedJar', '种子罐', [-4.0, 1.059, -5.84]);
   tube([.23, .32, .23], [0, .17, 0], glass, jar);
-  tube([.24, .058, .24], [0, .32, 0], metal, jar);
-  tube([.21, .08, .21], [0, .07, 0], yellow, jar);
+  tube([.24, .058, .24], [0, .32, 0], instrumentBody, jar);
+  tube([.19, .026, .19], [0, .036, 0], ceramic, jar);
+  for (let index = 0; index < 9; index += 1) {
+    const angle = index * 2.4;
+    const radius = .041 + (index % 3) * .019;
+    round([.04, .023, .028], [Math.cos(angle) * radius, .061 + (index % 2) * .012, Math.sin(angle) * radius],
+      index % 2 ? amber : yellow, jar, [0, angle, 0]);
+  }
+  plate('备用种子', .17, .081, [0, .163, .117], 0, {
+    size: 58, color: '#23322b', bg: '#ded3ad', accent: '#bba171', parent: jar,
+  });
   const planter = interact('soilPot', '育苗盆', [-3.14, 1.054, -5.87]);
-  pot([.53, .31, .53], [0, .15, 0], wood, planter);
+  pot([.53, .31, .53], [0, .15, 0], terracotta, planter);
+  tube([.55, .033, .55], [0, .291, 0], terracotta, planter);
   tube([.48, .029, .48], [0, .305, 0], soil, planter);
   const seedDots = group(0, .319, 0, 0, planter);
   for (let i = 0; i < 4; i += 1) round([.067, .028, .036],
     [(i % 2 - .5) * .186, 0, (Math.floor(i / 2) - .5) * .158], amber, seedDots, [0, i * .75, 0]);
   const fan = interact('fan', '循环风扇', [-7.35, 1.06, -6.14], .29);
-  tube([.43, .07, .43], [0, .033, 0], metal, fan);
+  tube([.43, .07, .43], [0, .033, 0], instrumentBody, fan);
   tube([.061, .45, .061], [0, .249, 0], trim, fan);
-  tube([.57, .085, .57], [0, .61, .045], metal, fan, [Math.PI / 2, 0, 0]);
-  tube([.475, .088, .475], [0, .61, .064], dark, fan, [Math.PI / 2, 0, 0]);
+  tube([.57, .085, .57], [0, .61, .045], instrumentBody, fan, [Math.PI / 2, 0, 0]);
+  const rotorBehind = imageMaterial('lab/fan-grille.webp', '#162826', { roughness: .75, side: THREE.DoubleSide });
+  const grille = new THREE.Mesh(new THREE.CircleGeometry(.258, 32), rotorBehind);
+  grille.position.set(0, .61, .102);
+  fan.add(grille);
   const blades = group(0, .61, .127, 0, fan);
   for (let i = 0; i < 4; i += 1) {
     const angle = i * Math.PI / 2;
@@ -439,22 +459,33 @@ export function createWorld(THREE) {
   round([.095, .095, .051], [0, 0, .034], blue, blades);
   const fanFront = group(0, .61, .155, 0, fan);
   for (let i = 0; i < 8; i += 1) box([.01, .43, .014], [0, 0, 0], trim, fanFront, [0, 0, i * Math.PI / 8]);
-  box([.09, .09, .097], [0, .61, .18], amber, fan);
+  round([.11, .11, .055], [0, .61, .17], instrumentBody, fan);
   bench(-2.65, -8.86, 1.66, .79);
   const rootCam = interact('rootCam', '根系观测仪', [-2.65, 1.24, -8.70], .04);
-  box([.99, .58, .16], [0, .29, 0], dark, rootCam);
-  iconScreen('root', '#a4dc9a', .91, .50, [0, .29, .083], 0, rootCam);
-  box([.38, .08, .32], [0, -.15, .03], metal, rootCam);
+  box([.99, .58, .16], [0, .29, 0], instrumentBody, rootCam);
+  const rootDisplay = new THREE.MeshBasicMaterial({ color: '#31574d', toneMapped: false });
+  plane([.91, .50, 1], [0, .29, .083], rootDisplay, rootCam);
+  imageTexture('lab/root-display.webp', (map) => {
+    rootDisplay.map = map;
+    rootDisplay.color.set('#ffffff');
+    rootDisplay.needsUpdate = true;
+  });
+  box([.38, .08, .32], [0, -.15, .03], instrumentBody, rootCam);
   for (let i = 0; i < 6; i += 1) plant(group(-8.76, 0, -1.53 - i * 1.33, i * .7),
     1.6 + (i % 3) * .26, false, i % 2 === 0);
   for (let i = 0; i < 4; i += 1) plant(group(-6.9 + i * 1.15, 0, -9.19, i * .7),
     1.52 + (i % 3) * .28, false, i % 2 === 0);
   const trough = group(-8.49, .011, -3.72, -.04);
-  box([.64, .31, 2.08], [0, .154, 0], wood, trough);
+  const planterSlats = imageMaterial('lab/crate-slats.webp', '#735e4a', { roughness: .91 });
+  box([.64, .31, 2.08], [0, .154, 0], planterSlats, trough);
+  for (const x of [-.304, .304]) box([.058, .046, 2.12], [x, .32, 0], wood, trough);
+  for (const z of [-1.027, 1.027]) box([.59, .046, .058], [0, .32, z], wood, trough);
   box([.55, .052, 2.0], [0, .318, 0], soil, trough);
-  for (let i = 0; i < 13; i += 1) {
-    leaf([.19, .15, .13], [i % 2 ? .16 : -.16, .347 + (i % 3) * .045, -.92 + i * .144],
-      greenLeaf[i % 3], trough, [.21, i * 2.4, .28 + i % 4 * .13]);
+  for (let i = 0; i < 16; i += 1) {
+    const base = .23 + i % 4 * .16;
+    const blade = leaf([.25, .19, .18], [i % 2 ? .14 : -.14, .36 + (i % 3) * .052, -.91 + i * .12],
+      greenLeaf[i % 3], trough, [.21, i * 2.4, base]);
+    leaves.push({ leaf: blade, base, phase: i + leaves.length });
   }
   box([.063, .063, 4.4], [-9.68, .78, -3.7], trim);
   for (const z of [-1.96, -3.78, -5.64]) box([.15, .11, .078], [-9.64, .79, z], ceramic);
@@ -462,16 +493,23 @@ export function createWorld(THREE) {
   bench(2.68, -8.56, 2.75, 1.045, true);
   const screen = interact('rehearsalScreen', '彩排播放器', [2.43, 1.09, -8.55], .12);
   box([1.14, .63, .13], [0, .405, 0], dark, screen);
-  iconScreen('wave', '#81cbe2', 1.04, .55, [0, .407, .075], 0, screen);
+  const rehearsalDisplay = new THREE.MeshBasicMaterial({ color: '#31574d', toneMapped: false });
+  plane([1.04, .55, 1], [0, .407, .075], rehearsalDisplay, screen);
+  imageTexture('lab/rehearsal-display.webp', (map) => {
+    rehearsalDisplay.map = map;
+    rehearsalDisplay.color.set('#ffffff');
+    rehearsalDisplay.needsUpdate = true;
+  });
   box([.28, .25, .11], [0, .113, -.04], trim, screen);
   box([.53, .041, .32], [0, .016, -.015], metal, screen);
-  book('backupNotes', '备用布置图', 3.72, -8.19, paper, -.13);
+  book('backupNotes', '备用布置图', 3.72, -8.19, paper, -.13, 'page-exhibit.webp');
   const diorama = interact('exhibitStand', '科学展台', [5.68, 0, -5.90]);
   box([1.98, .17, 1.46], [0, .081, 0], navy, diorama);
   box([1.55, 1.04, 1.10], [0, .64, 0], enamel, diorama);
   box([1.82, .095, 1.37], [0, 1.19, 0], counter, diorama);
   box([1.79, .035, 1.31], [0, 1.252, 0], yellow, diorama);
-  plate('种子的力量', 1.245, .37, [0, .813, .567], 0, { size: 61, accent: AMBER, parent: diorama });
+  plate('种子的力量', 1.245, .37, [0, .813, .567], 0,
+    { size: 61, accent: AMBER, parent: diorama, art: 'lab/nameplate.webp' });
   const exhibitPlant = group(0, 1.273, -.09, .13, diorama);
   plant(exhibitPlant, 2.08, false, true);
   obstacle(5.68, -5.90, 1.98, 1.46);
@@ -481,7 +519,7 @@ export function createWorld(THREE) {
   bench(8.05, -2.21, 2.27, .90, true);
   const desk = book('handoverDesk', '交接纪要', 8.08, -1.938, blue, .1);
   box([.17, .036, .026], [.12, .047, .14], amber, desk, [0, -.4, 0]);
-  plate('交接记录', 1.21, .36, [8.11, 2.19, -.172], Math.PI, { size: 63 });
+  plate('交接记录', 1.21, .36, [8.11, 2.19, -.172], Math.PI, { size: 63, art: 'lab/nameplate.webp' });
   const posterPanel = group(9.835, 2.28, -6.94, -Math.PI / 2);
   box([2.22, 2.62, .1], [0, 0, 0], wood, posterPanel);
   plate('植物观察', 2.11, 2.48, [0, 0, .056], 0, { size: 68, secondary: '扎根 · 成长', parent: posterPanel });
@@ -492,8 +530,8 @@ export function createWorld(THREE) {
   const display = group(9.82, 2.23, -4.54, -Math.PI / 2);
   box([.92, .72, .071], [0, 0, 0], trim, display);
   plate('开放日', .84, .65, [0, 0, .041], 0,
-    { size: 57, secondary: '春芽科学小组', parent: display });
-  const exhibitRug = new THREE.MeshBasicMaterial({ color: '#7b9e77', transparent: true, opacity: .14, depthWrite: false });
+    { size: 57, secondary: '春芽科学小组', parent: display, art: 'lab/chalkboard.webp' });
+  const exhibitRug = imageMaterial('lab/exhibit-mat.webp', '#54745f', { roughness: .95 });
   box([2.16, .02, 2.32], [5.68, .016, -5.9], exhibitRug);
 
   for (const [x, z] of [[-5, .7], [-5, -.7], [.7, 5], [-.7, 5], [.7, -5], [-.7, -5], [5, .7], [5, -.7]]) {

@@ -157,15 +157,18 @@ export function createKit(THREE, scene) {
   }
 
   function plate(text, width, height, at, angle = 0, options = {}) {
-    const { color = '#e5f0df', bg = '#162f31', accent = '#d2d9a0', size = 37, secondary = '', parent } = options;
-    const map = texture((ctx, w, h) => {
+    const { color = '#e5f0df', bg = '#162f31', accent = '#d2d9a0', size = 37, secondary = '', parent, art } = options;
+    function draw(ctx, w, h, backing) {
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = accent;
-      ctx.fillRect(0, 0, 7, h);
-      ctx.strokeStyle = '#e5edcf3c';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(4, 3, w - 8, h - 6);
+      if (backing) ctx.drawImage(backing, 0, 0, w, h);
+      else {
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, 0, 7, h);
+        ctx.strokeStyle = '#e5edcf3c';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(4, 3, w - 8, h - 6);
+      }
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = '700 ' + size + 'px "Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif';
@@ -176,65 +179,22 @@ export function createKit(THREE, scene) {
         ctx.fillStyle = accent;
         ctx.fillText(secondary, w / 2 + 3, h * .72, w - 22);
       }
-    }, 400, Math.max(90, Math.round(400 * height / width)));
+    }
+    const map = texture(draw, 400, Math.max(90, Math.round(400 * height / width)));
+    if (art) {
+      imageTexture(art, (source) => {
+        const { image: canvas } = map;
+        draw(canvas.getContext('2d'), canvas.width, canvas.height, source.image);
+        map.needsUpdate = true;
+        source.dispose();
+      });
+    }
     const mat = new THREE.MeshBasicMaterial({ map, toneMapped: false });
     return shape([width, height, 1], at, mat, parent, [0, angle, 0], planeGeometry);
   }
 
-  function iconScreen(kind, color, width, height, at, angle = 0, parent) {
-    const map = texture((ctx, w, h) => {
-      ctx.fillStyle = '#10242b';
-      ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = '#5b8f7a53';
-      ctx.lineWidth = 1;
-      for (let x = 18; x < w; x += 30) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-      for (let y = 18; y < h; y += 28) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
-      }
-      ctx.strokeStyle = color;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      if (kind === 'root') {
-        ctx.moveTo(w * .49, h * .76);
-        ctx.quadraticCurveTo(w * .59, h * .37, w * .48, h * .24);
-        ctx.quadraticCurveTo(w * .25, h * .14, w * .26, h * .31);
-        ctx.quadraticCurveTo(w * .29, h * .49, w * .51, h * .49);
-        ctx.quadraticCurveTo(w * .43, h * .24, w * .73, h * .21);
-        ctx.quadraticCurveTo(w * .73, h * .49, w * .53, h * .51);
-        ctx.moveTo(w * .53, h * .62);
-        ctx.lineTo(w * .68, h * .81);
-        ctx.moveTo(w * .52, h * .63);
-        ctx.lineTo(w * .35, h * .82);
-      } else {
-        for (let x = 0; x < w; x += 4) {
-          const envelope = Math.pow(Math.sin(Math.PI * x / w), 2);
-          const y = h * .5 + envelope * (Math.sin(x * .19) + Math.sin(x * .077) * .72) * h * .14;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-      }
-      ctx.stroke();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(15, 14, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }, 320, 176);
-    return shape([width, height, 1], at, new THREE.MeshBasicMaterial({ map, toneMapped: false }),
-      parent, [0, angle, 0], planeGeometry);
-  }
-
   return {
-    group, material, texture, imageTexture, imageMaterial, metricSurface, plate, flooring, iconScreen, finish,
+    group, material, texture, imageTexture, imageMaterial, metricSurface, plate, flooring, finish,
     box: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, boxGeometry),
     tube: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, tubeGeometry),
     pot: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, taperedGeometry),
@@ -287,6 +247,7 @@ function createPaper(THREE) {
 
 function createLeaf(THREE) {
   const positions = [];
+  const uv = [];
   const shades = [];
   const indices = [];
   for (let i = 0; i <= 10; i += 1) {
@@ -294,6 +255,7 @@ function createLeaf(THREE) {
     const profile = Math.sin(Math.PI * u) ** .87;
     for (const across of [-1, -.06, .06, 1]) {
       positions.push(u - .5, profile * (.095 + (.5 - Math.abs(across)) * .13) - .22 * u * u, .5 * profile * across);
+      uv.push(u, .5 - .5 * profile * across);
       const vein = Math.abs(across) < .1;
       const shade = (vein ? .95 : .68) + (across > 0 ? .13 : .04) + Math.sin(u * Math.PI) * .15;
       shades.push(shade, shade, shade * .94);
@@ -307,6 +269,7 @@ function createLeaf(THREE) {
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(shades, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();

@@ -158,3 +158,65 @@ A neat plant tag and a warm desk lamp directed at the leaves.
 Show her hands, plant and attentive expression, frame waist up with the central seedling sharp.
 A reddish indicator light on the physical monitor corner, no time code or letterforms.
 Use quiet dark foreground towards the bottom for subtitles.
+
+## Lab environment
+
+The built-in image generator produced reusable material atlases, foliage cutouts, and the courtyard artwork for the lab's four rooms.
+The runtime textures below are optimized WebPs under `lab/`.
+The furniture, buildings, and small props render on 3D geometry, and the plants use the generated leaf surfaces on curved animated meshes.
+The rain-glass texture preserves transparency, and the wall signs place live Chinese lettering over generated textures.
+`root-display.webp` and `rehearsal-display.webp` crop the image area from the existing generated monitor close-ups.
+
+### Shared atlas prompt
+
+Generate ONE square texture atlas with exactly nine equal square tiles in a 3-by-3 grid, no borders, no gaps, exact joins at thirds of the canvas.
+Every tile is its own cropped straight-on material sample filling its full square.
+The intended use is UV mapping onto real geometry in a rainy Singapore primary school greenhouse and science exhibition game.
+Refined tactile stylized photographic realism, believable physical materials, muted mint-jade and warm wood, no cast shadows, no wide camera angle, no text or logos.
+Keep all useful features within their matching tile.
+In reading order:
+
+### Surface materials
+
+Files in `lab/` correspond to `ivory-plaster.webp`, `powder-coated-steel.webp`, `honey-oak.webp`, `sage-enamel.webp`, `acoustic-ceiling.webp`, `rubber-grip.webp`, `terracotta.webp`, `speckled-ceramic.webp`, `potting-soil.webp`.
+
+Top row: warm ivory lime plaster with tiny trowel grain; muted deep-jade powder-coated steel with fine weathered surface; honey-toned oak with fine horizontal straight grain and subtle abrasion.
+Middle row: green grey stove-enamel metal with soft orange peel; pale grey fibrous acoustic ceiling board with tiny fine holes; charcoal molded equipment rubber with fine diagonal grip grain.
+Bottom row: warm rusty fired terracotta with subtle mineral marks; pale sage ceramic glaze with fine brown speckles; deep earthy brown damp potting soil with tiny natural perlite and organic fragments.
+These are seamless-style flat PBR color samples, no illustrated objects or visible perspective; all details stay at believable close material scale, neutral uniform light.
+
+### Furniture and boards
+
+Files in `lab/` correspond to `cupboard-front.webp`, `drawer-front.webp`, `shelf-rail.webp`, `tabletop.webp`, `cork-board.webp`, `chalkboard.webp`, `crate-slats.webp`, `exhibit-mat.webp`, `nameplate.webp`.
+
+Top row: a single full face of a quiet desaturated green-jade cupboard door, shallow bead detailing and one small dark inset handle near the upper edge, face entirely fills the tile; warm honeywood drawer front with inset small horizontal bronze pull and shallow routed border, entire face; reclaimed green open shelf material with small regular round mounting holes running horizontally across the strip near center, cropped tight.
+Middle row: honey plywood tabletop seen perfectly from above with parallel horizontal timber seams and faint handwriting-free scuffs; straight-on natural mottled tan cork bulletin board filling the entire tile without frame, with no pins; textured deep green classroom chalkboard with subtle erased chalk haze, no drawings or writing.
+Bottom row: aged warm wooden storage crate face with three horizontal slats, small dark screwheads, worn edges in-tile but no background; dark muted sage woven rubber backed exhibition floor mat seen directly from above, slightly mottled attractive weave; a brushed dark bronze nameplate with pale antique border on all four edges and blank dark blue-green central field for later overlays, no writing.
+
+### Equipment and rain glass
+
+Files in `lab/` correspond to `radio-face.webp`, `work-light.webp`, `desk-light.webp`, `marking-tape.webp`, `weatherstrip.webp`, `tray-surface.webp`, `fan-grille.webp`, `instrument-body.webp`, `rain-glass.webp`.
+
+Top row: front panel of a rugged deep jade school walkie-talkie with small blank yellow-green LCD in upper third, subtle speaker grille, charcoal rubber rim, no lettering; straight-on work-light reflector surface with cool pale LED array and squared brushed surround; old desk lamp reflector panel ivory white with pale warm brass microtexture.
+Middle row: a tiny bright vivid orange fabric warning/marking tape surface with fine actual woven stripes and no lettering; black rubber weather-strip face with repeated shallow channels; warm grey molded plastic carrying tray surface with very fine nonslip grain and tiny perforation marks.
+Bottom row: realistic dark round fan grill head-on centered in square, thin concentric steel mesh and black center hub with no letters; pitted low-sheen graphite plastic with brushed dark teal metal instrument surround, no openings; clean translucent jade tinted glass close-up with minuscule water beads, fine bluish vertical rain trails, restrained contrast.
+For patterned tiles fill the entire tile without padding.
+
+### Foliage
+
+Files in `lab/` correspond to `leaf-mature.webp`, `leaf-young.webp`, `leaf-drooping.webp`, `leaf-deep.webp`.
+
+Generate one square 2-by-2 texture atlas on TRUE transparent background with four isolated single botanical leaves, each contained securely in its own square quadrant with 8% padding.
+Top left broad healthy haricot bean unifoliate green blade, top right bright young bean leaf, bottom left thin slightly drooping matte yellow-green bean leaf with lightly curled tip, bottom right lush round darker small greenhouse bean leaf.
+All are full isolated blades, top-down orthographic, aligned horizontally with short cut stem on the LEFT and pointed leaf tip on the RIGHT, strong real silhouettes, intricate delicate green veins, faint water sheen and subtle differences in hue.
+No other leaves or extras, no text, no stems beyond the stubs or background, no black outlines; cropped atlas used in 3D meshes, evenly lit for physically shaded game using alpha edges.
+
+### School courtyard
+
+Files in `lab/` correspond to `school-courtyard.webp`.
+
+Wide panoramic 3:2 first-person video-game exterior background, facing out from a second-floor Singapore primary-school greenhouse directly after a rainstorm.
+Cool blue early morning haze, soft overcast sky in top third, in middle distance leafy tropical treetops with wet palm fronds, modest modern local school blocks with beige and pale mint facades, glass awnings and a rain-dark covered walkway.
+Varied full-width scene across the entire picture, enough building detail to feel located but soft atmospheric contrast to keep attention indoors.
+No foreground window or frame, no vignette, no people, no readable text, no signs, no letters, no logo.
+Photorealistic yet subtly stylized atmosphere of a cozy school adventure.
