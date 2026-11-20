@@ -1,60 +1,80 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#071319">
-  <meta name="description" content="Race across rain-soaked rooftops and restore a greenhouse in this P6 Chinese platforming stage.">
-  <title>Stormroot — P6 Chinese</title>
-  <link rel="stylesheet" href="stage/stormroot.css">
+  <meta name="theme-color" content="#08171c">
+  <meta name="description" content="走进风雨后的学校温室，在探索中练习六年级第一课的华文词语。">
+  <title>暴雨后的温室 · P6 华文</title>
+  <link rel="stylesheet" href="greenhouse/game.css">
+  <script defer src="greenhouse/vendor/gsap.min.js"></script>
   <script defer src="stage/vendor/hanzi-writer.min.js"></script>
-  <script type="module" src="stage/game.js"></script>
+  <script type="module" src="greenhouse/game.js"></script>
 </head>
 <body>
-  <main class="game" id="game">
-    <canvas id="scene" aria-label="Stormroot rooftop platformer" tabindex="-1"></canvas>
-    <div class="film" aria-hidden="true"></div>
-    <header class="hud">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">✦</span>
-        <div><strong>Stormroot</strong><small>P6 Chinese · Lesson 1</small></div>
-      </div>
-      <div class="flight" aria-label="Greenhouse relay progress">
-        <div class="flight-text"><span id="zone">School rooftop</span><span id="charge">0 / 3 relays</span></div>
-        <div class="flight-line" aria-hidden="true"><i></i><i></i><i></i></div>
-      </div>
-      <div class="hud-actions">
-        <button id="sound" class="tool" type="button" aria-label="Sound" aria-pressed="false"><span aria-hidden="true">♪</span><span id="sound-label">Sound off</span></button>
-        <button id="journal" class="tool" type="button"><span aria-hidden="true">≡</span> Field notes</button>
-      </div>
-    </header>
-    <section class="title-layer" id="intro" aria-labelledby="title">
-      <div class="title-content">
-        <p class="chapter"><span lang="zh-Hans">风雨中的幼苗</span> <span> / </span> Rooftop rescue</p>
-        <h1 id="title">Stormroot</h1>
-        <p class="premise">The storm knocked out the school greenhouse. Cross the rooftops and bring its three relays back online before the seedlings lose their light.</p>
-        <button class="launch" id="start" type="button">Start the rescue</button>
-        <p class="intro-controls"><span class="keyboard-help">Move with <kbd>←</kbd> <kbd>→</kbd> · Jump with <kbd>Space</kbd></span><span class="touch-help">Use the onscreen controls to run and jump.</span></p>
-      </div>
-    </section>
-    <p id="banner" class="mission-text" hidden></p>
-    <button id="nearby" class="interact" type="button" hidden><kbd>E</kbd> <span>Use relay</span></button>
-    <button id="replay" class="interact" type="button" hidden>Replay rooftop</button>
-    <div class="touch-controls" id="touch-controls" hidden>
-      <div>
-        <button type="button" data-control="left" aria-label="Move left">‹</button>
-        <button type="button" data-control="right" aria-label="Move right">›</button>
-      </div>
-      <button type="button" data-control="jump" aria-label="Jump">Jump</button>
+<main id="app">
+  <canvas id="scene" tabindex="-1" aria-label="学校科学楼的三维场景"></canvas>
+  <div class="vellum" aria-hidden="true"></div>
+
+  <header class="hud">
+    <div class="identity">
+      <span class="emblem-plant" aria-hidden="true">♧</span>
+      <div><strong>暴雨后的温室</strong><span>六年级华文 · 第一课</span></div>
     </div>
-    <footer class="game-footer">
-      <div class="controls"><span><kbd>A</kbd><kbd>D</kbd> Move</span><span><kbd>Space</kbd> Jump</span><span><kbd>E</kbd> Use relay</span></div>
-      <p class="hint" id="objective">Restore the greenhouse</p>
-      <p class="dew"><span aria-hidden="true">◆</span> <span id="dew-count">0 / 9</span><span class="dew-name"> dew drops</span></p>
-    </footer>
-    <dialog id="overlay" aria-labelledby="overlay-title"><div id="panel"></div></dialog>
-    <p id="announcer" class="sr-only" aria-live="polite"></p>
-    <noscript>Stormroot requires JavaScript to play.</noscript>
-  </main>
+    <div id="toolbar" class="toolbar" hidden>
+      <button id="book" type="button" class="hud-button"><span aria-hidden="true">▤</span><span>词语手册</span><strong id="word-count">0 / 24</strong></button>
+      <button id="help" type="button" class="icon-button" aria-label="操作帮助" title="操作帮助">?</button>
+    </div>
+  </header>
+
+  <section id="splash" class="splash" aria-labelledby="game-title">
+    <div class="splash-content">
+      <p class="subheading">六年级 · 第一课</p>
+      <h1 id="game-title">暴雨后的<br>温室</h1>
+      <p>明天就是科学展。暴雨刚过，一株幼苗还在等你。</p>
+      <div class="button-row">
+        <button id="start" type="button" class="primary">进入科学楼</button>
+        <button id="intro-en" type="button" class="icon-button" aria-expanded="false" aria-label="英文说明" title="English">?</button>
+      </div>
+      <p id="intro-translation" class="translation" lang="en" hidden>The science fair opens tomorrow. The storm has passed, and a seedling needs your help. Enter the science wing to begin.</p>
+      <p id="start-status" class="minor" role="status">正在准备科学楼……</p>
+      <a href="stormroot.html" class="archive-link">打开旧版屋顶关卡</a>
+    </div>
+  </section>
+
+  <section id="mission-ui" class="mission" aria-label="当前任务" hidden>
+    <div class="mission-line">
+      <div class="radio-wave" id="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div><p id="mission-number" class="label"></p><h2 id="mission-name"></h2></div>
+      <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><span aria-hidden="true">◖))</span></button>
+      <button id="cue-en" type="button" class="icon-button" aria-expanded="false" aria-label="当前任务的英文翻译" title="English">?</button>
+    </div>
+    <p id="cue-text" class="cue-text"></p>
+    <p id="cue-translation" class="translation" lang="en" hidden></p>
+    <p id="voice-status" class="voice-status" role="status" hidden></p>
+    <button id="nudge" type="button" class="quiet-link">需要线索？</button>
+  </section>
+
+  <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
+  <div id="response" class="response" role="status" aria-live="polite" hidden>
+    <span id="response-text"></span>
+    <button id="response-en" type="button" class="icon-button" aria-label="互动反馈的英文翻译" aria-expanded="false" title="English">?</button>
+    <p id="response-translation" class="translation" lang="en" hidden></p>
+  </div>
+
+  <footer id="play-controls" class="play-controls" hidden>
+    <div id="joystick" class="joystick" aria-label="拖动摇杆行走"><span></span></div>
+    <div class="desktop-control"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 移动 <span>·</span> <kbd>Esc</kbd> 释放鼠标</div>
+    <div class="scene-action">
+      <button id="interact" type="button" class="primary action" hidden><kbd>E</kbd><span></span></button>
+      <button id="resume-task" type="button" class="primary action" hidden>打开交接记录</button>
+    </div>
+    <p id="held" class="held" hidden></p>
+    <p class="touch-instruction">拖动画面转向</p>
+  </footer>
+
+  <dialog id="workbench" aria-labelledby="panel-title"><div id="panel"></div></dialog>
+  <noscript>请启用 JavaScript，才能探索温室。</noscript>
+</main>
 </body>
 </html>

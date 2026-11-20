@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071319">
+  <meta name="description" content="Race across rain-soaked rooftops and restore a greenhouse in this P6 Chinese platforming stage.">
+  <title>Stormroot — P6 Chinese</title>
+  <link rel="stylesheet" href="stage/stormroot.css">
+  <script defer src="stage/vendor/hanzi-writer.min.js"></script>
+  <script type="module" src="stage/game.js"></script>
+</head>
+<body>
+  <main class="game" id="game">
+    <canvas id="scene" aria-label="Stormroot rooftop platformer" tabindex="-1"></canvas>
+    <div class="film" aria-hidden="true"></div>
+    <header class="hud">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <div><strong>Stormroot</strong><small>P6 Chinese · Lesson 1</small></div>
+      </div>
+      <div class="flight" aria-label="Greenhouse relay progress">
+        <div class="flight-text"><span id="zone">School rooftop</span><span id="charge">0 / 3 relays</span></div>
+        <div class="flight-line" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+      <div class="hud-actions">
+        <button id="sound" class="tool" type="button" aria-label="Sound" aria-pressed="false"><span aria-hidden="true">♪</span><span id="sound-label">Sound off</span></button>
+        <button id="journal" class="tool" type="button"><span aria-hidden="true">≡</span> Field notes</button>
+      </div>
+    </header>
+    <section class="title-layer" id="intro" aria-labelledby="title">
+      <div class="title-content">
+        <p class="chapter"><span lang="zh-Hans">风雨中的幼苗</span> <span> / </span> Rooftop rescue</p>
+        <h1 id="title">Stormroot</h1>
+        <p class="premise">The storm knocked out the school greenhouse. Cross the rooftops and bring its three relays back online before the seedlings lose their light.</p>
+        <button class="launch" id="start" type="button">Start the rescue</button>
+        <p class="intro-controls"><span class="keyboard-help">Move with <kbd>←</kbd> <kbd>→</kbd> · Jump with <kbd>Space</kbd></span><span class="touch-help">Use the onscreen controls to run and jump.</span></p>
+      </div>
+    </section>
+    <p id="banner" class="mission-text" hidden></p>
+    <button id="nearby" class="interact" type="button" hidden><kbd>E</kbd> <span>Use relay</span></button>
+    <button id="replay" class="interact" type="button" hidden>Replay rooftop</button>
+    <div class="touch-controls" id="touch-controls" hidden>
+      <div>
+        <button type="button" data-control="left" aria-label="Move left">‹</button>
+        <button type="button" data-control="right" aria-label="Move right">›</button>
+      </div>
+      <button type="button" data-control="jump" aria-label="Jump">Jump</button>
+    </div>
+    <footer class="game-footer">
+      <div class="controls"><span><kbd>A</kbd><kbd>D</kbd> Move</span><span><kbd>Space</kbd> Jump</span><span><kbd>E</kbd> Use relay</span></div>
+      <p class="hint" id="objective">Restore the greenhouse</p>
+      <p class="dew"><span aria-hidden="true">◆</span> <span id="dew-count">0 / 9</span><span class="dew-name"> dew drops</span></p>
+    </footer>
+    <dialog id="overlay" aria-labelledby="overlay-title"><div id="panel"></div></dialog>
+    <p id="announcer" class="sr-only" aria-live="polite"></p>
+    <noscript>Stormroot requires JavaScript to play.</noscript>
+  </main>
+</body>
+</html>

@@ -1,7 +1,8 @@
 # Game Ideas
 
 Concept notes for a Chinese vocabulary game for Singapore primary students.
-The current playable experiment is [Stormroot](https://goatedapps.github.io/RPG-ChineseGame2/), a P6 Lesson 1 rooftop platformer.
+The current playable experiment is [暴雨后的温室](https://goatedapps.github.io/RPG-ChineseGame2/), a first-person P6 Lesson 1 adventure in a school science wing.
+[Stormroot](stormroot.html), the earlier rooftop platformer, is still available.
 The [Lantern Detective Agency proposal](Lantern%20Detective%20Agency.html) is kept here as an earlier concept.
 
 ## Content and shared progression
