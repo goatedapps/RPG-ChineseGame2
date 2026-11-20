@@ -1,8 +1,8 @@
 # Game Ideas
 
 Concept notes for a Chinese vocabulary game for Singapore primary students.
-Lantern Detective Agency is the first concept selected for further exploration.
-See the [Lantern Detective Agency proposal](Lantern%20Detective%20Agency.html) for a sample case and progression design.
+The current playable experiment is [Stormroot](https://goatedapps.github.io/RPG-ChineseGame2/), a P6 Lesson 1 rooftop platformer.
+The [Lantern Detective Agency proposal](Lantern%20Detective%20Agency.html) is kept here as an earlier concept.
 
 ## Content and shared progression
 
