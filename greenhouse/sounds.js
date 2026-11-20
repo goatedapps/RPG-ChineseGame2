@@ -1,5 +1,5 @@
 const clips = {
-  step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .23, cooldown: .28 },
+  step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .42, cooldown: .28 },
   pickup: { files: ['pickup'], volume: .38, cooldown: .12 },
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
   radio: { files: ['radio-click'], volume: .34, cooldown: .26 },

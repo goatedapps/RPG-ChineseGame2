@@ -40,6 +40,7 @@
 - Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, and a pronunciation control.
 - Use the browser's Speech Synthesis API for Mandarin dictation and Hanzi Writer for stroke-by-stroke practice.
 - Give players one large active handwriting box for both touch and mouse input, with progress shown separately for multi-character words.
+- During dictation, highlight the next stroke after five unsuccessful attempts at that stroke.
 - Show the sentence while it is read aloud, with the target word blanked out.
 - Offer normal-speed replay as the only dictation playback option.
 - Use natural-sounding prerecorded Mandarin for story dialogue, such as walkie-talkie conversations, where practical.

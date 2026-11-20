@@ -61,7 +61,7 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
       writers.push(writer);
       setViewBox(square, renderedSize);
       writer.quiz({
-        showHintAfterMisses: guided ? 2 : false,
+        showHintAfterMisses: guided ? 2 : 5,
         onMistake,
         onComplete: () => {
           if (cancelled) return;
