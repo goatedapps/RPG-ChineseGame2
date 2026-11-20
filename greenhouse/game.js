@@ -4,7 +4,9 @@ import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js';
 import { createWriting } from './writing.js';
-import { createAudio } from '../stage/audio.js';
+import { createGreenhouseAudio } from './sounds.js';
+import { playComic } from './comic.js';
+import { evidence } from './evidence.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
@@ -13,13 +15,13 @@ const panel = $('#panel');
 const reticle = $('#reticle');
 const interact = $('#interact');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-const audio = createAudio();
+const audio = createGreenhouseAudio();
 const entries = missions.flatMap((mission) => mission.dictation);
 const lessonWords = new Set(entries.map(({ word }) => word));
 const storageKey = 'greenhouse-p6-lesson1-v1';
 const actions = { inspect: '查看', pickup: '拿起', use: '使用', place: '摆放' };
 const roomNames = {
-  radio: '准备室', westWindow: '温室', eastWindow: '温室', seal: '储藏室',
+  radio: '准备室', westWindow: '温室', westNote: '温室', eastWindow: '温室', seal: '储藏室',
   brightLamp: '储藏室', deskLamp: '储藏室', vividTape: '储藏室', tray: '储藏室',
   weakPlant: '温室', sturdyPlant: '温室', fan: '温室', seedJar: '温室', soilPot: '温室', rootCam: '温室',
   diary: '准备室', exerciseLog: '准备室', testSheet: '准备室', rehearsalTape: '准备室',
@@ -71,6 +73,8 @@ let unavailable = false;
 let tutorialIndex = 0;
 let walked = 0;
 let turned = 0;
+let footstepDistance = 0;
+let effectsEnabled = true;
 let currentTarget = null;
 let cue = { cn: '', en: '' };
 let cueParts = { lead: null, task: cue, showingLead: false };
@@ -290,6 +294,10 @@ function updateTarget(target) {
 function useObject(target) {
   if (!target || !started || desk.open || !objects[target.id]) return;
   const thing = objects[target.id];
+  if (evidence[target.id]) {
+    showEvidence(target.id, target.id === nextObject() ? () => completeObject(target, true) : null);
+    return;
+  }
   if (target.id !== nextObject()) {
     response(thing.descriptionCN, thing.descriptionEN);
     audio.cue('dew');
@@ -299,11 +307,15 @@ function useObject(target) {
     last = { id: 'radio', action: 'pickup' };
     state.tutorialDone = true;
     save();
-    audio.cue('dew');
+    audio.cue('radio');
     response('对讲机已接通。', 'The radio is connected.');
     objective(true, true);
     return;
   }
+  completeObject(target);
+}
+
+function completeObject(target, inspected = false) {
   const mission = missions[state.mission];
   const action = mission.actions[state.action];
   last = { id: target.id, action: action.action, mission: state.mission, step: state.action };
@@ -314,15 +326,15 @@ function useObject(target) {
   if (state.action >= mission.actions.length) {
     state.phase = 'question';
     save();
-    audio.cue('relay');
+    audio.cue(target.id === 'westWindow' ? 'seal' : 'relay');
     objective(false);
     openTask({ cn: action.resultCN, en: action.resultEN });
     return;
   }
   save();
-  audio.cue(action.action === 'pickup' ? 'dew' : 'correct');
+  if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'correct'));
   $('#response').hidden = true;
-  objective(true, false, { cn: action.resultCN, en: action.resultEN });
+  objective(true, false, inspected ? null : { cn: action.resultCN, en: action.resultEN });
 }
 
 function clearPanel() {
@@ -388,6 +400,31 @@ function addTranslation(parent, english) {
   const { control, block } = translation(english);
   parent.append(control);
   panel.append(block);
+}
+
+function showEvidence(id, next) {
+  const item = evidence[id];
+  openPanel('查看物品', item.title);
+  const sheet = node('article', '', item.kind === 'paper' ? 'evidence-sheet paper-sheet' : 'evidence-sheet');
+  if (item.cover) {
+    const cover = node('img');
+    cover.src = new URL('./art/' + item.cover + '.webp', import.meta.url).href;
+    cover.alt = '';
+    sheet.append(cover);
+  }
+  const content = node('div', '', 'evidence-content');
+  content.append(node('p', item.label, 'evidence-label'));
+  for (const [chinese] of item.lines) content.append(node('p', chinese, 'evidence-line'));
+  sheet.append(content);
+  panel.append(sheet);
+  const actions = row(makeButton('收起', 'primary', () => desk.close()),
+    makeButton('朗读', 'text-button', () => voice.speak(item.lines.map(([chinese]) => chinese).join(' '))));
+  addTranslation(actions, item.lines.map(([, english]) => english).join('\n'));
+  voiceMessage();
+  if (next) afterClose = next;
+  audio.cue('paper');
+  animate(sheet, { opacity: 0, rotationX: item.kind === 'paper' ? -45 : -12, y: 16, scale: .94 },
+    { opacity: 1, rotationX: 0, y: 0, scale: 1 }, .42);
 }
 
 function showQuestion(item, label, onNext, context) {
@@ -561,13 +598,13 @@ function finishMission() {
 
 function showEnding() {
   openPanel('六年级 · 第一课', '温室准备就绪');
-  panel.append(node('p', '窗缝堵好了，幼苗也到了安全的地方。明天来参观的同学可以看到完整的科学展。', 'body'));
+  panel.append(node('p', '窗缝堵好了，幼苗也安全了。科学展可以开始了！', 'body'));
   const guided = Object.values(state.written).filter((value) => value === 'guided').length;
   panel.append(node('p', guided ? `24 个词已收录。其中 ${guided} 个用过描写提示，可以在手册中再试听写。` : '24 个词都已收录。回到词语手册，可以重听和复习。', 'body'));
   const controls = row(makeButton('打开词语手册', 'primary', showBook),
     makeButton('返回展示室', 'text-button', () => desk.close()),
     makeButton('重玩任务', 'text-button', replay));
-  addTranslation(controls, 'The window is sealed, the seedling is safe, and the exhibit is ready for tomorrow. All 24 words are in your notebook.');
+  addTranslation(controls, 'The window is sealed, the seedling is safe, and the science fair can open. All 24 words are in your notebook.');
   voiceMessage();
   voice.speak('交接完成。窗缝堵好了，幼苗也到了安全的地方。科学展准备就绪！');
 }
@@ -629,6 +666,12 @@ function showHelp() {
   ];
   help.forEach((line) => panel.append(node('p', line, 'body')));
   const controls = row(makeButton('返回科学楼', 'primary', () => desk.close()));
+  const sound = makeButton(effectsEnabled ? '关闭音效' : '开启音效', 'text-button', () => {
+    effectsEnabled = !effectsEnabled;
+    audio.setEnabled(effectsEnabled);
+    sound.textContent = effectsEnabled ? '关闭音效' : '开启音效';
+  });
+  controls.append(sound);
   if (state.phase === 'done') controls.append(makeButton('重玩任务', 'text-button', replay));
   addTranslation(controls, 'Desktop: use WASD or arrows, click the scene for mouse look, or click and drag. Tablet: move with the left joystick and drag the scene to look. Aim at objects and press E or tap the action button. Escape releases the mouse. P opens the notebook and R replays the current task. Question-mark buttons show English help.');
 }
@@ -679,7 +722,7 @@ window.addEventListener('keydown', (event) => {
 function begin() {
   if (unavailable || !engine || started) return;
   started = true;
-  audio.setEnabled(true);
+  audio.setEnabled(effectsEnabled);
   audio.setAmbience(true);
   $('#splash').hidden = true;
   $('#toolbar').hidden = false;
@@ -725,14 +768,27 @@ for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
   });
 }
 
-$('#start').addEventListener('click', begin);
-if (state.tutorialDone) $('#start').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
+function beginWithComic() {
+  if (!unavailable && engine && !started && $('#comic-overlay').hidden) playComic($('#comic-overlay'), begin);
+}
+
+$('#start').addEventListener('click', () => state.tutorialDone ? begin() : beginWithComic());
+$('#replay-intro').addEventListener('click', beginWithComic);
+if (state.tutorialDone) {
+  $('#start').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
+  $('#replay-intro').hidden = false;
+}
 
 engine = createEngine({
   canvas, worldFactory: createWorld, reducedMotion: motion,
   onTarget: updateTarget,
   onInteract: useObject,
   onMove({ distance }) {
+    footstepDistance += distance;
+    if (footstepDistance >= .72) {
+      footstepDistance %= .72;
+      audio.cue('step');
+    }
     if (!started || state.tutorialDone || tutorialIndex !== 0) return;
     walked += distance;
     if (walked > .85) {

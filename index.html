@@ -7,6 +7,8 @@
   <meta name="description" content="走进风雨后的学校温室，在探索中练习六年级第一课的华文词语。">
   <title>暴雨后的温室 · P6 华文</title>
   <link rel="stylesheet" href="greenhouse/game.css">
+  <link rel="stylesheet" href="greenhouse/comic.css">
+  <link rel="preload" href="greenhouse/art/comic-1.webp" as="image">
   <script defer src="greenhouse/vendor/gsap.min.js"></script>
   <script defer src="stage/vendor/hanzi-writer.min.js"></script>
   <script type="module" src="greenhouse/game.js"></script>
@@ -31,12 +33,13 @@
     <div class="splash-content">
       <p class="subheading">六年级 · 第一课</p>
       <h1 id="game-title">暴雨后的<br>温室</h1>
-      <p>明天就是科学展。暴雨刚过，一株幼苗还在等你。</p>
+      <p>科学展快开始了。暴雨刚过，一株幼苗还在等你。</p>
       <div class="button-row">
         <button id="start" type="button" class="primary">进入科学楼</button>
+        <button id="replay-intro" type="button" class="text-button" hidden>看序幕</button>
         <button id="intro-en" type="button" class="icon-button" aria-expanded="false" aria-label="英文说明" title="English">?</button>
       </div>
-      <p id="intro-translation" class="translation" lang="en" hidden>The science fair opens tomorrow. The storm has passed, and a seedling needs your help. Enter the science wing to begin.</p>
+      <p id="intro-translation" class="translation" lang="en" hidden>The science fair is about to open. The storm has passed, and a seedling needs your help. Enter the science wing to begin.</p>
       <p id="start-status" class="minor" role="status">正在准备科学楼……</p>
       <a href="stormroot.html" class="archive-link">打开旧版屋顶关卡</a>
     </div>
@@ -76,6 +79,7 @@
     <p class="touch-instruction">拖动画面转向</p>
   </footer>
 
+  <section id="comic-overlay" hidden></section>
   <dialog id="workbench" aria-labelledby="panel-title"><div id="panel"></div></dialog>
   <noscript>请启用 JavaScript，才能探索温室。</noscript>
 </main>

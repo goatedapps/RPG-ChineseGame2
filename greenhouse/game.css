@@ -91,6 +91,12 @@ dialog .body { margin-top: .6rem; }
 .choice.wrong { color: #ffd0b2; background: #d388681f; }
 .feedback { margin-top: .7rem; color: var(--sun); }
 .clue-note { margin-top: .6rem; color: var(--muted); font-size: .93rem; }
+.evidence-sheet { display: flex; align-items: flex-start; gap: clamp(.7rem, 3vw, 1.45rem); padding: clamp(1.4rem, 4.3vw, 2.7rem); margin-top: .8rem; max-width: 42rem; color: #20302a; background: #f4ead5; border-radius: .32rem; box-shadow: 0 9px 27px #0006; transform-origin: center top; }
+.paper-sheet { background: #f6ead0 url("art/paper-crumpled.webp") center / 100% 100%; }
+.evidence-sheet img { width: min(27%, 7.2rem); max-height: 9rem; object-fit: cover; border: 1px solid #baa986; border-radius: .2rem; }
+.evidence-label { color: #426351; font-weight: 700; font-size: .84rem; border-bottom: 1px solid #42635157; padding-bottom: .45rem; margin-bottom: .6rem; }
+.evidence-line { font-size: clamp(1.06rem, 2.8vw, 1.3rem); line-height: 1.5; }
+.evidence-line + .evidence-line { margin-top: .55rem; }
 .question-layout.with-figure { display: grid; grid-template-columns: minmax(10rem, .8fr) minmax(0, 1.25fr); gap: 1.25rem; align-items: start; }
 .question-figure { margin: .6rem 0 0; }
 .question-figure img { display: block; width: 100%; height: auto; border-radius: .4rem; background: #ece7d8; }

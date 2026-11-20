@@ -8,7 +8,7 @@ export function createWorld(THREE) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#183442');
   scene.fog = new THREE.Fog('#294856', 17, 33);
-  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, imageTexture, metricSurface, flooring, iconScreen, finish } = createKit(THREE, scene);
+  const { group, material, box, tube, pot, round, leaf, plane, plate, texture, imageTexture, imageMaterial, metricSurface, flooring, iconScreen, crumpledPaper, finish } = createKit(THREE, scene);
   const targets = new Map();
   const colliders = [];
   const leaves = [];
@@ -213,13 +213,23 @@ export function createWorld(THREE) {
     return canopy;
   }
 
-  function book(id, label, x, z, color, angle = 0) {
+  function book(id, label, x, z, color, angle = 0, coverImage) {
     const object = interact(id, label, [x, 1.065, z], angle);
-    box([.35, .05, .46], [0, .013, 0], color, object);
-    box([.325, .037, .428], [.01, .016, 0], paper, object);
+    box([.35, .012, .46], [0, -.008, 0], color, object);
+    box([.318, .037, .434], [.011, .017, 0], paper, object);
+    box([.037, .052, .46], [-.159, .016, 0], color, object);
+    for (let i = 0; i < 3; i += 1) {
+      box([.0015, .0014, .417], [.171, .003 + i * .012, 0], rubberTan, object);
+    }
     box([.35, .012, .46], [0, .042, 0], color, object);
-    box([.2, .006, .122], [0, .05, -.09], paper, object);
-    for (let i = 0; i < 3; i += 1) box([.14 - i * .025, .007, .015], [-.015, .055, -.126 + i * .035], trim, object);
+    if (coverImage) {
+      const cover = imageMaterial(coverImage, color.color.getStyle(), { roughness: .82 });
+      plane([.345, .451, 1], [0, .050, 0], cover, object, [-Math.PI / 2, 0, 0]);
+    } else {
+      plate(label, .28, .17, [0, .05, -.093], 0, {
+        size: 63, parent: object, bg: '#e6dbb6', color: '#243637', accent: '#7b8f72',
+      }).rotation.x = -Math.PI / 2;
+    }
     return object;
   }
 
@@ -276,6 +286,11 @@ export function createWorld(THREE) {
   }
 
   const fixedSeal = outsideWindow('x', -HALF, -5, 10, 'westWindow', '西窗', true);
+  const westNote = interact('westNote', '皱巴巴的便条', [-9.73, 1.137, -4.73], -.1);
+  const noteSurface = imageMaterial('paper-crumpled.webp', '#ecd9a2', {
+    roughness: .95, flatShading: true, vertexColors: true, side: THREE.DoubleSide,
+  });
+  crumpledPaper([.289, .143, .352], [0, 0, 0], noteSurface, westNote);
   outsideWindow('z', -HALF, -5, 10, 'eastWindow', '东窗');
   outsideWindow('z', -HALF, 5, 10);
   const distant = [material('#354f5f'), material('#476778'), material('#2b4253')];
@@ -323,10 +338,13 @@ export function createWorld(THREE) {
     for (let row = 0; row < 3; row += 1) box([.125 - row * .014, .009, .013], [dx, dy + .035 - row * .056, .093], trim, wallBoard);
   }
   bench(-7.88, 2.75, 2.55, .98);
-  book('diary', '阿宁的日记', -8.67, 3.001, wood, -.18);
-  book('exerciseLog', '锻炼记录', -8.12, 3.105, blue, .10);
-  book('testSheet', '科学测验卷', -7.657, 3.057, ceramic, -.1);
+  book('diary', '阿宁的日记', -8.67, 3.001, wood, -.18, 'book-diary.webp');
+  book('exerciseLog', '晨练记录', -8.12, 3.105, blue, .10, 'book-exercise.webp');
+  book('testSheet', '科学测验卷', -7.657, 3.057, ceramic, -.1, 'book-test.webp');
   const reel = interact('rehearsalTape', '彩排录像', [-7.14, 1.052, 3.03], .3);
+  const reelCover = imageMaterial('book-rehearsal.webp', '#ae7857', { roughness: .84 });
+  box([.319, .022, .433], [-.006, .005, -.08], wood, reel);
+  plane([.319, .433, 1], [-.006, .018, -.08], reelCover, reel, [-Math.PI / 2, 0, 0]);
   box([.34, .046, .215], [0, .025, 0], dark, reel);
   box([.258, .018, .13], [0, .051, -.008], yellow, reel);
   for (const dx of [-.076, .075]) tube([.078, .027, .078], [dx, .056, .015], paper, reel);

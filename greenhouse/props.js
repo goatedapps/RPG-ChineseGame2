@@ -8,6 +8,7 @@ export function createKit(THREE, scene) {
   const sphereGeometry = new THREE.SphereGeometry(.5, 12, 8);
   const planeGeometry = new THREE.PlaneGeometry(1, 1);
   const leafGeometry = createLeaf(THREE);
+  const paperGeometry = createPaper(THREE);
   const batches = new Map();
   const transform = new THREE.Object3D();
   const images = new THREE.TextureLoader();
@@ -78,6 +79,16 @@ export function createKit(THREE, scene) {
       map.anisotropy = 4;
       ready(map);
     }, undefined, () => {});
+  }
+
+  function imageMaterial(file, fallback, options) {
+    const surface = material(fallback, options);
+    imageTexture(file, (map) => {
+      surface.map = map;
+      surface.color.set('#ffffff');
+      surface.needsUpdate = true;
+    });
+    return surface;
   }
 
   function metricSurface(file, fallback, tint, tilesPerMeter, options) {
@@ -223,14 +234,55 @@ export function createKit(THREE, scene) {
   }
 
   return {
-    group, material, texture, imageTexture, metricSurface, plate, flooring, iconScreen, finish,
+    group, material, texture, imageTexture, imageMaterial, metricSurface, plate, flooring, iconScreen, finish,
     box: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, boxGeometry),
     tube: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, tubeGeometry),
     pot: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, taperedGeometry),
     round: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, sphereGeometry),
     leaf: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, leafGeometry),
     plane: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, planeGeometry),
+    crumpledPaper: (size, at, mat, parent) => shape(size, at, mat, parent, undefined, paperGeometry),
   };
+}
+
+function createPaper(THREE) {
+  const folds = [
+    [0.13, .07, .21, .11, .36],
+    [0.09, .52, .27, .62, .12],
+    [0.28, .26, .79, .32, .23],
+    [0.15, .48, .30, .58, .16],
+    [0.36, .07, .29, .12, .18],
+  ];
+  const positions = [];
+  const shades = [];
+  const uv = [];
+  const indices = [];
+  for (let row = 0; row < folds.length; row += 1) {
+    for (let column = 0; column < folds.length; column += 1) {
+      const i = row * folds.length + column;
+      const u = column / (folds.length - 1);
+      const v = row / (folds.length - 1);
+      positions.push(u - .5 + (noise(i + 69) - .5) * .115, folds[row][column], v - .5 + (noise(i + 33) - .5) * .115);
+      const shade = .66 + folds[row][column] * .40;
+      shades.push(shade, shade * .98, shade * .9);
+      uv.push(u, 1 - v);
+      if (row && column) {
+        const a = i - folds.length - 1;
+        const b = i - folds.length;
+        const d = i - 1;
+        if ((row + column) % 2) indices.push(a, d, i, a, i, b);
+        else indices.push(a, d, b, b, d, i);
+      }
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(shades, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geometry.setIndex(indices);
+  const facets = geometry.toNonIndexed();
+  facets.computeVertexNormals();
+  return facets;
 }
 
 function createLeaf(THREE) {
