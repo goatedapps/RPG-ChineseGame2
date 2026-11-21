@@ -1,11 +1,11 @@
 import { vocabularyList } from '../shared/vocabulary.js';
-import { speakerButton } from '../shared/speaker.js';
+import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
-import { createVoice } from './voice.js';
+import { createVoice } from './voice.js?v=radio-briefings';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js';
+import { createGreenhouseAudio } from './sounds.js?v=radio-briefings';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
@@ -800,7 +800,7 @@ function sentenceWithGap(sentence, word) {
   return line;
 }
 
-function showWord(entry, label, complete, guided = false, announce = true) {
+function showWord(entry, label, complete, guided = false) {
   openPanel(label, guided ? '练写' : '听写', 'writing');
   const layout = node('div', '', 'dictation-layout');
   const directions = node('div', '', 'dictation-directions');
@@ -809,8 +809,7 @@ function showWord(entry, label, complete, guided = false, announce = true) {
   if (guided) directions.append(node('p', entry.word + ' · ' + lexicon[entry.word].pinyin, 'ink-word'));
   const spoken = entry.spokenTarget ?? entry.word + '。';
   const audioLine = entry.sentence + ' 要写的是：' + spoken;
-  const play = () => voice.speak(audioLine, .85);
-  const buttons = buttonRow(speakerButton(play, '重听听写'));
+  const buttons = buttonRow(dictationButton(voice, audioLine));
   directions.append(buttons);
   addTranslation(buttons, [entry.instructionEN, entry.en].filter(Boolean).join('\n'), directions);
   voiceMessage(directions);
@@ -837,7 +836,7 @@ function showWord(entry, label, complete, guided = false, announce = true) {
   layout.append(directions, workspace);
   panel.append(layout);
   if (!guided) {
-    helper.append(makeButton('看字练写', 'text-button', () => showWord(entry, label, complete, true, false)));
+    helper.append(makeButton('看字练写', 'text-button', () => showWord(entry, label, complete, true)));
   }
   cleanup = createWriting(grid, entry.word, guided, () => {
     audio.cue('correct');
@@ -847,14 +846,13 @@ function showWord(entry, label, complete, guided = false, announce = true) {
     helper.firstElementChild.focus();
   }, () => {
     status.textContent = '书写格未能载入。请再试一次。';
-    helper.append(makeButton('重新载入书写格', 'text-button', () => showWord(entry, label, complete, guided, false)));
+    helper.append(makeButton('重新载入书写格', 'text-button', () => showWord(entry, label, complete, guided)));
   }, () => {
     status.textContent = guided ? '再试一笔。也可以看看亮起的笔画。' : '这一笔的位置或笔顺不对，请再试。';
   }, (completed) => {
     status.textContent = '';
     updateProgress(completed);
   });
-  if (announce) play();
 }
 
 function record(word, guided) {
@@ -1000,7 +998,7 @@ async function openLessonTest(mode) {
 
   try {
     const [bank, { createLessonTestView }] = await Promise.all([
-      loadLessonTest(), import('./lesson-test-view.js'),
+      loadLessonTest(), import('./lesson-test-view.js?v=radio-briefings'),
     ]);
     if (activeTest !== run) return;
     state[slot] = restoreLessonTest(bank, state[slot]);

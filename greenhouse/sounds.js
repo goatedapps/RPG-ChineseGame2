@@ -3,6 +3,7 @@ const clips = {
   pickup: { files: ['pickup'], volume: .38, cooldown: .12 },
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
   notification: { files: ['phone-notification'], volume: .45, cooldown: .65 },
+  radio: { files: ['moonbridge-radio-alert'], volume: .8, cooldown: .16 },
   seal: { files: ['seal-press'], volume: .50, cooldown: .22 },
   correct: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
@@ -25,7 +26,7 @@ const comicClips = ['page', 'storm'];
 const sceneClips = {
   title: ['ui'],
   comic: ['ui', 'notification', ...comicClips],
-  game: Object.keys(clips).filter((name) => !comicClips.includes(name)),
+  game: Object.keys(clips).filter((name) => name !== 'radio' && !comicClips.includes(name)),
 };
 const maxEffects = 7;
 const maxCueDelay = 650;
@@ -34,7 +35,7 @@ function fileURL(category, name) {
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
 }
 
-export function createGreenhouseAudio() {
+export function createGreenhouseAudio({ radioAlerts = false } = {}) {
   let context;
   let master;
   let effects;
@@ -178,6 +179,7 @@ export function createGreenhouseAudio() {
 
   function prepareSceneEffects() {
     if (!enabled) return;
+    if (radioAlerts) prepareEffect(clips.radio.files[0]);
     for (const name of sceneClips[musicScene] ?? sceneClips.title) {
       for (const file of clips[name].files) prepareEffect(file);
     }
@@ -196,8 +198,9 @@ export function createGreenhouseAudio() {
     void Promise.all([prepareEffect(file), enabling]).then(([buffer]) => {
       const request = pendingCues.get(name);
       pendingCues.delete(name);
-      const current = name === 'ui' || request.scene === musicScene;
-      if (buffer && current && audible() && performance.now() - request.time <= maxCueDelay) cue(name);
+      const current = request && (name === 'ui' || request.scene === musicScene);
+      const delay = name === 'radio' ? 5000 : maxCueDelay;
+      if (buffer && current && audible() && performance.now() - request.time <= delay) cue(name);
     });
   }
 

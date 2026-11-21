@@ -1,3 +1,4 @@
+import { dictationButton } from '../shared/speaker.js?v=radio-briefings';
 import { createWriting } from '../greenhouse/writing.js';
 import {
   createLessonTest,
@@ -83,16 +84,11 @@ export function mountTest(
       item.total +
       '</p>' +
       '<p class="sentence"></p><div class="response"></div>' +
-      '<div class="buttons"><button class="hear">朗读题目</button><button class="reveal">看字</button></div><p class="note reveal-note"></p></div>';
+      '<div class="buttons"><button class="reveal">看字</button></div><p class="note reveal-note"></p></div>';
     host.querySelector('.sentence').textContent =
       item.before + (item.revealed ? item.word : '＿＿') + item.after;
-    host.querySelector('.hear').onclick = () =>
-      speak(
-        item.before +
-          '，' +
-          (item.revealed ? item.word + '，' : '') +
-          item.after,
-      );
+    const text = item.before + '，' + (item.revealed ? item.word + '，' : '') + item.after;
+    host.querySelector('.buttons').prepend(dictationButton({ speak, stop: stopSpeech }, text));
     host.querySelector('.leave').onclick = onExit;
     const reveal = host.querySelector('.reveal');
     reveal.disabled = item.revealed;

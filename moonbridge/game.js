@@ -1,5 +1,5 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js?v=radio-pickup';
+import { createWorld } from './world.js?v=radio-briefings';
 import {
   opening,
   parts,
@@ -9,11 +9,11 @@ import {
 import { words, bank } from './curriculum.js';
 import { fieldwork } from './fieldwork.js?v=physical-clues';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { speakerButton } from '../shared/speaker.js';
+import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
-import { mountWriting, mountTest } from './assess.js';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js';
-import { createVoice } from '../greenhouse/voice.js';
+import { mountWriting, mountTest } from './assess.js?v=radio-briefings';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=radio-briefings';
+import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 
 import { playLessonComic } from '../shared/comic.js';
@@ -21,7 +21,7 @@ import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js';
 
 const $ = (id) => document.getElementById(id);
-const audio = createGreenhouseAudio();
+const audio = createGreenhouseAudio({ radioAlerts: true });
 const dialog = $('dialog');
 const body = $('dialog-body');
 const canvas = $('world');
@@ -39,6 +39,7 @@ const initial = {
   fieldDone: [],
   fieldProgress: null,
   seenRadioMessages: [],
+  acknowledgedBriefings: [],
   stage: 0,
   part: null,
   won: false,
@@ -82,6 +83,11 @@ function readSave() {
       seenRadioMessages: Array.isArray(value.seenRadioMessages)
         ? value.seenRadioMessages.filter((key) => typeof key === 'string')
         : [],
+      acknowledgedBriefings: Array.isArray(value.acknowledgedBriefings)
+        ? value.acknowledgedBriefings.filter((key) => typeof key === 'string')
+        : (Array.isArray(value.seenRadioMessages)
+            ? value.seenRadioMessages.filter((key) => typeof key === 'string' && key.endsWith(':guide'))
+            : []),
       discoveries: words
         .map(({ word }) => word)
         .filter(
@@ -112,6 +118,7 @@ const voice = createVoice((status) => audio.setDucked(status === 'playing'));
 let view = 'home';
 let world;
 let radioBuzz;
+let lastRadioAlert;
 let currentTarget = null;
 let hintCount = 0;
 let toastTimer;
@@ -296,6 +303,11 @@ function objective() {
   return { title: field.title, cue: field.cue, item: field.item, guide: field.guide, hint: field.hint };
 }
 
+function briefingPending(task = objective()) {
+  return Boolean(task?.guide) &&
+    (save.stage === 3 || !save.acknowledgedBriefings.includes(radioMessageKey('guide')));
+}
+
 function syncRadio(notify = false) {
   const radio = $('radio');
   const unread = !radio.hidden && Boolean(objective()?.guide) &&
@@ -306,8 +318,10 @@ function syncRadio(notify = false) {
     : 'Open Mei’s walkie-talkie');
   radio.title = unread ? 'New message from Mei' : 'Walkie-talkie';
   if (!unread) radioBuzz?.cancel();
-  if (!unread || !notify) return;
-  play('notification');
+  const key = radioMessageKey('guide');
+  if (!unread || !notify || key === lastRadioAlert) return;
+  lastRadioAlert = key;
+  play('radio');
   if (reducedMotion.matches) return;
   radioBuzz?.cancel();
   radioBuzz = radio.animate([
@@ -322,8 +336,9 @@ function syncRadio(notify = false) {
 
 function update(notifyRadio = false) {
   const task = objective();
-  $('objective').textContent = task?.title ?? '月桥重新亮了';
-  $('control-hint').textContent = task?.cue ?? '';
+  const waiting = briefingPending(task);
+  $('objective').textContent = waiting ? '听听小梅怎么说' : (task?.title ?? '月桥重新亮了');
+  $('control-hint').textContent = waiting ? '打开对讲机，确认小梅的消息。' : (task?.cue ?? '');
   const missionNumber =
     save.stage < 4
       ? 1
@@ -348,11 +363,11 @@ function update(notifyRadio = false) {
   $('radio').hidden = save.stage < 3;
   syncRadio(notifyRadio);
   $('word-count').textContent = save.discoveries.length + ' / ' + words.length;
-  $('speak').disabled = !task?.cue;
+  $('speak').disabled = waiting || !task?.cue;
   world?.setTargets(
     save.stage === 2
       ? ['radio']
-      : task?.item && save.stage !== 3
+      : task?.item && !waiting
         ? [task.item]
         : [],
   );
@@ -390,7 +405,7 @@ function paintAction() {
     action.textContent = '转一下视角';
     return;
   }
-  action.disabled = !currentTarget || stage === 3;
+  action.disabled = !currentTarget || briefingPending();
   action.textContent = currentTarget
     ? stage === 11 && currentTarget === 'cart'
       ? '上车出发'
@@ -459,11 +474,12 @@ function startWorld() {
   driving = false;
   moveStart = null;
   setView('hud');
-  update();
+  update(true);
   audio.prepareGameplay();
 }
 function restartMission() {
   closePanel();
+  lastRadioAlert = undefined;
   Object.assign(save, structuredClone(initial), {
     passed: save.passed,
     discoveries: save.passed ? save.discoveries : [],
@@ -504,7 +520,7 @@ $('speak').onclick = () => {
   const status = $('voice-status');
   status.textContent = '';
   status.hidden = false;
-  if (objective()?.cue) speaker(objective().cue, status);
+  if (!briefingPending() && objective()?.cue) speaker(objective().cue, status);
 };
 
 function radioMessageKey(kind) {
@@ -569,22 +585,27 @@ function openRadio() {
   scene.append(device, transmission);
   transmission.append(wave);
   body.append(scene);
-  if (stage === 3) {
-    const acknowledge = button('Got it', () => {
-      go(4);
-      closePanel();
-    }, 'gold');
-    acknowledge.disabled = true;
-    transmission.append(
-      radioMessage(guide, 'guide', () => { acknowledge.disabled = false; }),
-      group(acknowledge),
-    );
-    syncRadio();
-    return;
-  }
-  const message = radioMessage(guide, 'guide');
+  const pending = briefingPending(task);
+  const acknowledge = button('Got it', () => {
+    if (pending) {
+      const key = radioMessageKey('guide');
+      if (!save.acknowledgedBriefings.includes(key)) save.acknowledgedBriefings.push(key);
+      if (stage === 3) go(4);
+      else {
+        persist();
+        update();
+      }
+    }
+    closePanel();
+  }, pending ? 'gold' : undefined);
+  acknowledge.disabled = pending;
+  const message = radioMessage(guide, 'guide', () => { acknowledge.disabled = false; });
   transmission.append(message);
   syncRadio();
+  if (pending) {
+    transmission.append(group(acknowledge));
+    return;
+  }
   const places = {
     spark:
       'The spark is on the right side of the same table where you found the radio.',
@@ -607,7 +628,6 @@ function openRadio() {
       closePanel();
     }
   });
-  const acknowledge = button('Got it', closePanel);
   transmission.append(group(acknowledge, help));
   if (hintCount > 0) {
     message.after(radioMessage(hint, 'hint'));
@@ -718,7 +738,7 @@ function runVisual(ok) {
 function firstRun() {
   if (testing) return;
   showPanel('equipment', '第一次试跑');
-  body.append(fieldImage('test-lever'));
+  body.append(fieldImage('test-lever-v2'));
   runVisual(false);
   play('wrong');
   body.append(make('p', '灯车一颠，火种就弹出了架子。', 'dialog-copy'));
@@ -742,7 +762,7 @@ function practiceRun() {
     return;
   }
   showPanel('equipment', '试跑台');
-  body.append(fieldImage('test-lever'));
+  body.append(fieldImage('test-lever-v2'));
   const part = parts[save.part];
   const note = make(
     'p',
@@ -916,7 +936,10 @@ function showDictation(term, title, onComplete, onBack, text = term.sentences[0]
   const status = make('p', '', 'note');
   const writing = make('div', '', 'field-writing');
   const audioLine = text + ' 要写的是：' + term.word + '。';
-  body.append(sentence, group(pronounce('重听听写', audioLine, status),
+  const playback = dictationButton(voice, audioLine, (state) => {
+    status.textContent = state === 'unavailable' ? '这个设备暂时无法播放普通话。' : '';
+  });
+  body.append(sentence, group(playback,
     button('看字', () => { sentence.textContent = text; })), writing, status);
   if (onBack) body.append(group(button('返回词语手册', onBack)));
   disposeWriting = mountWriting(writing, term.word, {
@@ -926,7 +949,6 @@ function showDictation(term, title, onComplete, onBack, text = term.sentences[0]
       onComplete();
     },
   });
-  speaker(audioLine, status);
 }
 
 function finishFieldwork(field) {
@@ -940,7 +962,7 @@ function finishFieldwork(field) {
     update(true);
   }
   closePanel();
-  showToast(field.done);
+  showToast(briefingPending() ? '记录已完成。' : field.done);
 }
 function enterRace() {
   if (driving || save.stage !== 11) return;
@@ -979,7 +1001,7 @@ function endStory() {
   });
 }
 function action() {
-  if (view !== 'hud' || dialog.open || driving) return;
+  if (view !== 'hud' || dialog.open || driving || briefingPending()) return;
   if (save.stage === 1) {
     world.lookNudge();
     return;
@@ -1118,7 +1140,7 @@ function openTest(mode) {
   disposeTest = mountTest($('assessment-body'), {
     mode,
     saved: save[key],
-    speak: speaker,
+    speak: voice.speak,
     stopSpeech: voice.stop,
     cue: play,
     onProgress: (state) => {

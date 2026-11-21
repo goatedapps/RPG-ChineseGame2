@@ -1,3 +1,4 @@
+import { dictationButton } from '../shared/speaker.js?v=radio-briefings';
 import { currentLessonQuestion, revealLessonWord, completeLessonQuestion } from './lesson-test.js';
 import { createWriting } from './writing.js';
 
@@ -15,14 +16,6 @@ function button(className, text, action) {
   const control = node('button', className, text);
   control.type = 'button';
   control.addEventListener('click', action);
-  return control;
-}
-
-function speaker(action) {
-  const control = button('lesson-test-icon lesson-test-speaker', '', action);
-  control.setAttribute('aria-label', '朗读题目');
-  control.title = '朗读题目';
-  control.innerHTML = '<svg class="speaker-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
   return control;
 }
 
@@ -106,10 +99,9 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const layout = node('div', 'lesson-test-layout');
     const prompt = node('div', 'lesson-test-prompt');
     const promptTools = node('div', 'lesson-test-tools');
-    const read = speaker(() => {
-      const gap = question.revealed ? question.word : '，空格，';
-      speak(`${question.before}${gap}${question.after}`);
-    });
+    const spokenGap = question.revealed ? question.word : '，空格，';
+    const read = dictationButton({ speak, stop: stopSpeech }, question.before + spokenGap + question.after);
+    read.classList.add('lesson-test-icon', 'lesson-test-speaker');
     const translation = node('p', 'lesson-test-translation', helpEN);
     translation.lang = 'en';
     translation.id = 'lesson-test-english';

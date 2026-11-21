@@ -3,18 +3,24 @@ const mandarin = /^(?:cmn(?:[-_]|$)|zh$|zh[-_](?:CN|SG|TW|Hans)(?:[-_]|$))/i;
 export function createVoice(onChange) {
   const synth = window.speechSynthesis;
   let revision = 0;
+  let activeListener;
 
   function stop() {
     revision += 1;
     synth?.cancel();
+    const previous = activeListener;
+    activeListener = undefined;
     onChange('idle');
+    previous?.('idle');
   }
 
   function speak(text, rate = .87, onState = () => {}) {
     stop();
     const id = revision;
+    activeListener = onState;
     const report = (status) => {
       if (id !== revision) return;
+      if (status !== 'playing') activeListener = undefined;
       onChange(status);
       onState(status);
     };

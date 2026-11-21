@@ -430,6 +430,13 @@ dialog header,
     margin-bottom: 23px;
   }
 }
+@media (any-pointer: coarse) and (min-width: 36rem) and (min-height: 31rem) {
+  #hud .radio-dock {
+    width: 3.9rem;
+    height: 5.95rem;
+    padding: .42rem;
+  }
+}
 .toast {
   position: absolute;
   max-width: 80vw;

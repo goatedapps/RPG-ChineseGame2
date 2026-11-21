@@ -23,7 +23,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues. Spread story beats and fieldwork across distinct walkable locations with visible landmarks.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone. For radios and phones, briefly shake the device when a new message arrives and show an unread indicator until the message is opened.
-- Give the story briefing before showing the related task. Write the helper’s messages as a conversation that reacts to what just happened and explains why the next action matters. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
+- Show and acknowledge each new story briefing before revealing its related task on the HUD. Write the helper’s messages as a conversation that reacts to what just happened and explains why the next action matters. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
 - When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
 - Show close-ups as full images of the actual objects with ImageGen artwork. Put readable clues and relevant controls on or near the object itself. Use live text over generated paper for handwritten notes and pages. Keep the close-up free of generic dialog cards.
 - Let players tap or click outside a close-up to dismiss it, and show any image a question refers to.
@@ -38,7 +38,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
 - Use the [shared vocabulary rows](shared/vocabulary.js) and [layout](shared/vocabulary.css). Show discovery progress and reveal each word with its Chinese meaning, Hanyu Pinyin, pronunciation control, sentence-bank example, and writing review.
-- Use browser Speech Synthesis for Mandarin dictation, show the sentence with the target word blanked out, and offer normal-speed replay through a speaker icon.
+- Use browser Speech Synthesis for Mandarin dictation, show the sentence with the target word blanked out, and offer normal-speed playback through one button that starts dictation on the first press and stops it on the next.
 - Use Hanzi Writer for Chinese handwriting, with one large active box at a time and separate progress markers for multi-character words.
 - Keep the handwriting box at least 248 CSS pixels per side at typical tablet and desktop sizes.
 - In dictation, show the next stroke after five unsuccessful attempts at that stroke.

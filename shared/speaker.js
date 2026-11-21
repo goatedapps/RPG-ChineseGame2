@@ -2,7 +2,7 @@ export function speakerButton(click, label) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'icon-button speaker-button';
-  button.addEventListener('click', click);
+  if (click) button.addEventListener('click', click);
   button.setAttribute('aria-label', label);
   const svgNS = 'http://www.w3.org/2000/svg';
   const icon = document.createElementNS(svgNS, 'svg');
@@ -14,5 +14,26 @@ export function speakerButton(click, label) {
   icon.append(path);
   button.append(icon);
   button.title = label;
+  return button;
+}
+
+
+export function dictationButton(voice, text, onState) {
+  const button = speakerButton(null, '播放听写');
+  const icon = button.querySelector('path');
+  const speaker = icon.getAttribute('d');
+  let playing = false;
+  function render(state) {
+    playing = state === 'playing';
+    const label = playing ? '停止听写' : '播放听写';
+    button.title = label;
+    button.setAttribute('aria-label', label);
+    icon.setAttribute('d', playing ? 'M6 6h12v12H6z' : speaker);
+    onState?.(state);
+  }
+  button.onclick = () => {
+    if (playing) voice.stop();
+    else voice.speak(text, .85, render);
+  };
   return button;
 }

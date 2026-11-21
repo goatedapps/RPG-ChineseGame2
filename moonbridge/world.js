@@ -918,8 +918,17 @@ export function createWorld(canvas, notify, finished) {
     [5.05, 0, 8.54],
   ])
     crate(fixed, x, y, z);
-  box(fixed, color.red, -3.75, 1.08, 2.16, 0.35, 0.13, 0.33);
-  box(fixed, color.brass, -3.75, 1.23, 2.16, 0.08, 0.23, 0.08);
+  const lever = groupAt(fixed, -3.75, 1.015, 2.16);
+  box(lever, color.dark, 0, .055, 0, .64, .11, .43);
+  for (const x of [-.25, .25])
+    for (const z of [-.16, .16])
+      mesh(lever, wheelGeo, color.brass, [x, .118, z], [.052, .023, .052]);
+  mesh(lever, wheelGeo, color.brass, [0, .17, 0], [.14, .22, .14], [Math.PI / 2, 0, 0]);
+  const quadrant = new T.TorusGeometry(.27, .024, 8, 26, Math.PI * .86);
+  for (const z of [-.087, .087])
+    mesh(lever, quadrant, color.rail, [0, .14, z], [1, 1, 1], [0, 0, .22]);
+  beam(lever, color.dark, V(0, .17, 0), V(-.29, .63, 0), .067, .066);
+  mesh(lever, wheelGeo, color.red, [-.29, .63, 0], [.15, .34, .15], [0, 0, Math.PI / 2]);
   cloth(fixed, -4.69, 2.21, 5.8, color.red, 1.2, 1.02);
 
   const radio = device(effects, 2.77, 1.015, 4.82);
@@ -960,7 +969,7 @@ export function createWorld(canvas, notify, finished) {
     dispatch: V(2, 1.55, -.41),
     arrival: V(12.22, 1.13, -84.77),
     cart: V(0, 0.86, 3.32),
-    lever: V(-3.75, 1.48, 2.16),
+    lever: V(-4.04, 1.63, 2.16),
     launch: V(0, 0.7, 1.1),
     beacon: V(12.4, 1.6, -89),
   };
