@@ -127,10 +127,10 @@ let moveStart;
 function play(name) {
   audio.cue(name);
 }
-function speaker(text, status) {
+function speaker(text, status, unavailableMessage = '这个设备暂时无法播放普通话。') {
   voice.speak(text, 0.86, (state) => {
     if (state === 'unavailable' && status)
-      status.textContent = '这个设备暂时无法播放普通话。';
+      status.textContent = unavailableMessage;
   });
 }
 function animate(element, y = 6) {
@@ -250,7 +250,9 @@ function showComic(content, title, onFinish) {
   });
 }
 
-function showPanel(backdrop, title) {
+function showPanel(backdrop, title, language = 'zh-Hans') {
+  dialog.lang = language;
+  $('dialog-close').setAttribute('aria-label', language === 'en' ? 'Close' : '关闭');
   disposeWriting();
   disposeWriting = () => {};
   voice.stop();
@@ -298,7 +300,10 @@ function syncRadio(notify = false) {
   const unread = !radio.hidden && Boolean(objective()?.guide) &&
     !save.seenRadioMessages.includes(radioMessageKey('guide'));
   $('unread').hidden = !unread;
-  radio.setAttribute('aria-label', unread ? '打开小梅的对讲机，有新消息' : '打开小梅的对讲机');
+  radio.setAttribute('aria-label', unread
+    ? 'Open Mei’s walkie-talkie, new message'
+    : 'Open Mei’s walkie-talkie');
+  radio.title = unread ? 'New message from Mei' : 'Walkie-talkie';
   if (!unread) radioBuzz?.cancel();
   if (!unread || !notify) return;
   play('notification');
@@ -544,14 +549,14 @@ function openRadio() {
   const task = objective();
   const guide = task?.guide;
   if (!guide) return;
-  showPanel(null, '小梅的对讲机');
+  showPanel(null, 'Mei’s Walkie-Talkie', 'en');
   body.append(radioMessage(guide, 'guide'));
   syncRadio();
   if (stage === 3) {
     body.append(
       group(
         button(
-          '收到',
+          'Got it',
           () => {
             go(4);
             closePanel();
@@ -576,11 +581,11 @@ function openRadio() {
       'Look right from the track. The tall brass lamp has an empty socket.',
   };
   const hint = task.hint ?? places[task.item] ?? guide;
-  const help = button('再给一点提示', () => {
+  const help = button('Get a hint', () => {
     hintCount++;
     if (hintCount === 1) {
       status.before(radioMessage(hint, 'hint'));
-      status.textContent = '需要时可再点一次，显示位置。';
+      help.textContent = 'Show location';
     } else {
       world.point(task.item);
       closePanel();
@@ -588,14 +593,14 @@ function openRadio() {
   });
   body.append(
     group(
-      button('听华文提示', () => speaker(task.cue, status)),
+      button('Replay Mandarin cue', () => speaker(task.cue, status, 'Mandarin audio is unavailable on this device.')),
       help,
     ),
     status,
   );
   if (hintCount > 0) {
     status.before(radioMessage(hint, 'hint'));
-    status.textContent = '需要时可再点一次，显示位置。';
+    help.textContent = 'Show location';
   }
 }
 $('radio').onclick = openRadio;
