@@ -31,7 +31,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use the lesson's Tingxie wordlist in `content/<level>/tingxie/` as the required curriculum and give students practice reading, understanding, and writing every entry.
 - Use the supplied stories as optional references.
 - Include practice from the supplied question bank, with lesson-tagged questions used in their matching lesson and untagged questions eligible anywhere in that primary level.
-- Use Simplified Chinese for all player-facing game text and Mandarin for spoken game content. The only English in the game is the dedicated story helper's storyline, next-action guidance, and contextual hints.
+- **Across all levels and every lesson, only the dedicated helper who tells the storyline uses English. Everything else in the game is in Chinese.** Use Simplified Chinese for player-facing text and Mandarin for spoken content. The helper's English is limited to storyline narration, next-action guidance, and contextual hints.
 - Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Label the helper's controls in Chinese as well.
 - Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
