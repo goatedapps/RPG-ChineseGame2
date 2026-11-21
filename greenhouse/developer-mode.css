@@ -16,6 +16,7 @@
   stroke-linejoin: round;
 }
 
+#workbench:has(.developer-unlock, .developer-option) { width: min(35rem, calc(100% - 2rem)); }
 .developer-unlock { max-width: 26rem; }
 .developer-unlock label { display: block; color: var(--muted); }
 
