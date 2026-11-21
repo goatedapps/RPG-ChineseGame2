@@ -510,6 +510,17 @@ dialog:has(.restart-confirmation) {
 .helper-message[lang='en'] {
   font-family: system-ui, sans-serif;
 }
+.helper-message:has(.helper-typing) {
+  position: relative;
+}
+.helper-transcript {
+  color: transparent;
+}
+.helper-typing {
+  position: absolute;
+  inset: 10px 12px;
+  pointer-events: none;
+}
 .options {
   display: grid;
   gap: 6px;

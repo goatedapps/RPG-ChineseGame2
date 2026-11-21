@@ -38,6 +38,7 @@ const initial = {
   version: 2,
   fieldDone: [],
   fieldProgress: null,
+  seenRadioMessages: [],
   stage: 0,
   part: null,
   won: false,
@@ -78,6 +79,9 @@ function readSave() {
       won: value.won === true,
       storyFinished: value.storyFinished === true,
       passed: value.passed === true,
+      seenRadioMessages: Array.isArray(value.seenRadioMessages)
+        ? value.seenRadioMessages.filter((key) => typeof key === 'string')
+        : [],
       discoveries: words
         .map(({ word }) => word)
         .filter(
@@ -479,6 +483,43 @@ $('speak').onclick = () => {
   if (objective()?.cue) speaker(objective().cue, status);
 };
 
+function radioMessageKey(kind) {
+  const variant = pendingFieldwork()?.cue ? 'field' : 'task';
+  return save.stage + ':' + variant + ':' + kind;
+}
+
+function radioMessage(text, kind) {
+  const message = make('p', text, 'helper-message');
+  message.lang = 'en';
+  const key = radioMessageKey(kind);
+  if (save.seenRadioMessages.includes(key)) return message;
+  save.seenRadioMessages.push(key);
+  persist();
+  if (reducedMotion.matches) return message;
+
+  // Reserve the final text layout and expose the complete message to screen readers.
+  const full = make('span', text, 'helper-transcript');
+  const typed = make('span', '', 'helper-typing');
+  typed.setAttribute('aria-hidden', 'true');
+  message.replaceChildren(full, typed);
+
+  const characters = Array.from(text);
+  const duration = Math.min(characters.length * 15, 2200);
+  const start = performance.now();
+  function type(now) {
+    const count = Math.floor((now - start) / duration * characters.length);
+    if (count >= characters.length || reducedMotion.matches ||
+        !message.isConnected || !dialog.open) {
+      message.textContent = text;
+      return;
+    }
+    typed.textContent = characters.slice(0, count).join('');
+    requestAnimationFrame(type);
+  }
+  requestAnimationFrame(type);
+  return message;
+}
+
 function openRadio() {
   if (save.stage < 3 || driving) return;
   const stage = save.stage;
@@ -488,9 +529,7 @@ function openRadio() {
   radioUnread = false;
   $('unread').hidden = true;
   showPanel(null, '小梅的对讲机');
-  const message = make('p', guide, 'helper-message');
-  message.lang = 'en';
-  body.append(message);
+  body.append(radioMessage(guide, 'guide'));
   if (stage === 3) {
     body.append(
       group(
@@ -508,24 +547,22 @@ function openRadio() {
   }
   const status = make('p', '', 'dialog-note');
   status.setAttribute('role', 'status');
+  const places = {
+    spark:
+      'The spark is on the right side of the same table where you found the radio.',
+    cart: 'Look for the brass bell on the cart in the middle of the station.',
+    lever: 'The red handle is on the left-hand workbench.',
+    handbook: 'The handbook is on the worktable in the west workshop, just beside the archive.',
+    shelf:
+      'The shelf at the back of the west workshop holds the two fittings, one brass and one blue.',
+    beacon:
+      'Look right from the track. The tall brass lamp has an empty socket.',
+  };
+  const hint = task.hint ?? places[task.item] ?? guide;
   const help = button('再给一点提示', () => {
     hintCount++;
     if (hintCount === 1) {
-      const additional = make('p', guide, 'helper-message');
-      additional.lang = 'en';
-      const places = {
-        spark:
-          'The spark is on the right side of the same table where you found the radio.',
-        cart: 'Look for the brass bell on the cart in the middle of the station.',
-        lever: 'The red handle is on the left-hand workbench.',
-        handbook: 'The handbook is on the worktable in the west workshop, just beside the archive.',
-        shelf:
-          'The shelf at the back of the west workshop holds the two fittings, one brass and one blue.',
-        beacon:
-          'Look right from the track. The tall brass lamp has an empty socket.',
-      };
-      additional.textContent = task.hint ?? places[task.item] ?? guide;
-      status.before(additional);
+      status.before(radioMessage(hint, 'hint'));
       status.textContent = '需要时可再点一次，显示位置。';
     } else {
       world.point(task.item);
@@ -539,6 +576,10 @@ function openRadio() {
     ),
     status,
   );
+  if (hintCount > 0) {
+    status.before(radioMessage(hint, 'hint'));
+    status.textContent = '需要时可再点一次，显示位置。';
+  }
 }
 $('radio').onclick = openRadio;
 
