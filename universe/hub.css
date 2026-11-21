@@ -17,6 +17,7 @@
 }
 body {
   margin: 0;
+  min-height: 100vh;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
@@ -44,6 +45,7 @@ button:disabled {
   cursor: default;
 }
 button:focus-visible,
+.grade-card:focus-visible,
 canvas:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 3px;
@@ -57,6 +59,7 @@ p {
 .choose {
   position: relative;
   isolation: isolate;
+  min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -136,6 +139,10 @@ p {
   align-items: center;
   gap: 10px;
   text-align: left;
+  text-decoration: none;
+  color: var(--ink);
+  min-height: 44px;
+  border: 1px solid var(--line);
   padding: 9px 12px;
   border-radius: 0.8rem;
   isolation: isolate;
@@ -151,7 +158,7 @@ p {
     box-shadow 0.2s,
     border-color 0.2s;
 }
-.grade-card:hover:enabled,
+.grade-card:hover,
 .grade-card:focus-visible {
   transform: translateY(-4px);
   box-shadow: 0 0 27px color-mix(in srgb, var(--planet) 32%, transparent);
@@ -160,6 +167,7 @@ p {
 .grade-card img {
   width: clamp(42px, 6vw, 76px);
   aspect-ratio: 1;
+  height: auto;
   object-fit: contain;
   filter: drop-shadow(
     0 0 12px color-mix(in srgb, var(--planet) 36%, transparent)
@@ -408,14 +416,15 @@ dialog header button {
       linear-gradient(90deg, #1010208a, transparent);
   }
   .hero-copy {
-    margin: clamp(66px, 14vh, 125px) 0 32px;
+    margin: clamp(26px, 10vh, 96px) 0 24px;
   }
   .grade-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .grade-card {
     gap: 7px;
-    padding: 0.45rem 0.55rem;
+    min-height: 54px;
+    padding: 0.37rem 0.55rem;
   }
   .map-header button {
     font-size: 0.76rem;
@@ -425,6 +434,17 @@ dialog header button {
     gap: 5px;
     left: 8px;
     right: 8px;
+  }
+}
+@media (max-width: 660px) and (max-height: 570px) {
+  .choose {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .hero-copy {
+    margin: clamp(16px, 6vh, 34px) 0 18px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(2.2rem, 9vw, 3rem);
   }
 }
 @media (any-pointer: coarse) {

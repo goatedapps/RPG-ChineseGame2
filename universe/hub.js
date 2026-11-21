@@ -3,6 +3,7 @@ import { lessonCompleted } from '../shared/lesson-progress.js';
 import { getWorlds, levels } from './catalog.js';
 
 const $ = (id) => document.getElementById(id);
+const gradeKeys = Object.keys(levels);
 const dialog = $('world-directory');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const statusText = {
@@ -34,55 +35,21 @@ function setAddress(level) {
   else address.searchParams.delete('level');
   history.replaceState(null, '', address);
 }
-function renderGrades() {
-  $('grades').replaceChildren(
-    ...Object.entries(levels).map(([key, level]) => {
-      const card = add('button', '', 'grade-card');
-      card.type = 'button';
-      card.dataset.level = key;
-      card.style.setProperty(
-        '--planet',
-        '#' + level.accent.toString(16).padStart(6, '0'),
-      );
-      const image = add('img');
-      image.src = linkAsset('./art/' + level.image);
-      image.alt = '';
-      const description = add('span');
-      description.append(
-        add('strong', level.label),
-        add('small', level.count + ' 个世界'),
-      );
-      card.append(image, description);
-      card.onclick = () => openLevel(key);
-      return card;
-    }),
+function animateTitle() {
+  if (motion.matches || !window.gsap) return;
+  window.gsap.fromTo(
+    '.hero-copy > *',
+    { opacity: 0, y: 16 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.62,
+      stagger: 0.09,
+      clearProps: 'opacity,transform',
+    },
   );
-  if (!motion.matches && window.gsap) {
-    window.gsap.fromTo(
-      '.hero-copy > *',
-      { opacity: 0, y: 16 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.62,
-        stagger: 0.09,
-        clearProps: 'opacity,transform',
-      },
-    );
-    window.gsap.fromTo(
-      '.grade-card',
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.47,
-        delay: 0.23,
-        stagger: 0.08,
-        clearProps: 'opacity,transform',
-      },
-    );
-  }
 }
+
 function mapStatus(text = '', duration = 0) {
   clearTimeout(statusTimer);
   $('map-status').textContent = text;
@@ -95,7 +62,7 @@ function refreshWorlds(level) {
     '已完成 ' + completed + ' / ' + worlds.length + ' 课';
 }
 async function openLevel(level) {
-  if (!Object.hasOwn(levels, level)) return;
+  if (!gradeKeys.includes(level)) return;
   const ticket = ++generation;
   if (dialog.open) dialog.close();
   universe?.destroy();
@@ -260,6 +227,12 @@ window.addEventListener('pageshow', (event) => {
   if (event.persisted && currentLevel) openLevel(currentLevel);
 });
 bindJoystick($('joystick'), (x, forward) => universe?.setStick(x, forward));
-renderGrades();
+$('grades').addEventListener('click', (event) => {
+  const grade = event.target.closest('a[data-level]');
+  if (!grade || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  event.preventDefault();
+  void openLevel(grade.dataset.level);
+});
+animateTitle();
 const firstLevel = new URL(location.href).searchParams.get('level');
-if (Object.hasOwn(levels, firstLevel)) openLevel(firstLevel);
+if (gradeKeys.includes(firstLevel)) openLevel(firstLevel);
