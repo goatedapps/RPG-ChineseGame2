@@ -28,27 +28,25 @@ function makeRing(radius, thickness, hue, opacity) {
   return ring;
 }
 
-function makeLabel(number, status) {
+function makeLabel(text, { width, height, fontSize, muted = false }) {
   const sheet = document.createElement('canvas');
-  sheet.width = 128;
-  sheet.height = 64;
   const ctx = sheet.getContext('2d');
+  const font = 'bold ' + fontSize + 'px system-ui, sans-serif';
+  ctx.font = font;
+  sheet.width = width ?? Math.ceil(ctx.measureText(text).width + 76);
+  sheet.height = height;
   ctx.beginPath();
-  ctx.roundRect(10, 10, 108, 44, 21);
+  ctx.roundRect(10, 10, sheet.width - 20, height - 20, (height - 20) / 2);
   ctx.fillStyle = '#18172edb';
   ctx.fill();
-  ctx.strokeStyle = status === 'locked' ? '#70708c' : '#eec793';
+  ctx.strokeStyle = muted ? '#70708c' : '#eec793';
   ctx.lineWidth = 2.5;
   ctx.stroke();
-  ctx.fillStyle = status === 'locked' ? '#c0bcd1' : '#ffe7b9';
-  ctx.font = 'bold 25px system-ui, sans-serif';
+  ctx.fillStyle = muted ? '#c0bcd1' : '#ffe7b9';
+  ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(
-    String(number).padStart(2, '0'),
-    64,
-    32,
-  );
+  ctx.fillText(text, sheet.width / 2, height / 2);
   return new T.Sprite(
     new T.SpriteMaterial({
       map: new T.CanvasTexture(sheet),
@@ -179,9 +177,24 @@ export function createUniverse(
     );
     orbit.position.y = -0.12;
     root.add(orbit);
-    const label = makeLabel(world.number, world.status);
+    const label = makeLabel(String(world.number).padStart(2, '0'), {
+      width: 128,
+      height: 64,
+      fontSize: 25,
+      muted: world.status === 'locked',
+    });
     label.scale.set(1.08, 0.54, 1);
     root.add(label);
+    let name;
+    if (ready && world.href) {
+      name = makeLabel(world.title, { height: 76, fontSize: 46 });
+      const artwork = name.material.map.image;
+      const scale = Math.min(1 / 155, (planet.scale.x * 0.65) / artwork.width);
+      name.scale.set(artwork.width * scale, artwork.height * scale, 1);
+      name.renderOrder = 1;
+      name.visible = false;
+      root.add(name);
+    }
     scene.add(root);
     entries.set(world.number, {
       world,
@@ -190,6 +203,7 @@ export function createUniverse(
       ring,
       orbit,
       label,
+      name,
       object: root,
       hintAnchor: [0, 1.87, 0],
     });
@@ -456,9 +470,16 @@ export function createUniverse(
       !reduce.matches,
     );
     screenUp.copy(UP).applyQuaternion(camera.quaternion);
-    for (const { planet, label } of entries.values()) {
+    for (const [id, { planet, label, name }] of entries) {
       label.position.copy(planet.position)
         .addScaledVector(screenUp, -(planet.scale.y / 2 + 0.24));
+      if (name) {
+        name.visible = !leaving && id === nearby;
+        if (name.visible) {
+          name.position.copy(planet.position)
+            .addScaledVector(screenUp, planet.scale.y * 0.18);
+        }
+      }
     }
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);

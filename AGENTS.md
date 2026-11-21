@@ -6,7 +6,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Lesson structure
 
-- The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Drag the star map to look around and move relative to the camera. Label each planet with its lesson number below it, and enter available worlds by double-clicking or double-tapping the planet. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
+- The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Drag the star map to look around and move relative to the camera. Label each planet with its lesson number below it. Show a compact lesson name on the planet itself when the player approaches a world they can enter. Enter available worlds by double-clicking or double-tapping the planet. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
 - Use [shared progress](shared/lesson-progress.js) to mark a lesson complete only after passing its final test. Unlock worlds in order within each level and keep completed lessons replayable. Display unpublished lessons as under construction once their prerequisites are met.
 - Give each lesson its own HTML entry point and reuse shared gameplay and learning systems where practical.
 - Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish. See the [P6 gameplay screenshots](references/p6-lesson1/README.md) for the task HUD, story helper, clues, comprehension, dictation, notebook, and final test.
