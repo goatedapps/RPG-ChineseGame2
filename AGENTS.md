@@ -47,7 +47,8 @@
 - Offer practice from the supplied question bank.
 - Use lesson-tagged questions in their matching lesson, and allow untagged questions in any lesson of the same primary level.
 - Write primarily in Chinese for second-language learners and read all key task instructions aloud in Mandarin.
-- Keep prompts short, omit instructions that are clear from the interaction, and break longer passages into chunks that appear as needed.
+- Keep visible and spoken prompts short, and omit directions the interface already makes clear, such as telling players to fill in an obvious blank.
+- Break longer instructions into short chunks that appear as needed.
 - Use a short text reveal or scroll animation when it helps players follow longer instructions.
 - Make English help available on demand through a quiet EN control and use a loudspeaker icon for replaying speech.
 - Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, a pronunciation control, and an example below the meaning from the lesson's sentence bank.
@@ -78,7 +79,6 @@
 ## Current reference implementation
 
 - The public GitHub Pages site serves the P6 Lesson 1 greenhouse game from `index.html`.
-- The earlier Stormroot platformer remains available at `stormroot.html`.
 - P6 Lesson 1 covers all 24 entries in `content/p6/tingxie/1.yaml`.
 - Keep `greenhouse/lesson-test-sentences.json`, used by the test and notebook, in sync with the Chinese `sentenceBank` entries in that file.
 - The story and dictation order live in `greenhouse/story.js`, the notebook and bilingual practice data in `greenhouse/lexicon.js`, and the close-ups in `greenhouse/evidence.js`.

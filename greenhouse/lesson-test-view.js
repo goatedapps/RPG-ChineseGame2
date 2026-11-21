@@ -1,8 +1,7 @@
 import { currentLessonQuestion, revealLessonWord, completeLessonQuestion } from './lesson-test.js';
 import { createWriting } from './writing.js';
 
-const instructionsCN = '读句子，写出空格里的词语。';
-const instructionsEN = 'Read the sentence and write the missing word. Tap 看字 (Show word) to see and trace it. Any word you reveal comes back at the end.';
+const helpEN = '看字 (Show word) reveals the answer. That word comes back at the end.';
 const poster = new URL('./art/science-poster.webp', import.meta.url);
 
 function node(tag, className, text) {
@@ -107,12 +106,11 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const layout = node('div', 'lesson-test-layout');
     const prompt = node('div', 'lesson-test-prompt');
     const promptTools = node('div', 'lesson-test-tools');
-    const directions = node('p', 'lesson-test-directions', question.review ? '再试一次' : '看句子，写词语');
     const read = speaker(() => {
-      const sentence = question.revealed ? question.word : '，空格，';
-      speak(`${instructionsCN}${question.before}${sentence}${question.after}`);
+      const gap = question.revealed ? question.word : '，空格，';
+      speak(`${question.before}${gap}${question.after}`);
     });
-    const translation = node('p', 'lesson-test-translation', instructionsEN);
+    const translation = node('p', 'lesson-test-translation', helpEN);
     translation.lang = 'en';
     translation.id = 'lesson-test-english';
     translation.hidden = !englishOpen;
@@ -125,7 +123,8 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     english.setAttribute('aria-label', '英文说明');
     english.setAttribute('aria-controls', translation.id);
     english.setAttribute('aria-expanded', String(englishOpen));
-    promptTools.append(directions, read, english);
+    if (question.review) promptTools.append(node('p', 'lesson-test-review', '再试一次'));
+    promptTools.append(read, english);
     const sentence = node('p', 'lesson-test-sentence');
     sentence.tabIndex = -1;
     const gap = node('span', 'lesson-test-gap', question.revealed ? question.word : '');
@@ -136,7 +135,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
 
     const help = node('div', 'lesson-test-help');
     if (question.revealed) {
-      help.append(node('p', 'lesson-test-revealed', '照着写。这个词稍后再试。'));
+      help.append(node('p', 'lesson-test-revealed', '这个词稍后再试。'));
     } else {
       const showWord = button('lesson-test-show-word', '看字', () => {
         save(revealLessonWord(state));
@@ -198,8 +197,6 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
       status.textContent = '';
       updateCharacters(completed);
     }, { hintsAfterMisses: question.revealed ? 2 : false });
-
-    if (first) speak(instructionsCN);
   }
 
   render(true);

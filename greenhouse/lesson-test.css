@@ -88,11 +88,12 @@
 .lesson-test-tools {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: .44rem;
   margin-block-end: .7rem;
 }
 
-.lesson-test-directions {
+.lesson-test-review {
   flex: 1;
   color: var(--test-quiet);
   font-size: .88rem;

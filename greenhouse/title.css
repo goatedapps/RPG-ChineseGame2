@@ -138,7 +138,6 @@
 }
 .cover-tools .cover-tool svg { width: 1.14rem; height: 1.14rem; }
 .cover-tools .cover-tool:is(:hover,[aria-pressed='true'],[aria-expanded='true']) { border-color: #ffcb7f; color: #ffda9b; }
-.cover-archive { margin-inline-start: auto; color: #faeddc; font-size: .78rem; text-decoration-color: #f1d8bf90; }
 #intro-translation { order: 2; flex-basis: 100%; margin: 0; color: #fff2df; border-color: #f0c56b; background: #201c32f3; }
 
 @media (max-aspect-ratio: 1/1) {
