@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101329" />
+    <meta
+      name="description"
+      content="在月桥上驾驶灯车，把火种送到对岸。新加坡小学三年级华文第一课。"
+    />
+    <title>月桥竞速 · 三年级华文第一课</title>
+    <link rel="stylesheet" href="moonbridge/game.css" />
+    <link rel="preload" href="moonbridge/art/prelude-1.webp" as="image" />
+    <script defer src="greenhouse/vendor/gsap.min.js"></script>
+    <script type="module" src="moonbridge/game.js"></script>
+  </head>
+  <body>
+    <main>
+      <canvas id="world" aria-label="月桥车站与赛道" hidden></canvas>
+      <section id="home" class="home screen" aria-labelledby="title">
+        <div class="home-shade"></div>
+        <div class="cover">
+          <p class="tag">三年级华文 · 第一课</p>
+          <h1 id="title">月桥竞速</h1>
+          <p class="lead">桥灯熄灭了。开上你的灯车，把火种送到对岸。</p>
+          <div class="buttons">
+            <button id="start" class="gold">开始冒险</button
+            ><button id="resume-test" hidden>继续课末测试</button>
+          </div>
+          <div class="buttons">
+            <button id="home-book" hidden>词语手册</button
+            ><button id="practice" hidden>词语练习</button
+            ><button id="bank" hidden>题库练习</button
+            ><button data-settings>声音设置</button>
+          </div>
+          <p id="boot-status" class="note" role="status"></p>
+        </div>
+      </section>
+      <section
+        id="comic"
+        class="screen comic"
+        aria-labelledby="comic-title"
+        hidden
+      >
+        <div class="comic-frame">
+          <header>
+            <h2 id="comic-title">序幕</h2>
+            <span id="beat-count"></span>
+          </header>
+          <button
+            id="comic-page"
+            class="comic-page"
+            type="button"
+            aria-label="继续"
+          >
+            <img id="beat-art" alt="" /><span id="beat-caption" hidden></span>
+          </button>
+          <div class="buttons comic-nav">
+            <button id="prev-beat">上一幕</button
+            ><button id="next-beat" class="gold">继续</button>
+          </div>
+        </div>
+      </section>
+      <section id="hud" aria-label="游戏操作" hidden>
+        <header class="hud-header">
+          <div class="identity">
+            <span aria-hidden="true">◈</span>
+            <div><strong>月桥竞速</strong><small>三年级 · 第一课</small></div>
+          </div>
+          <nav aria-label="工具">
+            <button id="book">词语 <span id="word-count">0 / 25</span></button
+            ><button data-settings>声音</button
+            ><button id="developer" aria-label="开发者模式">⚙</button>
+          </nav>
+        </header>
+        <div class="mission" aria-live="polite">
+          <p id="district" class="tag">起点车站</p>
+          <h2 id="objective"></h2>
+          <p id="control-hint"></p>
+        </div>
+        <div id="reticle" aria-hidden="true"></div>
+        <p id="toast" class="toast" role="status" hidden></p>
+        <div id="drive" class="drive" hidden>
+          <div><strong id="speed">时速 0</strong><span id="place"></span></div>
+          <progress
+            id="race-progress"
+            max="1"
+            value="0"
+            aria-label="赛程"
+          ></progress>
+          <p id="race-hint"></p>
+          <div class="buttons">
+            <button id="left-route">走左线</button
+            ><button id="right-route">走右线</button>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="pad" id="pad" aria-label="移动方向">
+            <button data-move="up" aria-label="向前">▲</button
+            ><button data-move="left" aria-label="向左">◀</button
+            ><button data-move="down" aria-label="向后或刹车">▼</button
+            ><button data-move="right" aria-label="向右">▶</button>
+          </div>
+          <div class="context">
+            <button id="speak" aria-label="听任务提示">◖ 声音提示</button
+            ><button id="action" class="gold">互动</button
+            ><button id="radio" aria-label="打开小梅的对讲机" hidden>
+              对讲机 <span id="unread" aria-hidden="true">●</span>
+            </button>
+          </div>
+        </div>
+      </section>
+      <dialog id="dialog" aria-labelledby="dialog-title">
+        <header>
+          <h2 id="dialog-title" tabindex="-1"></h2>
+          <button id="dialog-close" type="button" aria-label="关闭">×</button>
+        </header>
+        <div id="dialog-body"></div>
+      </dialog>
+      <section
+        id="assessment"
+        class="screen assessment"
+        aria-labelledby="assessment-title"
+        hidden
+      >
+        <div id="assessment-body"></div>
+      </section>
+    </main>
+  </body>
+</html>

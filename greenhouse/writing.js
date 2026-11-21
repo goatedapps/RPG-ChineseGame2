@@ -1,17 +1,20 @@
 const dataUrl = new URL('../stage/vendor/lesson-characters.json', import.meta.url);
 const writerUrl = new URL('../stage/vendor/hanzi-writer.min.js', import.meta.url);
-let dataRequest;
+const dataRequests = new Map();
 let writerRequest;
 
-function getStrokeData() {
-  dataRequest ??= fetch(dataUrl).then((response) => {
-    if (!response.ok) throw new Error('Character data unavailable');
-    return response.json();
-  }).catch((error) => {
-    dataRequest = null;
-    throw error;
-  });
-  return dataRequest;
+function getStrokeData(url) {
+  const key = String(url);
+  if (!dataRequests.has(key)) {
+    dataRequests.set(key, fetch(url).then((response) => {
+      if (!response.ok) throw new Error('Character data unavailable');
+      return response.json();
+    }).catch((error) => {
+      dataRequests.delete(key);
+      throw error;
+    }));
+  }
+  return dataRequests.get(key);
 }
 
 function getWriter() {
@@ -65,7 +68,7 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
   });
   resize.observe(grid);
 
-  Promise.all([getStrokeData(), getWriter()]).then(([data, Writer]) => {
+  Promise.all([getStrokeData(options.strokeDataUrl ?? dataUrl), getWriter()]).then(([data, Writer]) => {
     if (cancelled) return;
     if (characters.some((character) => !data[character])) throw new Error('Missing handwriting asset');
     function begin(index) {
