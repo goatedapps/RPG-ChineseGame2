@@ -4,7 +4,7 @@ import { createHintPortal } from '../shared/hint-portal.js';
 const V = (x, y, z) => new T.Vector3(x, y, z);
 const UP = V(0, 1, 0);
 const clamp = T.MathUtils.clamp;
-const doubleTapWindow = 420;
+const doubleTapWindow = 500;
 const access = (world) =>
   world.status === 'open' || world.status === 'complete';
 
@@ -282,24 +282,23 @@ export function createUniverse(
     if (reduce.matches) player.position.copy(travelPosition);
   }
 
-  function pointerDown(event) {
-    if (leaving || pointer || event.button !== 0) return;
-    pointer = {
-      id: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      x: event.clientX,
-      y: event.clientY,
-      dragged: false,
-    };
-    canvas.setPointerCapture(event.pointerId);
+  function startGesture(id, type, x, y) {
+    if (leaving || pointer) return false;
+    pointer = { id, type, startX: x, startY: y, x, y, dragged: false };
+    return true;
   }
-  function pointerMove(event) {
-    if (leaving || pointer?.id !== event.pointerId) return;
-    const { clientX: x, clientY: y } = event;
+  function ownsGesture(id, type) {
+    return pointer?.id === id && pointer.type === type;
+  }
+  function gestureDistance(x, y) {
+    return Math.hypot(x - pointer.startX, y - pointer.startY);
+  }
+  function moveGesture(x, y) {
+    if (leaving) return;
     if (!pointer.dragged) {
-      if (Math.hypot(x - pointer.startX, y - pointer.startY) < 8) return;
+      if (gestureDistance(x, y) < 8) return;
       pointer.dragged = true;
+      travelPosition = null;
       clearTap();
     }
     heading -= (x - pointer.x) * 0.006;
@@ -307,25 +306,19 @@ export function createUniverse(
     pointer.x = x;
     pointer.y = y;
   }
-  function cancelPointer(event) {
-    if (pointer?.id !== event.pointerId) return;
+  function cancelGesture() {
     pointer = null;
     clearTap();
   }
-  function pointerUp(event) {
-    if (pointer?.id !== event.pointerId) return;
-    const isTap =
-      !pointer.dragged &&
-      Math.hypot(
-        event.clientX - pointer.startX,
-        event.clientY - pointer.startY,
-      ) < 8;
+  function endGesture(x, y, timeStamp) {
+    const isTap = !pointer.dragged && gestureDistance(x, y) < 8;
+    const { type } = pointer;
     pointer = null;
     if (!isTap || leaving) return;
     const box = canvas.getBoundingClientRect();
     cursor.set(
-      ((event.clientX - box.left) * 2) / box.width - 1,
-      1 - ((event.clientY - box.top) * 2) / box.height,
+      ((x - box.left) * 2) / box.width - 1,
+      1 - ((y - box.top) * 2) / box.height,
     );
     ray.setFromCamera(cursor, camera);
     const hit = ray.intersectObjects(portals).find(({ uv }) =>
@@ -336,8 +329,8 @@ export function createUniverse(
       clearTap();
       return;
     }
-    if (pendingTap?.number === picked && pendingTap.type === event.pointerType &&
-        event.timeStamp <= pendingTap.deadline) {
+    if (pendingTap?.number === picked && pendingTap.type === type &&
+        timeStamp <= pendingTap.deadline) {
       clearTap();
       onActivate(entries.get(picked).world);
       return;
@@ -346,20 +339,54 @@ export function createUniverse(
     // Delay the single-tap flight so the planet stays under the second tap.
     pendingTap = {
       number: picked,
-      type: event.pointerType,
-      deadline: event.timeStamp + doubleTapWindow,
+      type,
+      deadline: timeStamp + doubleTapWindow,
       timer: setTimeout(() => flyTo(picked), doubleTapWindow),
     };
   }
+  function cancelPointer(event) {
+    if (event.pointerType !== 'touch' && ownsGesture(event.pointerId, event.pointerType))
+      cancelGesture();
+  }
   const pointerEvents = {
-    pointerdown: pointerDown,
-    pointermove: pointerMove,
-    pointerup: pointerUp,
+    pointerdown(event) {
+      if (event.pointerType === 'touch' || event.button !== 0) return;
+      if (startGesture(event.pointerId, event.pointerType, event.clientX, event.clientY))
+        canvas.setPointerCapture(event.pointerId);
+    },
+    pointermove(event) {
+      if (event.pointerType !== 'touch' && ownsGesture(event.pointerId, event.pointerType))
+        moveGesture(event.clientX, event.clientY);
+    },
+    pointerup(event) {
+      if (event.pointerType !== 'touch' && ownsGesture(event.pointerId, event.pointerType))
+        endGesture(event.clientX, event.clientY, event.timeStamp);
+    },
     pointercancel: cancelPointer,
     lostpointercapture: cancelPointer,
   };
-  for (const [type, handler] of Object.entries(pointerEvents)) {
-    canvas.addEventListener(type, handler);
+  function handleTouch(event, action) {
+    const contact = Array.from(event.changedTouches).find(({ identifier }) =>
+      ownsGesture(identifier, 'touch'),
+    );
+    if (!contact) return;
+    if (event.cancelable) event.preventDefault();
+    action(contact.clientX, contact.clientY, event.timeStamp);
+  }
+  const touchEvents = {
+    touchstart(event) {
+      const { identifier, clientX, clientY } = event.changedTouches[0];
+      if (startGesture(identifier, 'touch', clientX, clientY) && event.cancelable)
+        event.preventDefault();
+    },
+    touchmove: (event) => handleTouch(event, moveGesture),
+    touchend: (event) => handleTouch(event, endGesture),
+    touchcancel: (event) => handleTouch(event, cancelGesture),
+  };
+  // Handle touch directly so camera gestures do not depend on pointer capture.
+  const canvasEvents = Object.entries({ ...pointerEvents, ...touchEvents });
+  for (const [type, handler] of canvasEvents) {
+    canvas.addEventListener(type, handler, { passive: false });
   }
 
   function setKey(event, held) {
@@ -379,6 +406,7 @@ export function createUniverse(
   const down = (event) => setKey(event, true);
   const up = (event) => setKey(event, false);
   function stopInput() {
+    cancelGesture();
     keys.clear();
     stick.set(0, 0);
   }
@@ -492,7 +520,6 @@ export function createUniverse(
       stick.set(x, forward);
     },
     warp(number) {
-      clearTap();
       leaving = true;
       target = number;
       stopInput();
@@ -512,7 +539,7 @@ export function createUniverse(
       clearTap();
       cancelAnimationFrame(raf);
       observer.disconnect();
-      for (const [type, handler] of Object.entries(pointerEvents)) {
+      for (const [type, handler] of canvasEvents) {
         canvas.removeEventListener(type, handler);
       }
       window.removeEventListener('keydown', down);

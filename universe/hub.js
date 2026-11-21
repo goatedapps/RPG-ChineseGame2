@@ -90,7 +90,7 @@ async function openLevel(level) {
       { opacity: 1, duration: 0.36, clearProps: 'opacity' },
     );
   try {
-    const { createUniverse } = await import('./map.js');
+    const { createUniverse } = await import('./map.js?v=touch-controls');
     if (ticket !== generation) return;
     universe = createUniverse($('universe'), levels[level], worlds, {
       onNearby: (world) => { nearby = world; },
