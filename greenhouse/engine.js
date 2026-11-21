@@ -44,7 +44,7 @@ function blocksSight(hit) {
 function sleepEngine() {
   const noop = () => {};
   return {
-    setActive: noop, setGameState: noop, interact: noop, setVector: noop,
+    hide: noop, setActive: noop, setGameState: noop, interact: noop, setVector: noop,
     look: noop, reset: noop, focus: noop, getSelected: () => null,
   };
 }
@@ -357,8 +357,13 @@ export function createEngine({
     renderer.setAnimationLoop(frame);
   }
 
+  function hide() {
+    renderer.setAnimationLoop(null);
+    previous = 0;
+  }
+
   return {
-    show, ready, setActive, interact, setVector, look, reset, focus, projectTarget,
+    show, hide, ready, setActive, interact, setVector, look, reset, focus, projectTarget,
     setGameState(next) {
       state = { ...next };
       nextRay = 0;

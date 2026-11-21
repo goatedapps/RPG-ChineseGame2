@@ -13,6 +13,8 @@
 - Keep intuitive tap-to-advance instructions out of the visible prelude.
 - Use the title, prelude, and first playable moments to establish what is at stake and why the mission needs attention.
 - Conclude the storyline with a picture-led epilogue showing what the player's actions achieved.
+- Open the final story message after the epilogue and start the lesson test when the player dismisses it.
+- Celebrate a passed test and return the player to the title screen, where practice tests and mission replay are available.
 - Introduce walking, looking around, picking up the handset, and opening its messages in a short hands-on tutorial.
 
 ## Gameplay and presentation
@@ -48,13 +50,17 @@
 - Keep prompts short, omit instructions that are clear from the interaction, and break longer passages into chunks that appear as needed.
 - Use a short text reveal or scroll animation when it helps players follow longer instructions.
 - Make English help available on demand through a quiet EN control and use a loudspeaker icon for replaying speech.
-- Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, and a pronunciation control.
+- Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, a pronunciation control, and an example below the meaning from the lesson's sentence bank.
+- Keep the completed vocabulary notebook available from the title screen.
 - Use the browser's Speech Synthesis API for Mandarin dictation and Hanzi Writer for stroke-by-stroke practice.
 - Open Hanzi Writer from phone replies that ask the player to write Chinese characters.
 - Give players one large active handwriting box for both touch and mouse input, with progress shown separately for multi-character words.
 - Keep the active box at least 248 CSS pixels per side at typical desktop and tablet sizes, a 50% increase over the original 165-pixel maximum.
 - During dictation, highlight the next stroke after five unsuccessful attempts at that stroke.
 - Show the sentence while it is read aloud, with the target word blanked out.
+- Build the final and practice tests from the lesson's bilingual sentence bank, using one Chinese fill-in-the-blank handwriting question for each vocabulary entry.
+- Offer Show word as explicit help and put each assisted word at the end with a fresh sentence until the player writes it unaided.
+- Save test progress and keep the practice unlock when the player replays the mission.
 - Offer normal-speed replay as the only dictation playback option.
 - Deliver Ah Ning's chat as text and use Mandarin speech for the task cues and Chinese practice.
 - Use stereo MP3s for sound effects.
@@ -74,6 +80,7 @@
 - The public GitHub Pages site serves the P6 Lesson 1 greenhouse game from `index.html`.
 - The earlier Stormroot platformer remains available at `stormroot.html`.
 - P6 Lesson 1 covers all 24 entries in `content/p6/tingxie/1.yaml`.
+- Keep `greenhouse/lesson-test-sentences.json`, used by the test and notebook, in sync with the Chinese `sentenceBank` entries in that file.
 - The story and dictation order live in `greenhouse/story.js`, the notebook and bilingual practice data in `greenhouse/lexicon.js`, and the close-ups in `greenhouse/evidence.js`.
 - Keep generated art under `greenhouse/art/`, shared lab textures under `greenhouse/art/lab/`, and interaction geometry aligned with the visible objects.
 - Phone dialogue, login questions, and hints live in `greenhouse/phone-story.js`.

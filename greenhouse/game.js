@@ -8,11 +8,13 @@ import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
+import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
 const desk = $('#workbench');
 const panel = $('#panel');
+const testScreen = $('#lesson-test');
 const reticle = $('#reticle');
 const interact = $('#interact');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -36,6 +38,7 @@ function emptySave() {
   return {
     tutorialDone: false, mission: 0, action: 0, phase: 'explore', wordIndex: 0, held: null, written: {},
     phonePicked: false, notePending: false, noteAnswer: '', unlocked: [], endingSeen: false,
+    lessonComplete: false, finalStarted: false, finalPassed: false, finalTest: null, practiceTest: null,
   };
 }
 
@@ -59,6 +62,9 @@ function load() {
       : [...missions.slice(0, data.mission).flatMap((item) => item.actions), ...(mission?.actions.slice(0, action) ?? [])]
         .map(({ target }) => target);
     const tutorialDone = data.tutorialDone === true || phase !== 'explore' || data.mission > 0 || action > 0;
+    const endingSeen = phase === 'done' && data.endingSeen === true;
+    const finalStarted = endingSeen && data.finalStarted === true;
+    const lessonComplete = data.lessonComplete === true;
     return {
       tutorialDone, phonePicked: tutorialDone || data.phonePicked === true,
       mission: data.mission, action, phase, wordIndex, written,
@@ -66,7 +72,10 @@ function load() {
       notePending: data.notePending === true && data.mission === 0 && action === 1 && phase === 'explore',
       noteAnswer: typeof data.noteAnswer === 'string' ? data.noteAnswer.slice(0, 180) : '',
       unlocked: unlocked.filter((id) => Object.hasOwn(screenChecks, id)),
-      endingSeen: phase === 'done' && data.endingSeen === true,
+      endingSeen, lessonComplete, finalStarted,
+      finalPassed: finalStarted && lessonComplete && data.finalPassed === true,
+      finalTest: finalStarted ? data.finalTest ?? null : null,
+      practiceTest: lessonComplete ? data.practiceTest ?? null : null,
     };
   } catch {
     return emptySave();
@@ -92,6 +101,8 @@ let hintTimer;
 let activeHintKey;
 let hintTarget;
 let announceAfterPhone = false;
+let finalMessageOpen = false;
+let activeTest = null;
 let cleanup = () => {};
 let afterClose = null;
 let last = null;
@@ -239,6 +250,7 @@ const voice = createVoice((status) => {
 });
 
 function discovered() {
+  if (state.lessonComplete) return lessonWords;
   const known = new Set(missions.slice(0, state.mission).flatMap((mission) => mission.dictation.map(({ word }) => word)));
   const current = missions[state.mission];
   if (current) {
@@ -295,7 +307,7 @@ function objective(announce = true) {
   } else if (state.phase === 'done') {
     status.textContent = '六项任务已完成';
     title.textContent = '温室准备就绪';
-    setCue({ cn: '展示室准备好了。打开词语手册复习吧！', en: 'The exhibition room is ready. Open the vocabulary notebook to review.' }, announce);
+    setCue({ cn: '查看阿宁的消息。', en: 'Read Ah Ning’s message.' }, announce);
   } else {
     const mission = missions[state.mission];
     status.textContent = '任务 ' + (state.mission + 1) + ' / ' + missions.length;
@@ -430,6 +442,10 @@ function togglePhone(open) {
       save();
       objective(false);
     }
+  } else if (finalMessageOpen) {
+    finalMessageOpen = false;
+    void openLessonTest('final');
+    return;
   } else if (!desk.open && $('#comic-overlay').hidden) {
     engine?.setActive(true);
     if (announceAfterPhone) {
@@ -442,7 +458,7 @@ function togglePhone(open) {
 
 function resetHint() {
   const target = state.notePending ? 'westNote' : nextObject();
-  const key = state.tutorialDone && target ? `${state.mission}:${state.action}:${target}` : null;
+  const key = started && state.tutorialDone && target ? `${state.mission}:${state.action}:${target}` : null;
   if (key === activeHintKey) return;
   activeHintKey = key;
   clearTimeout(hintTimer);
@@ -584,7 +600,7 @@ function openPanel(label, title, practice) {
   heading.id = 'panel-title';
   heading.tabIndex = -1;
   header.append(heading);
-  top.append(header, makeButton('×', 'icon-button', () => desk.close(), '返回场景'));
+  top.append(header, makeButton('×', 'icon-button', () => desk.close(), started ? '返回场景' : '关闭'));
   presentPanel(top, heading);
   if (practice) desk.dataset.practice = practice;
 }
@@ -845,7 +861,7 @@ function record(word, guided) {
 
 function openTask() {
   const mission = missions[state.mission];
-  if (!mission) return showEnding();
+  if (!mission) return;
   if (state.phase === 'question') {
     showQuestion(mission.question, mission.titleCN, () => {
       state.phase = 'dictation';
@@ -905,24 +921,107 @@ function showFinale() {
     save();
     audio.setMusic('game');
     audio.cue('finish');
-    sendMessage(closingMessages, 'closing');
-    showEnding();
+    openFinalMessage();
   }, {
     ending: true,
     onPage(page) { if (page > 1) audio.cue('page'); },
   });
 }
 
-function showEnding() {
-  openPanel(null, '温室准备就绪');
-  panel.append(node('p', '科学展顺利开幕了！', 'body'));
-  const guided = Object.values(state.written).filter((value) => value === 'guided').length;
-  panel.append(node('p', guided ? `24 个词已收录。其中 ${guided} 个用过描写提示，可以在手册中再试听写。` : '24 个词都已收录。回到词语手册，可以重听和复习。', 'body'));
-  const controls = row(makeButton('打开词语手册', 'primary', showBook), makeButton('重看结局', 'text-button', () => {
-    afterClose = showFinale;
+function openFinalMessage() {
+  sendMessage(closingMessages, 'closing');
+  finalMessageOpen = true;
+  phone.open();
+}
+
+function suspendRoom() {
+  started = false;
+  finalMessageOpen = false;
+  announceAfterPhone = false;
+  engine?.setActive(false);
+  engine?.hide();
+  resetHint();
+  phone.setVisible(false);
+  voice.stop();
+  audio.setAmbience(false);
+  for (const selector of ['#toolbar', '#mission-ui', '#response', '#play-controls', '#reticle', '#interact']) {
+    $(selector).hidden = true;
+  }
+}
+
+function returnHome() {
+  if (desk.open) {
+    afterClose = returnHome;
     desk.close();
-  }), makeButton('重玩任务', 'text-button', replay));
-  addTranslation(controls, 'The window is sealed, the seedling is safe, and the science fair can open. All 24 words are in your notebook.');
+    return;
+  }
+  activeTest?.destroy?.();
+  activeTest = null;
+  testScreen.hidden = true;
+  testScreen.replaceChildren();
+  suspendRoom();
+  audio.setMusic('title');
+  updateTitle();
+  $('#splash').hidden = false;
+  const button = $('#start').disabled ? $('#practice-test') : $('#start');
+  if (!button.hidden) button.focus({ preventScroll: true });
+}
+
+async function openLessonTest(mode) {
+  const final = mode === 'final';
+  if (activeTest || (final ? !state.endingSeen || state.finalPassed : !state.lessonComplete)) return;
+  const run = {};
+  activeTest = run;
+  const slot = final ? 'finalTest' : 'practiceTest';
+  if (final && !state.finalStarted) {
+    state.finalStarted = true;
+    save();
+  }
+  suspendRoom();
+  $('#splash').hidden = true;
+  testScreen.hidden = false;
+  const loading = node('div', '', 'lesson-test-loading');
+  const status = node('p', '正在准备测验……');
+  status.setAttribute('role', 'status');
+  const home = makeButton('返回首页', 'text-button', returnHome);
+  loading.append(status, home);
+  testScreen.replaceChildren(loading);
+  home.focus({ preventScroll: true });
+
+  try {
+    const [bank, { createLessonTestView }] = await Promise.all([
+      loadLessonTest(), import('./lesson-test-view.js'),
+    ]);
+    if (activeTest !== run) return;
+    state[slot] = restoreLessonTest(bank, state[slot]);
+    save();
+    run.destroy = createLessonTestView(testScreen, {
+      bank, state: state[slot], mode, speak: voice.speak, stopSpeech: voice.stop, cue: audio.cue,
+      onProgress(snapshot) {
+        state[slot] = snapshot;
+        save();
+      },
+      onPass() {
+        if (final) {
+          state.finalPassed = true;
+          state.lessonComplete = true;
+        }
+        state[slot] = null;
+        save();
+      },
+      onExit: returnHome,
+    });
+  } catch {
+    if (activeTest !== run) return;
+    status.textContent = '测验未能载入。请再试一次。';
+    const retry = makeButton('重试', 'primary', () => {
+      activeTest = null;
+      void openLessonTest(mode);
+    });
+    home.before(retry);
+    testScreen.replaceChildren(loading);
+    retry.focus({ preventScroll: true });
+  }
 }
 
 function showBook() {
@@ -933,6 +1032,7 @@ function showBook() {
   panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。`, 'body'));
   voiceMessage();
   const list = node('ol', '', 'vocab');
+  const examples = new Map();
   for (const [index, entry] of entries.entries()) {
     const line = node('li');
     if (!known.has(entry.word)) {
@@ -942,7 +1042,12 @@ function showBook() {
       const data = lexicon[entry.word];
       const term = node('strong', entry.word);
       term.append(node('span', data.pinyin, 'pinyin'));
-      const definition = node('span', data.cn, 'definition');
+      const details = node('div', '', 'word-details');
+      const definition = node('p', data.cn, 'definition');
+      const example = node('p', '', 'word-example');
+      example.hidden = true;
+      examples.set(entry.word, example);
+      details.append(definition, example);
       const buttons = node('span', '', 'row-buttons');
       const hint = translation(data.en);
       const speak = speakerButton(() => voice.speak(data.spoken ?? entry.word), '听' + entry.word + '的发音');
@@ -953,11 +1058,29 @@ function showBook() {
       if (state.written[entry.word] === 'guided') definition.append(node('span', ' · 可再试听写', 'vocab-note'));
       hint.control.setAttribute('aria-label', entry.word + '的英文意思');
       buttons.append(speak, hint.control, review);
-      line.append(term, definition, buttons, hint.block);
+      line.append(term, details, buttons, hint.block);
     }
     list.append(line);
   }
   panel.append(list);
+  if (examples.size) void loadExamples();
+
+  async function loadExamples() {
+    try {
+      const bank = await loadLessonTest();
+      for (const [word, example] of examples) {
+        example.textContent = bank[word][0];
+        example.hidden = false;
+      }
+    } catch {
+      if (!list.isConnected || !desk.open) return;
+      const retry = makeButton('重新载入例句', 'text-button', () => {
+        retry.remove();
+        void loadExamples();
+      });
+      list.before(retry);
+    }
+  }
 }
 
 function showBank(index, total) {
@@ -993,24 +1116,23 @@ function showHelp() {
     if (musicEnabled) startAudio();
     music.textContent = musicEnabled ? '关闭音乐' : '开启音乐';
   });
-  const controls = row(sound, music);
-  if (state.phase === 'done') controls.append(makeButton('重玩任务', 'text-button', replay));
+  const controls = row(sound, music, makeButton('返回首页', 'text-button', returnHome));
   addTranslation(controls, 'Desktop: use WASD or arrows to walk and drag to look. Press E to interact, F to open the phone, and Esc to release the mouse. Tablet: move with the joystick, drag to look, and tap the phone or action button. P opens the notebook, R replays the task, and EN shows English.');
 }
 
-function replay() {
-  state = { ...emptySave(), written: state.written };
+function replayMission() {
+  state = { ...emptySave(), lessonComplete: state.lessonComplete, practiceTest: state.practiceTest, written: state.written };
   phone.reset();
   phone.setVisible(false);
-  announceAfterPhone = false;
   last = null;
   tutorialIndex = 0;
   walked = 0;
   turned = 0;
+  footstepDistance = 0;
   engine?.reset();
   save();
-  afterClose = () => objective(true);
-  desk.close();
+  updateTitle();
+  beginWithComic();
 }
 
 function replayCue() {
@@ -1071,7 +1193,7 @@ function begin() {
   engine.focus(state.phase === 'explore' && !state.notePending && (state.tutorialDone || !state.phonePicked));
   objective(state.phase !== 'done');
   if (state.phase === 'done') {
-    if (state.endingSeen) showEnding();
+    if (state.endingSeen) openFinalMessage();
     else showFinale();
   }
 }
@@ -1140,12 +1262,38 @@ document.addEventListener('click', (event) => {
   if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
 }, true);
 
-$('#start').addEventListener('click', () => state.phonePicked ? begin() : beginWithComic());
-$('#replay-intro').addEventListener('click', beginWithComic);
-if (state.phonePicked) {
-  $('#start-label').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
-  $('#replay-intro').hidden = false;
+function updateTitle() {
+  const done = state.phase === 'done';
+  const assessmentReady = done && state.finalStarted && !state.finalPassed;
+  let label = state.phonePicked ? '继续任务' : '进入科学楼';
+  if (state.finalPassed) label = '重玩任务';
+  else if (assessmentReady) label = '继续测验';
+  else if (done && state.endingSeen) label = '查看最后消息';
+  $('#start-label').textContent = label;
+  $('#start').disabled = unavailable && !assessmentReady;
+  $('#replay-intro').hidden = done || !state.phonePicked;
+  $('#practice-test').hidden = !state.lessonComplete;
+  $('#home-book').hidden = !state.lessonComplete;
+  $('#practice-test-label').textContent = state.practiceTest ? '继续温习测验' : '温习测验';
+  $('.cover-warning').toggleAttribute('data-completed', state.lessonComplete || done);
+  $('#cover-situation').textContent = state.lessonComplete ? '第一课已完成！' : done ?
+    '科学展顺利开幕了。' : '科学展快开门了。西窗还在漏水！';
+  const english = state.lessonComplete ? 'Lesson 1 complete! Take a practice test or revisit the mission.' : done ?
+    'The science fair is open. Finish the lesson with a vocabulary test.' :
+    'The science fair is about to open. The west window is still leaking. Head into the science wing.';
+  resetTranslation($('#intro-en'), $('#intro-translation'), english);
 }
+
+$('#start').addEventListener('click', () => {
+  if (state.finalPassed) replayMission();
+  else if (state.finalStarted) void openLessonTest('final');
+  else if (state.phonePicked) begin();
+  else beginWithComic();
+});
+$('#practice-test').addEventListener('click', () => void openLessonTest('practice'));
+$('#home-book').addEventListener('click', showBook);
+$('#replay-intro').addEventListener('click', beginWithComic);
+updateTitle();
 
 function prepareRoom() {
   roomRequest ??= Promise.all([import('./engine.js'), import('./world.js')]).then(async ([{ createEngine }, { createWorld }]) => {

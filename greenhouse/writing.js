@@ -36,7 +36,7 @@ function getWriter() {
   return writerRequest;
 }
 
-export function createWriting(grid, word, guided, onComplete, onError, onMistake, onProgress) {
+export function createWriting(grid, word, guided, onComplete, onError, onMistake, onProgress, options = {}) {
   const characters = [...word];
   grid.dataset.length = String(characters.length);
   const squares = characters.map((_, index) => {
@@ -85,7 +85,7 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
       writers.push(writer);
       setViewBox(square, renderedSize);
       writer.quiz({
-        showHintAfterMisses: guided ? 2 : 5,
+        showHintAfterMisses: options.hintsAfterMisses ?? (guided ? 2 : 5),
         onMistake,
         onComplete: () => {
           if (cancelled) return;
