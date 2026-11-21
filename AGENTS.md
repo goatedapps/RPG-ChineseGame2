@@ -11,7 +11,8 @@
 - Give comic art expressive characters, clear action, and exaggerated staging where it suits the story.
 - Put dialogue inside comic panels and reveal story beats one at a time with GSAP when the player clicks or taps the scene.
 - Use the title, prelude, and first playable moments to establish what is at stake and why the mission needs attention.
-- Introduce walking, looking around, and interacting in a short hands-on tutorial.
+- Conclude the storyline with a picture-led epilogue showing what the player's actions achieved.
+- Introduce walking, looking around, and opening the in-game phone in a short hands-on tutorial.
 
 ## Gameplay and presentation
 
@@ -21,12 +22,18 @@
 - Let players discover descriptions through what they see, and teach verbs, expressions, and abstract words through actions, consequences, dialogue, or evidence.
 - Connect discoveries to comprehension questions and dictation before advancing to the next clue or story checkpoint.
 - Give players a reason to keep exploring through visible progress, discoveries, and satisfying feedback when their actions change the scene.
+- Keep the interactive phone docked in the bottom-right corner during exploration.
+- Notify players of new messages with a ringtone and vibration, then let them open the handset to read the messages.
+- Put Ah Ning's casual English messages in the phone chat and keep the on-screen Chinese task cues separate.
+- Explain the situation before directing the player, and let exploration reveal discoveries such as the note by the leaking window.
+- Offer a contextual hint through the phone after a delay, then give players the option to reveal a gold spiral at the exact target.
 - Use the `imagegen`, `game-feel`, and GSAP skills where they help the lesson.
 - Use generated artwork throughout the lab, including plants, desks, boards, shelving, and cupboards, and reuse matching assets across repeated objects.
 - Show an item close-up directly over the room, with only the item and the words a player needs.
 - Open books to the relevant page, use legible handwritten Chinese for personal notes, and let players click or tap outside the item to dismiss it.
 - Keep generic titles, outer cards, and redundant controls out of object close-ups.
 - Include any picture or diagram that a question refers to.
+- Integrate selected learning checks into the story, such as replying to a clue in chat and answering a question to unlock a monitor.
 
 ## Curriculum and language
 
@@ -46,7 +53,7 @@
 - During dictation, highlight the next stroke after five unsuccessful attempts at that stroke.
 - Show the sentence while it is read aloud, with the target word blanked out.
 - Offer normal-speed replay as the only dictation playback option.
-- Use natural-sounding prerecorded Mandarin for story dialogue, such as walkie-talkie conversations, where practical.
+- Deliver Ah Ning's chat as text and use Mandarin speech for the task cues and Chinese practice.
 - Use stereo MP3s for sound effects.
 - Use background music on the title screen, during the prelude, and in gameplay, with separate music and sound-effect controls.
 - Keep footsteps and button feedback audible in the mix, and lower the music during speech.
@@ -66,6 +73,6 @@
 - P6 Lesson 1 covers all 24 entries in `content/p6/tingxie/1.yaml`.
 - The story and dictation order live in `greenhouse/story.js`, the notebook and bilingual practice data in `greenhouse/lexicon.js`, and the close-ups in `greenhouse/evidence.js`.
 - Keep generated art under `greenhouse/art/`, shared lab textures under `greenhouse/art/lab/`, and interaction geometry aligned with the visible objects.
-- If a recorded radio line changes, regenerate the matching MP3 using the transcript in `greenhouse/radio-lines.js`.
+- Phone dialogue, login questions, and hints live in `greenhouse/phone-story.js`.
 - Keep Hanzi stroke data and its attribution together under `stage/vendor/`.
 - Preview over HTTP with `python -m http.server 8000` and keep asset and module URLs relative to work under the GitHub Pages repository path.

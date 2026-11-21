@@ -45,7 +45,7 @@ export const evidence = {
     alt: '一位师姐正用手势向观众介绍展台上的豆苗。',
     lines: [
       ['师姐的手势很优雅。', 'The older student’s gestures are graceful.'],
-      ['阿宁：“我以前很懒惰。师姐是我的榜样。”', 'A Ning: “I used to be lazy. She’s my role model.”'],
+      ['每天练习，她介绍展品时就更从容了。', 'Daily practice helped her present the exhibit with confidence.'],
     ],
   },
 };

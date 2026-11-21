@@ -1,8 +1,8 @@
 export const tutorial = [
   {
     id: 'walk',
-    cn: '对讲机在响！按方向键或拖动摇杆，走过去。',
-    en: 'The radio is calling! Walk towards it with the arrow keys, WASD, or the joystick.',
+    cn: '按方向键或拖动摇杆，向前走几步。',
+    en: 'Walk forward a few steps with the arrow keys, WASD, or the joystick.',
   },
   {
     id: 'look',
@@ -11,15 +11,15 @@ export const tutorial = [
   },
   {
     id: 'radio',
-    cn: '走近并对准对讲机。按 E 或点按按钮。',
-    en: 'Walk up to the radio and aim at it. Press E or tap the action button.',
+    cn: '点开右下角的手机，看看新消息。',
+    en: 'Open the phone in the bottom right to read the new message. On a keyboard, press F.',
   },
 ];
 
 const object = (cn, en, descriptionCN, descriptionEN) => ({ cn, en, descriptionCN, descriptionEN });
 
 export const objects = {
-  radio: object('对讲机', 'Radio', '阿宁在对讲机另一头等你。', 'A Ning is waiting on the radio.'),
+  radio: object('手机', 'Phone', '屏幕上有一条新消息。', 'There is a new message on the screen.'),
   westNote: object('皱纸条', 'Crumpled note', '西窗旁压着一张皱纸条。', 'A crumpled note is tucked by the west window.'),
   westWindow: object('西窗', 'West window', '西窗的窗台上有水痕。', 'There is a trail of water on the west windowsill.'),
   eastWindow: object('东窗', 'East window', '东窗的窗台是干的。', 'The east windowsill is dry.'),
@@ -57,12 +57,10 @@ export const missions = [
     id: 'storm',
     titleCN: '追查漏水',
     titleEN: 'Trace the leak',
-    cn: '喂？听得到吗？我是阿宁。温室进水了！',
-    en: 'Hello? Can you hear me? It’s A Ning. Water got into the greenhouse!',
     actions: [
       step('westNote', 'inspect',
-        '找找西窗旁的纸条。',
-        'Look for the note beside the west window.',
+        '检查温室的窗户，看看哪里漏水。',
+        'Check the greenhouse windows to find where water is getting in.',
         '找到漏水的原因了。',
         'You found the cause of the leak.'),
       step('seal', 'pickup',
@@ -106,8 +104,6 @@ export const missions = [
     id: 'equipment',
     titleCN: '备好搬运工具',
     titleEN: 'Pack the rescue kit',
-    cn: '水停了，太好了！去储藏室找工具吧。',
-    en: 'The leak stopped. Great! Let’s get the tools from the storeroom.',
     actions: [
       step('brightLamp', 'pickup',
         '找到灯光耀眼的检修灯。',
@@ -149,8 +145,6 @@ export const missions = [
     id: 'seedling',
     titleCN: '安顿幼苗',
     titleEN: 'Shelter the seedling',
-    cn: '哎，风扇还对着幼苗吹呢。我们先帮帮它。',
-    en: 'Oh, the fan’s still blowing on the seedling. Let’s help it first.',
     actions: [
       step('fan', 'use',
         '到温室把风扇转开。',
@@ -196,8 +190,6 @@ export const missions = [
     id: 'records',
     titleCN: '找出排练录像',
     titleEN: 'Find the rehearsal recording',
-    cn: '幼苗安全了。对了！我把录像留在准备室了。',
-    en: 'The seedling is safe. Oh, right! I left the recording in the prep room.',
     actions: [
       step('diary', 'inspect',
         '翻开阿宁的日记。',
@@ -243,14 +235,12 @@ export const missions = [
     id: 'exhibit',
     titleCN: '恢复科学展台',
     titleEN: 'Restore the display',
-    cn: '找到啦！我们去展示室，照着录像布置吧。',
-    en: 'You found it! Let’s go to the exhibition room and follow the recording.',
     actions: [
       step('rehearsalScreen', 'use',
         '用排练播放器观看示范。',
         'Use the rehearsal player to watch the demonstration.',
-        '师姐的手势很优雅。阿宁说：“我以前很懒惰。师姐天天练习，是我的榜样。”',
-        'The older student’s gestures are graceful. “I used to be lazy about practising,” says A Ning. “She practises daily. She’s my role model.”'),
+        '师姐天天练习，手势很优雅。',
+        'The older student practises every day and gestures gracefully.'),
       step('backupNotes', 'inspect',
         '查看播放器旁的备用布置图。',
         'Check the backup layout next to the player.',
@@ -285,12 +275,10 @@ export const missions = [
     id: 'handover',
     titleCN: '完成交接',
     titleEN: 'Finish the handover',
-    cn: '你看，展灯亮了！我还有句话想告诉你。',
-    en: 'Look, the display light’s on! There’s one more thing I’d like to tell you.',
     actions: [
       step('exhibitStand', 'inspect',
-        '在展台旁听阿宁的留言。',
-        'Listen to A Ning’s message at the stand.',
+        '检查展台，再看阿宁发来的消息。',
+        'Check the display, then read Ah Ning’s message on your phone.',
         '“第一次上台，我紧张得没讲完。后来反复练习，我克服了恐惧，把整段话讲完了。”',
         '“I was too nervous to finish the first time. I practised until I overcame my fear and finished the whole presentation.”'),
       step('handoverDesk', 'use',

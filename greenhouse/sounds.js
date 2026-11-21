@@ -2,7 +2,7 @@ const clips = {
   step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .42, cooldown: .28 },
   pickup: { files: ['pickup'], volume: .38, cooldown: .12 },
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
-  radio: { files: ['radio-click'], volume: .34, cooldown: .26 },
+  notification: { files: ['phone-notification'], volume: .45, cooldown: .65 },
   seal: { files: ['seal-press'], volume: .50, cooldown: .22 },
   correct: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
@@ -24,7 +24,7 @@ const musicLoopStart = .145;
 const comicClips = ['page', 'storm'];
 const sceneClips = {
   title: ['ui'],
-  comic: ['ui', 'radio', ...comicClips],
+  comic: ['ui', 'notification', ...comicClips],
   game: Object.keys(clips).filter((name) => !comicClips.includes(name)),
 };
 const maxEffects = 7;

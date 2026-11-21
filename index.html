@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="greenhouse/game.css">
   <link rel="stylesheet" href="greenhouse/comic.css">
   <link rel="stylesheet" href="greenhouse/title.css">
+  <link rel="stylesheet" href="greenhouse/phone.css">
   <script defer src="greenhouse/vendor/gsap.min.js"></script>
   <script type="module" src="greenhouse/game.js"></script>
 </head>
@@ -66,10 +67,6 @@
     <div class="cue-window"><p id="cue-text" class="cue-text" aria-live="polite"></p></div>
     <p id="cue-translation" class="translation" lang="en" hidden></p>
     <p id="voice-status" class="voice-status" role="status" hidden></p>
-    <div class="cue-actions">
-      <button id="cue-step" type="button" class="quiet-link" hidden></button>
-      <button id="nudge" type="button" class="quiet-link">提示</button>
-    </div>
   </section>
 
   <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
@@ -81,15 +78,15 @@
 
   <footer id="play-controls" class="play-controls" hidden>
     <div id="joystick" class="joystick" aria-label="拖动摇杆行走"><span></span></div>
-    <div class="desktop-control"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 移动 <span>·</span> <kbd>Esc</kbd> 释放鼠标</div>
+    <div class="desktop-control"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 移动 <span>·</span> <kbd>F</kbd> 手机 <span>·</span> <kbd>Esc</kbd> 释放鼠标</div>
     <div class="scene-action">
       <button id="interact" type="button" class="primary action" hidden><kbd>E</kbd><span></span></button>
-      <button id="resume-task" type="button" class="primary action" hidden>打开交接记录</button>
     </div>
     <p id="held" class="held" hidden></p>
     <p class="touch-instruction">拖动画面转向</p>
   </footer>
 
+  <div id="phone" hidden></div>
   <section id="comic-overlay" hidden></section>
   <dialog id="workbench" aria-labelledby="panel-title"><div id="panel"></div></dialog>
   <noscript>请启用 JavaScript，才能探索温室。</noscript>

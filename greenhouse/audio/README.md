@@ -4,10 +4,12 @@ The `sfx/` MP3 files are original sound effects rendered for this project, with 
 They combine shaped and filtered noise, short resonant tones, and offset left and right room reflections.
 The stereo rain bed layers diffuse wind, wet glass, and scattered droplets.
 Footstep files alternate four heel and toe textures.
-Paper uses staggered crackle and flutter layers, and the radio cue combines a switch click with band-limited squelch.
+Paper uses staggered crackle and flutter layers.
+The phone notification is an original three-note synthesized chime, with soft harmonics and short stereo reflections.
+The game uses it for new phone messages and hint notifications.
 The mix was rendered at 44.1 kHz and encoded with LAME as stereo MP3 at 96 kbps and 32 kHz for effects, and 112 kbps and 44.1 kHz for rain.
 
-The game starts the audio graph after a player gesture, lowers the rain and effects while dialogue plays, and stops background audio on blur or when the tab is hidden.
+The game starts the audio graph after a player gesture, lowers the rain and effects during Mandarin speech, and stops background audio on blur or when the tab is hidden.
 The title prepares the button sound, the prelude prepares its own cues and warms the initial room sounds, and entering the room prepares the remaining effects.
 The rain repeats an eight-second region within the MP3 to avoid codec padding.
 
@@ -22,12 +24,7 @@ Render the editable score and cues with `python greenhouse/audio/render_music.py
 Music playback starts after a player gesture and can be switched separately from effects.
 The score loads per scene, fades between scenes, and lowers while Mandarin speech plays.
 
-## Radio dialogue
+## Speech and phone messages
 
-The `voice/` MP3s were generated locally using [MeloTTS Chinese](https://huggingface.co/myshell-ai/MeloTTS-Chinese), with the [sherpa-onnx conversion](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html#vits-melo-tts-zh-en-chinese-english-1-speaker).
-The model is released under the MIT license.
-The 26 clips use an original script, a lightly band-limited radio mix, and stereo MP3 encoding with LAME at 32 kHz and 64 kbps.
-`greenhouse/radio-lines.js` supplies the source text and file basenames.
-Regenerate any affected clip when changing its dialogue or reordering mission actions.
-Only the finished clips ship with the game.
-The browser supplies voices for other prompts and dictation.
+The browser uses a Mandarin voice for task cues, questions, vocabulary playback, and dictation.
+A Ning’s English messages appear as text in the phone chat.

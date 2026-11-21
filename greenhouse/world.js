@@ -5,6 +5,159 @@ const HALF = 10;
 const CEILING = 3.85;
 const AMBER = '#f2cd84';
 
+function roundedPanel(THREE, width, height, radius) {
+  const x = width / 2;
+  const y = height / 2;
+  const shape = new THREE.Shape();
+  shape.moveTo(-x + radius, -y);
+  shape.lineTo(x - radius, -y);
+  shape.quadraticCurveTo(x, -y, x, -y + radius);
+  shape.lineTo(x, y - radius);
+  shape.quadraticCurveTo(x, y, x - radius, y);
+  shape.lineTo(-x + radius, y);
+  shape.quadraticCurveTo(-x, y, -x, y - radius);
+  shape.lineTo(-x, -y + radius);
+  shape.quadraticCurveTo(-x, -y, -x + radius, -y);
+  return shape;
+}
+
+function phoneProp(THREE, kit, parent, stand) {
+  const { group, material, box, round, texture } = kit;
+  const device = group(0, .34, 0, 0, parent);
+  device.rotation.x = -.16;
+  const shell = new THREE.Mesh(new THREE.ExtrudeGeometry(roundedPanel(THREE, .25, .46, .035), {
+    depth: .027, bevelSegments: 2, bevelSize: .004, bevelThickness: .004, curveSegments: 7,
+  }), material('#788c8d', { metalness: .62, roughness: .3 }));
+  shell.position.z = -.016;
+  device.add(shell);
+
+  const bezel = new THREE.Mesh(new THREE.ShapeGeometry(roundedPanel(THREE, .245, .455, .034), 7), material('#101b22'));
+  bezel.position.z = .016;
+  device.add(bezel);
+
+  const width = .226;
+  const height = .436;
+  const screenGeometry = new THREE.ShapeGeometry(roundedPanel(THREE, width, height, .029), 7);
+  const { position, uv } = screenGeometry.attributes;
+  for (let index = 0; index < position.count; index += 1) {
+    uv.setXY(index, position.getX(index) / width + .5, position.getY(index) / height + .5);
+  }
+  const screen = texture((ctx, w, h) => {
+    const wallpaper = ctx.createLinearGradient(0, h, w, 0);
+    wallpaper.addColorStop(0, '#102c3b');
+    wallpaper.addColorStop(.55, '#187168');
+    wallpaper.addColorStop(1, '#9cbca3');
+    ctx.fillStyle = wallpaper;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#4bac9369';
+    ctx.beginPath();
+    ctx.ellipse(.8 * w, .9 * h, .85 * w, .31 * h, -.55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f3fff8';
+    ctx.font = 'bold 43px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('08:12', w / 2, .26 * h);
+    ctx.fillStyle = '#ecf7fbdf';
+    ctx.beginPath();
+    ctx.roundRect(.07 * w, .39 * h, .86 * w, .16 * h, 11);
+    ctx.fill();
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 19px system-ui';
+    ctx.fillStyle = '#19362f';
+    ctx.fillText('A Ning', .16 * w, .487 * h);
+    ctx.fillStyle = '#268b67';
+    ctx.beginPath();
+    ctx.arc(.85 * w, .47 * h, .031 * w, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f2fffa';
+    ctx.fillRect(.36 * w, .965 * h, .28 * w, .009 * h);
+  }, 192, 384);
+  const face = new THREE.Mesh(screenGeometry, new THREE.MeshBasicMaterial({ map: screen, toneMapped: false }));
+  face.position.z = .018;
+  device.add(face);
+  round([.014, .014, .004], [0, .202, .02], material('#101c25'), device);
+  box([.008, .051, .012], [.127, .096, 0], stand, device);
+  box([.008, .036, .012], [-.127, .074, 0], stand, device);
+}
+
+function drawLockedDisplay(ctx, width, height) {
+  const background = ctx.createLinearGradient(0, 0, width, height);
+  background.addColorStop(0, '#183843');
+  background.addColorStop(1, '#0c242b');
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = '#55989873';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(9, 9, width - 18, height - 18);
+  const center = width / 2;
+  ctx.strokeStyle = '#b4d6c5';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(center, 80, 12, Math.PI, 2 * Math.PI);
+  ctx.lineTo(center + 12, 87);
+  ctx.moveTo(center - 12, 80);
+  ctx.lineTo(center - 12, 87);
+  ctx.stroke();
+  ctx.fillStyle = '#b4d6c5';
+  ctx.beginPath();
+  ctx.roundRect(center - 19, 85, 38, 30, 4);
+  ctx.fill();
+  ctx.fillStyle = '#12333b';
+  ctx.beginPath();
+  ctx.arc(center, 98, 3, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.fillRect(center - 1, 98, 2, 7);
+  ctx.fillStyle = '#eaf5e8';
+  ctx.font = '600 24px "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('需要登录', center, 150);
+}
+
+function createHintSpiral(THREE, scene, targets) {
+  const points = Array.from({ length: 37 }, (_, index) => {
+    const progress = index / 36;
+    const angle = progress * Math.PI * 4.5;
+    const radius = .3 - progress * .23;
+    return new THREE.Vector3(Math.cos(angle) * radius, progress * .71, Math.sin(angle) * radius);
+  });
+  const path = new THREE.CatmullRomCurve3(points);
+  const marker = new THREE.Group();
+  marker.name = 'hint-spiral';
+  marker.visible = false;
+  for (const [radius, color, opacity] of [[.039, '#ff9f36', .26], [.016, '#ffe69a', .96]]) {
+    const strand = new THREE.Mesh(new THREE.TubeGeometry(path, 72, radius, 7, false),
+      new THREE.MeshBasicMaterial({ color, opacity, transparent: true, depthWrite: false, toneMapped: false }));
+    strand.userData.nonOccluding = true;
+    strand.raycast = () => {};
+    marker.add(strand);
+  }
+  scene.add(marker);
+  const bounds = new THREE.Box3();
+  const anchor = new THREE.Vector3();
+  let tracked;
+
+  return function showHint(id, angle) {
+    const target = targets.get(id);
+    marker.visible = Boolean(target?.object.visible);
+    if (!marker.visible) {
+      tracked = null;
+      return;
+    }
+    if (target !== tracked) {
+      if (target.hintAnchor) anchor.fromArray(target.hintAnchor);
+      else {
+        bounds.setFromObject(target.object).getCenter(anchor);
+        anchor.y = bounds.max.y + .035;
+        target.object.worldToLocal(anchor);
+      }
+      tracked = target;
+    }
+    marker.position.copy(anchor);
+    target.object.localToWorld(marker.position);
+    marker.rotation.y = angle;
+  };
+}
+
 export function createWorld(THREE) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#183442');
@@ -92,6 +245,27 @@ export function createWorld(THREE) {
     object.name = id;
     targets.set(id, { object, label });
     return object;
+  }
+
+  const lockedDisplay = new THREE.MeshBasicMaterial({
+    map: texture(drawLockedDisplay, 384, 208), toneMapped: false,
+  });
+
+  function monitorDisplay(file, size, at, parent) {
+    const display = plane(size, at, lockedDisplay, parent);
+    const footage = new THREE.MeshBasicMaterial({ color: '#31574d', toneMapped: false });
+    let requested = false;
+    return (unlocked) => {
+      if (unlocked && !requested) {
+        requested = true;
+        imageTexture(file, (map) => {
+          footage.map = map;
+          footage.color.set('#ffffff');
+          footage.needsUpdate = true;
+        });
+      }
+      display.material = unlocked ? footage : lockedDisplay;
+    };
   }
 
   function floor(x, z, color, grout) {
@@ -216,6 +390,7 @@ export function createWorld(THREE) {
     const at = axis === 'x' ? [fixed, 0, center] : [center, 0, fixed];
     const angle = axis === 'x' ? Math.PI / 2 : 0;
     const frame = id ? interact(id, label + ' · 窗框', at, angle) : group(...at, angle);
+    if (id) targets.get(id).hintAnchor = [leak ? .46 : -.45, 1.14, .34];
     box([width, 1.1, .19], [0, .55, 0], wallLow, frame);
     box([width, .46, .20], [0, 3.53, 0], trim, frame);
     box([width, 2.16, .06], [0, 2.21, -.05], windowGlass, frame);
@@ -276,12 +451,10 @@ export function createWorld(THREE) {
 
   const spawn = { x: -5.35, z: 8.7, yaw: 0 };
   const contact = material('#102a29', { transparent: true, opacity: .22, depthWrite: false });
-  const LEDs = new THREE.MeshBasicMaterial({ color: '#91f2a7' });
   const rubberTan = material('#876846');
   const instrumentBody = metricSurface('lab/instrument-body.webp', '#28413f', '#dce8de', [2.6, 2.6], {
     roughness: .63, metalness: .24,
   });
-  const radioFace = imageMaterial('lab/radio-face.webp', '#3b5750', { roughness: .54 });
   const cork = imageMaterial('lab/cork-board.webp', '#9f774c', { roughness: .93 });
   const noticePaper = imageMaterial('paper-crumpled.webp', '#ded2b4', { roughness: .91 });
   const tapeSurface = imageMaterial('lab/marking-tape.webp', '#ee8b3c', { roughness: .78 });
@@ -293,15 +466,10 @@ export function createWorld(THREE) {
   scene.add(prep);
   plane([4.8, 3.6, 1], [-5.6, .012, 7.37], contact, null, [-Math.PI / 2, 0, 0]);
   for (let i = 0; i < 9; i += 1) box([.105, .015, .036], [-5.81 + i * .12, .025, 7.52], yellow, null, [0, .55, 0]);
-  const radio = interact('radio', '对讲机', [-5.35, 1.04, 6.00], -.1);
-  box([.34, .45, .155], [0, .25, 0], instrumentBody, radio);
-  box([.33, .065, .159], [0, .446, 0], rubber, radio);
-  tube([.036, .27, .036], [-.103, .58, -.047], rubber, radio);
-  tube([.046, .037, .046], [.102, .491, -.04], rubber, radio);
-  plane([.323, .404, 1], [0, .249, .08], radioFace, radio);
-  box([.022, .087, .053], [-.173, .303, .006], rubber, radio);
-  const radioLED = round([.037, .037, .023], [.099, .424, .083], LEDs, radio);
-  box([.22, .024, .21], [.55, .019, .17], instrumentBody, radio);
+  const phone = interact('radio', '手机', [-5.35, 1.04, 6.00], -.1);
+  phoneProp(THREE, kit, phone, instrumentBody);
+  box([.30, .038, .24], [-5.35, 1.051, 6], instrumentBody, null, [0, -.1, 0]);
+  box([.19, .105, .075], [-5.35, 1.107, 5.956], instrumentBody, null, [-.16, -.1, 0]);
   plate('从这里开始', 1.06, .25, [-5.35, .935, 6.323], 0, { size: 53, color: '#f9e2a7', bg: '#312a23', accent: AMBER });
   box([2.34, .97, .10], [-5.35, 2.53, 3.89], navy);
   plate('校内科学展', 2.22, .82, [-5.35, 2.53, 3.951], 0,
@@ -463,13 +631,7 @@ export function createWorld(THREE) {
   bench(-2.65, -8.86, 1.66, .79);
   const rootCam = interact('rootCam', '根系观测仪', [-2.65, 1.24, -8.70], .04);
   box([.99, .58, .16], [0, .29, 0], instrumentBody, rootCam);
-  const rootDisplay = new THREE.MeshBasicMaterial({ color: '#31574d', toneMapped: false });
-  plane([.91, .50, 1], [0, .29, .083], rootDisplay, rootCam);
-  imageTexture('lab/root-display.webp', (map) => {
-    rootDisplay.map = map;
-    rootDisplay.color.set('#ffffff');
-    rootDisplay.needsUpdate = true;
-  });
+  const showRoots = monitorDisplay('lab/root-display.webp', [.91, .50, 1], [0, .29, .083], rootCam);
   box([.38, .08, .32], [0, -.15, .03], instrumentBody, rootCam);
   for (let i = 0; i < 6; i += 1) plant(group(-8.76, 0, -1.53 - i * 1.33, i * .7),
     1.6 + (i % 3) * .26, false, i % 2 === 0);
@@ -493,13 +655,7 @@ export function createWorld(THREE) {
   bench(2.68, -8.56, 2.75, 1.045, true);
   const screen = interact('rehearsalScreen', '彩排播放器', [2.43, 1.09, -8.55], .12);
   box([1.14, .63, .13], [0, .405, 0], dark, screen);
-  const rehearsalDisplay = new THREE.MeshBasicMaterial({ color: '#31574d', toneMapped: false });
-  plane([1.04, .55, 1], [0, .407, .075], rehearsalDisplay, screen);
-  imageTexture('lab/rehearsal-display.webp', (map) => {
-    rehearsalDisplay.map = map;
-    rehearsalDisplay.color.set('#ffffff');
-    rehearsalDisplay.needsUpdate = true;
-  });
+  const showRehearsal = monitorDisplay('lab/rehearsal-display.webp', [1.04, .55, 1], [0, .407, .075], screen);
   box([.28, .25, .11], [0, .113, -.04], trim, screen);
   box([.53, .041, .32], [0, .016, -.015], metal, screen);
   book('backupNotes', '备用布置图', 3.72, -8.19, paper, -.13, 'page-exhibit.webp');
@@ -540,6 +696,7 @@ export function createWorld(THREE) {
       marker, null, [0, Math.abs(x) > 1 ? 0 : Math.PI / 2, 0]);
   }
 
+  const showHint = createHintSpiral(THREE, scene, targets);
   finish();
 
   const pickups = ['radio', 'seal', 'brightLamp', 'vividTape', 'tray', 'rehearsalTape'];
@@ -550,6 +707,8 @@ export function createWorld(THREE) {
     const motion = !state.reducedMotion;
     const completed = state.completed || 0;
     const used = (id) => state.used?.has(id);
+    showRoots(state.unlocked?.has('rootCam') || used('rootCam'));
+    showRehearsal(state.unlocked?.has('rehearsalScreen') || used('rehearsalScreen'));
     for (const id of pickups) {
       const { object } = targets.get(id);
       const collected = used(id);
@@ -568,7 +727,6 @@ export function createWorld(THREE) {
     }
     if (motion) {
       for (const { leaf, base, phase } of leaves) leaf.rotation.z = base + .09 * Math.sin(clock * 1.9 + phase);
-      radioLED.scale.set(.031 + Math.sin(clock * 3.3) * .006, .031, .023);
     }
     const fanStopped = completed >= 3 || (state.mission === 2 && state.action >= 1) || used('fan');
     if (!fanStopped && motion) blades.rotation.z -= speed * 13;
@@ -584,6 +742,7 @@ export function createWorld(THREE) {
     exhibitPlant.visible = ready;
     const goalIntensity = ready ? (completed >= 6 ? 3.55 : 2.30) : 0;
     exhibitAura.intensity += (goalIntensity - exhibitAura.intensity) * (motion ? Math.min(speed * 4, 1) : 1);
+    showHint(state.hintTarget, motion ? clock * 2.35 : 0);
   }
 
   update(0, { reducedMotion: true });

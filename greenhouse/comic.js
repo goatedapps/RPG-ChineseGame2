@@ -1,4 +1,4 @@
-const panels = [
+const openingPanels = [
   {
     dialogue: ['明天就是', '科学展！'],
     english: ['The science fair', 'is tomorrow!'],
@@ -19,11 +19,32 @@ const panels = [
     bubble: [28.7, 21.1, 39],
   },
   {
-    dialogue: ['科学展快开门了！', '快拿对讲机！'],
-    english: ['The fair opens soon!', 'Grab the walkie-talkie!'],
-    alt: '科学楼桌上亮起了红灯，对讲机开始闪烁。',
+    dialogue: ['科学展快开门了！', '手机有新消息！'],
+    english: ['The fair opens soon!', 'Check your phone!'],
+    alt: '桌上的手机振动起来，屏幕亮起。一名同学伸手去拿。',
     bubble: [63.2, 23.4, 33],
-    effect: { chinese: '滋滋……', english: 'KSSSH…', bubble: [86, 11.1, 17] },
+    effect: { chinese: '叮！', english: 'PING!', bubble: [86, 11.1, 17] },
+  },
+];
+
+const closingPanels = [
+  {
+    dialogue: ['雨停了！', '来参观吧！'],
+    english: ['The rain’s stopped!', 'Come on in!'],
+    alt: '阳光照进温室。窗户修好了，同学们打开门迎接参观者。',
+    bubble: [25, 18.2, 36],
+  },
+  {
+    dialogue: ['快看！', '豆苗又挺起来了！'],
+    english: ['Look!', 'It’s standing tall again!'],
+    alt: '展灯照亮救回来的豆苗，阿宁向参观者介绍植物的根。',
+    bubble: [69.4, 18, 36],
+  },
+  {
+    dialogue: ['科学展成功了！', '多亏有你！'],
+    english: ['We did it!', 'Thanks for your help!'],
+    alt: '阿宁和伙伴在豆苗旁击掌，庆祝科学展顺利开幕。',
+    bubble: [24, 18.4, 36],
   },
 ];
 
@@ -54,15 +75,16 @@ function balloon(className, [x, y, width]) {
   return node;
 }
 
-export function playComic(container, onFinish, { onPage = () => {} } = {}) {
-  const title = element('h2', 'comic-hidden', '暴雨后的温室序幕');
+export function playComic(container, onFinish, { onPage = () => {}, ending = false } = {}) {
+  const panels = ending ? closingPanels : openingPanels;
+  const title = element('h2', 'comic-hidden', ending ? '暴雨后的温室结局' : '暴雨后的温室序幕');
   title.id = 'comic-title';
   const frame = element('div', 'comic-frame');
   const hit = button('comic-hit');
   const english = button('comic-language', 'EN');
   english.setAttribute('aria-label', '切换英文对白 / English dialogue');
   english.setAttribute('aria-pressed', 'false');
-  const skip = button('comic-skip', '跳过序幕');
+  const skip = button('comic-skip', ending ? '跳过结局' : '跳过序幕');
   const actions = element('div', 'comic-actions');
   actions.append(english, skip);
   const hint = element('p', 'comic-hint');
@@ -110,7 +132,7 @@ export function playComic(container, onFinish, { onPage = () => {} } = {}) {
       image.hidden = true;
       fallback.hidden = false;
     }, { once: true });
-    const path = './art/comic-storm-' + (page + 1);
+    const path = './art/comic-' + (ending ? 'ending-' : 'storm-') + (page + 1);
     const full = new URL(path + '.webp', import.meta.url);
     const small = new URL(path + '-small.webp', import.meta.url);
     image.sizes = 'min(calc(100vw - 1.2rem), calc((100dvh - 6rem) * 1.5))';
@@ -144,8 +166,9 @@ export function playComic(container, onFinish, { onPage = () => {} } = {}) {
     const art = loadedPanels.get(page);
     announcement.textContent = '第 ' + (page + 1) + ' 幅，共 ' + panels.length + ' 幅。' + letter(page, art);
     dots.forEach((dot, position) => dot.classList.toggle('current', position === page));
-    hit.setAttribute('aria-label', page === panels.length - 1 ? '进入科学楼' : '继续看序幕');
-    hint.textContent = page === panels.length - 1 ? '点按画面，进入科学楼' : '点按画面，继续';
+    const lastLabel = ending ? '回到温室' : '进入科学楼';
+    hit.setAttribute('aria-label', page === panels.length - 1 ? lastLabel : '继续看漫画');
+    hint.textContent = page === panels.length - 1 ? '点按画面，' + lastLabel : '点按画面，继续';
   }
 
   function render(direction) {
@@ -176,7 +199,7 @@ export function playComic(container, onFinish, { onPage = () => {} } = {}) {
       }, {
         clipPath: revealClip.ready, duration: .28, ease: 'power3.inOut', clearProps: 'clipPath',
       }, 0);
-      transition.fromTo(art.drawing, { scale: page === 1 ? 1.07 : 1.035 }, {
+      transition.fromTo(art.drawing, { scale: !ending && page === 1 ? 1.07 : 1.035 }, {
         scale: 1, duration: .44, ease: 'power3.out', clearProps: 'transform',
       }, 0);
       if (art.effect) {
@@ -252,7 +275,7 @@ export function playComic(container, onFinish, { onPage = () => {} } = {}) {
     english.setAttribute('aria-pressed', String(useEnglish));
     if (shownPage >= 0) announce(shownPage);
   });
-  hit.setAttribute('aria-label', '继续看序幕');
+  hit.setAttribute('aria-label', '继续看漫画');
   render(1);
   hit.focus({ preventScroll: true });
 

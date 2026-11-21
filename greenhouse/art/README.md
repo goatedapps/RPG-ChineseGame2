@@ -110,6 +110,70 @@ Strong diagonally offset composition.
 No framing, title, text, words, logos, badges, signage, speech balloons or letters.
 No heavy gradients; use original sharply cut comic color shapes and small print-texture details.
 
+## Phone artwork and closing comic
+
+The built-in image generator replaced the radio in the title cover and fourth opening panel while preserving their original compositions.
+The game serves those edits as the existing cover and opening panel WebPs, including their narrow variants.
+It also uses three closing panels named `comic-ending-1.webp` through `comic-ending-3.webp`, with corresponding 768 × 512 `-small` variants.
+The ending follows the repaired window, the fair demonstration, and the students' celebration.
+
+### Shared ending prompt
+
+Original colorful high-energy 2D Western school adventure comic, same exact linework, grain, color language and character designs as the attached reference IMAGE.
+Amber sun after the rain and rich teal greenhouse frames.
+A Ning has chin-length black hair, white school blouse, jade green science vest and amber lanyard; her classmate has tousled black short hair, white school shirt and orange backpack.
+Modern Singapore school greenhouse, lovely alive bean seedling in terracotta pot, expressive child-safe adventure, memorable compositions.
+One landscape 3:2 single panel.
+No printed words, symbols that look like letters, captions, branding, logo or watermarks.
+Include ONE big plain matte warm-white speech balloon with bold black stroke and natural pointed tail, interior entirely blank with plenty of writing space, as part of the illustrated world, no extra balloons.
+
+### Title cover edit
+
+Precise edit target.
+Edit ONLY the object in the hero's hand, within its immediate area at right.
+Replace this old walkie-talkie with a stylish modern black smartphone with subtly rounded corner black glass, a narrow forest-green case, smartphone proportions about 2:1 tall, narrow centered notch, and a luminous mint notification shape on the front screen.
+Make it clearly recognizable immediately as a modern smartphone with no antenna, speaker holes, push to talk knobs or walkie talkie controls.
+Keep original fingers anatomically natural holding the phone with thumb resting on the side.
+No legible screen text, brand or logo.
+Preserve the rest of the image closely and especially large dark ink halftone negative space on left, four classmates, greenhouse, plant, storm and vivid comic linework.
+Preserve the wide 16:9 proportions and original placement of the phone for desktop and responsive phone cover.
+
+### Opening panel four edit
+
+Precise edit target, 3:2 single landscape comic panel.
+On the lower left of the wooden countertop replace ONLY the walkie-talkie with a modern sleek smartphone in dark green case and black rounded glass, screen visible in similar perspective angled up toward the right, with one mint generic incoming-message graphic on its screen and narrow centered slot.
+No lettering or logo.
+Remove antenna, grill, radio buttons.
+Draw small buzzing orange vibration arcs in the same places near the phone.
+Preserve the other details closely: existing large blank white ellipse top center-right and small blank jagged bubble in top far right in their EXACT original positions and with clear unpainted interiors, all foreground students and boy reaching forward, the terracotta seedling, rain-soaked physics lab and bold tones/linework.
+This is a direct replacement of the handheld object only.
+
+### Ending panel one
+
+The storm has just cleared.
+A brilliant diagonal sunbeam cuts across the freshly mopped school greenhouse and catches the visibly repaired west window, a small textured sealing strip neatly in place and no new leaks.
+Foreground left at y65%, A Ning arrives carrying the rolled exhibition signs with relieved grin while partner pulls open the glass door, welcoming the first visitors queuing in sunshine.
+Approved leaves upright.
+Place a large blank speech balloon with center x28%, y21%, ellipse around 39% width by 24% height with tail pointing toward A Ning below; no other bubbles.
+Compose across full width.
+Moment resolves the leak and makes the fair opening visible.
+
+### Ending panel two
+
+Science fair in full swing, waist-height photograph-like comic angle from the other side of the exhibit table.
+A gleaming desk lamp illuminates the healthy upright bean seedling on its central stand, clear class experiment display with a close roots exhibit, visitors lean in with delighted expressions.
+A Ning grins as her teammate presents the plant proudly to a younger pupil and a smiling teacher.
+Safe clean greenhouse and cheering energy with no spectacle outside context.
+Place an entirely blank white speech balloon centered at x71% y20% with ~38% image width and 24% image height, tail points down towards the children, no other balloons.
+Main plant in lower middle.
+
+### Ending panel three
+
+Warm rewarding final frame with a triumphant celebratory high-five between A Ning and her teammate beside the now impressively lively bean seedling, school festival bunting and visitors in gentle background, glorious late-afternoon golden light, green leaf confetti or drawn celebratory motion ink marks around the two.
+Their earned pride is the focus, the bean plant is fully visible in foreground on exhibit table.
+A single large plain blank white speech balloon centered at x28%, y22% with ~38% image width and 24% height in clear upper left, and short tail to A Ning.
+No title, no words or other bubbles, beautifully composed conclusion to the same comic.
+
 ## Object covers
 
 `book-diary.webp`, `book-exercise.webp`, and `book-rehearsal.webp` are 288 × 288 book textures, and `book-test.webp` is a 400 × 400 document texture.
@@ -250,7 +314,8 @@ Bottom row: aged warm wooden storage crate face with three horizontal slats, sma
 
 ### Equipment and rain glass
 
-Files in `lab/` correspond to `radio-face.webp`, `work-light.webp`, `desk-light.webp`, `marking-tape.webp`, `weatherstrip.webp`, `tray-surface.webp`, `fan-grille.webp`, `instrument-body.webp`, `rain-glass.webp`.
+Files in `lab/` correspond to `work-light.webp`, `desk-light.webp`, `marking-tape.webp`, `weatherstrip.webp`, `tray-surface.webp`, `fan-grille.webp`, `instrument-body.webp`, and `rain-glass.webp`.
+The first equipment tile was retired when the handset replaced the radio.
 
 Top row: front panel of a rugged deep jade school walkie-talkie with small blank yellow-green LCD in upper third, subtle speaker grille, charcoal rubber rim, no lettering; straight-on work-light reflector surface with cool pale LED array and squared brushed surround; old desk lamp reflector panel ivory white with pale warm brass microtexture.
 Middle row: a tiny bright vivid orange fabric warning/marking tape surface with fine actual woven stripes and no lettering; black rubber weather-strip face with repeated shallow channels; warm grey molded plastic carrying tray surface with very fine nonslip grain and tiny perforation marks.
