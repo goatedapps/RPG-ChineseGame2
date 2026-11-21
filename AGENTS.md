@@ -6,7 +6,8 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Lesson structure
 
-- The planned menu lets students choose P2, P3, P5, or P6 and progress in order from Lesson 1 within each level.
+- The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
+- Use [shared progress](shared/lesson-progress.js) to mark a lesson complete only after passing its final test. Unlock worlds in order within each level and keep completed lessons replayable. Display unpublished lessons as under construction once their prerequisites are met.
 - Give each lesson its own HTML entry point and reuse shared gameplay and learning systems where practical.
 - Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish.
 - Give each lesson a coherent storyline with one overarching mission and an illustrated title that fits its setting.

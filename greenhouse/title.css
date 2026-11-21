@@ -157,3 +157,9 @@
   .cover-warning span[aria-hidden] { animation: none; }
   .cover-start { transition: none; }
 }
+
+.cover-replay.universe-return {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

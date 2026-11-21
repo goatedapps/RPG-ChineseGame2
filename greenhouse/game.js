@@ -1,3 +1,4 @@
+import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js';
@@ -1027,6 +1028,7 @@ async function openLessonTest(mode) {
         if (final) {
           state.finalPassed = true;
           state.lessonComplete = true;
+          markLessonComplete('p6', 1);
         }
         state[slot] = null;
         save();

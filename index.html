@@ -1,103 +1,94 @@
 <!doctype html>
 <html lang="zh-Hans">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#08171c">
-  <meta name="description" content="走进风雨后的学校温室，在探索中练习六年级第一课的华文词语。">
-  <title>暴雨后的温室 · P6 华文</title>
-  <link rel="stylesheet" href="greenhouse/game.css">
-  <link rel="stylesheet" href="shared/comic.css">
-  <link rel="stylesheet" href="greenhouse/title.css">
-  <link rel="stylesheet" href="greenhouse/phone.css">
-  <link rel="stylesheet" href="greenhouse/phone-pickup.css">
-  <link rel="stylesheet" href="greenhouse/lesson-test.css">
-  <link rel="stylesheet" href="greenhouse/developer-mode.css">
-  <link rel="stylesheet" href="shared/game-menus.css">
-  <link rel="stylesheet" href="shared/joystick.css">
-  <script defer src="greenhouse/vendor/gsap.min.js"></script>
-  <script type="module" src="greenhouse/game.js"></script>
-</head>
-<body>
-<main id="app">
-  <canvas id="scene" tabindex="-1" aria-label="学校科学楼的三维场景"></canvas>
-  <div class="vellum" aria-hidden="true"></div>
-
-  <header class="hud">
-    <div class="identity">
-      <span class="emblem-plant" aria-hidden="true">♧</span>
-      <div><strong>暴雨后的温室</strong><span>六年级华文 · 第一课</span></div>
-    </div>
-    <div id="toolbar" class="toolbar" hidden>
-      <button id="book" type="button" class="hud-button"><span aria-hidden="true">▤</span><span>词语手册</span><strong id="word-count">0 / 24</strong></button>
-      <button id="settings" type="button" class="icon-button hud-utility" aria-label="设置" aria-haspopup="dialog" title="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h6m4 0h6M4 12h11m4 0h1M4 18h2m4 0h10M10 3v6m5 0v6m-9 0v6"/></svg></button>
-      <button id="developer-mode" type="button" class="icon-button hud-utility" aria-label="开发者模式" aria-haspopup="dialog" title="开发者模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7-5 5 5 5m10-10 5 5-5 5m-3-13-4 16"/></svg></button>
-    </div>
-  </header>
-
-  <section id="splash" class="splash" aria-labelledby="game-title">
-    <picture>
-      <source media="(max-aspect-ratio: 4/5)" srcset="greenhouse/art/storm-cover-portrait.webp">
-      <img class="cover-art" src="greenhouse/art/storm-cover.webp" alt="" fetchpriority="high">
-    </picture>
-    <div class="cover-copy">
-      <p class="cover-edition">六年级华文 · 第一课</p>
-      <h1 id="game-title"><span>暴雨后的</span><span>温室</span></h1>
-      <p class="cover-warning"><span aria-hidden="true"></span><span id="cover-situation">科学展快开门了。西窗还在漏水！</span></p>
-      <div class="cover-actions">
-        <button id="start" type="button" class="cover-start"><span id="start-label">进入科学楼</span><span aria-hidden="true">→</span></button>
-        <button id="practice-test" type="button" class="cover-start cover-practice" hidden><span id="practice-test-label">温习测验</span><span aria-hidden="true">→</span></button>
-        <button id="home-book" type="button" class="cover-replay" hidden>词语手册</button>
-        <button id="replay-intro" type="button" class="cover-replay" hidden>重看序幕</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#100f24" />
+    <meta
+      name="description"
+      content="选择年级，探索华文星图。完成一课，前往下一个世界。"
+    />
+    <title>华文宇宙 · 选择年级</title>
+    <link rel="stylesheet" href="universe/hub.css" />
+    <link rel="stylesheet" href="shared/joystick.css" />
+    <link rel="preload" href="universe/art/observatory.webp" as="image" />
+    <script defer src="greenhouse/vendor/gsap.min.js"></script>
+    <script type="module" src="universe/hub.js"></script>
+  </head>
+  <body>
+    <main>
+      <section id="choose" class="choose">
+        <div class="hero-stars" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <header class="brand">
+          <span aria-hidden="true">✦</span><span>华文探索</span>
+        </header>
+        <div class="hero-copy">
+          <p class="kicker">从这里出发</p>
+          <h1 id="title">华文宇宙</h1>
+          <p>选一个年级，去看看这一片星空。</p>
+        </div>
+        <section class="grade-picker" aria-labelledby="grade-title">
+          <h2 id="grade-title">选择年级</h2>
+          <div id="grades" class="grade-grid"></div>
+        </section>
+      </section>
+      <section id="map" class="map-screen" hidden aria-labelledby="map-title">
+        <div class="space-backdrop" aria-hidden="true"></div>
+        <canvas
+          id="universe"
+          tabindex="0"
+          aria-label="星图。按方向键移动。"
+        ></canvas>
+        <div class="map-hud">
+          <header class="map-header">
+            <button id="back" type="button">更换年级</button>
+            <div class="map-heading">
+              <h1 id="map-title" tabindex="-1"></h1>
+              <p id="completion"></p>
+            </div>
+            <button id="directory" type="button">世界目录</button>
+          </header>
+          <div id="marker" class="map-marker" hidden aria-hidden="true"></div>
+          <div class="map-footer">
+            <div id="joystick" class="joystick" aria-label="拖动摇杆移动">
+              <span></span>
+            </div>
+            <div class="step-panel" aria-live="polite">
+              <div class="step-label">
+                <span id="near-number"></span><span id="near-status"></span>
+              </div>
+              <h2 id="near-title"></h2>
+              <p id="near-hint"></p>
+              <button id="enter" class="gold" type="button">进入世界</button>
+            </div>
+            <p class="motion-key">方向键移动 · 按 E 进入</p>
+            <p class="motion-touch">拖动摇杆探索</p>
+          </div>
+        </div>
+      </section>
+      <dialog id="world-directory" aria-labelledby="directory-title">
+        <header>
+          <h2 id="directory-title">世界目录</h2>
+          <button id="close-directory" type="button" aria-label="关闭">
+            ×
+          </button>
+        </header>
+        <div id="world-list"></div>
+      </dialog>
+      <div id="warp" class="warp" hidden aria-live="polite">
+        <div class="warp-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div id="warp-copy">
+          <p id="warp-kicker"></p>
+          <strong id="warp-title"></strong>
+          <p id="warp-detail"></p>
+        </div>
       </div>
-      <p id="start-status" role="status"></p>
-    </div>
-    <footer class="cover-footer">
-      <div class="cover-tools">
-        <button id="title-music" type="button" class="cover-tool" aria-pressed="false" aria-label="播放背景音乐">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13M9 18c0 1.7-1.6 3-3.5 3S2 20.2 2 19s1.6-2.5 3.5-2.5c1.6 0 2.7.5 3.5 1.5Zm11-2c0 1.7-1.6 3-3.5 3S13 18.2 13 17s1.6-2.5 3.5-2.5c1.6 0 2.7.5 3.5 1.5Z"/></svg>
-          <span id="music-label">开启音乐</span>
-        </button>
-        <button id="intro-en" type="button" class="cover-tool translation-button" aria-expanded="false" aria-label="英文说明" title="English">EN</button>
-      </div>
-      <p id="intro-translation" class="translation" lang="en" hidden>The science fair is about to open. The west window is still leaking. Head into the science wing.</p>
-    </footer>
-  </section>
-
-  <section id="mission-ui" class="mission" aria-label="当前任务" hidden>
-    <div class="mission-line">
-      <div class="radio-wave" id="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-      <div><p id="mission-number" class="label"></p><h2 id="mission-name"></h2></div>
-      <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><svg class="speaker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
-      <button id="cue-en" type="button" class="icon-button translation-button" aria-expanded="false" aria-label="当前任务的英文翻译" title="English">EN</button>
-    </div>
-    <div class="cue-window"><p id="cue-text" class="cue-text" aria-live="polite"></p></div>
-    <p id="cue-translation" class="translation" lang="en" hidden></p>
-    <p id="voice-status" class="voice-status" role="status" hidden></p>
-  </section>
-
-  <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
-  <div id="response" class="response" role="status" aria-live="polite" hidden>
-    <span id="response-text"></span>
-    <button id="response-en" type="button" class="icon-button translation-button" aria-label="互动反馈的英文翻译" aria-expanded="false" title="English">EN</button>
-    <p id="response-translation" class="translation" lang="en" hidden></p>
-  </div>
-
-  <footer id="play-controls" class="play-controls" hidden>
-    <div id="joystick" class="joystick" aria-label="拖动摇杆行走"><span></span></div>
-    <div class="desktop-control"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 移动 <span>·</span> <kbd>F</kbd> 手机 <span>·</span> <kbd>Esc</kbd> 释放鼠标</div>
-    <div class="scene-action">
-      <button id="interact" type="button" class="primary action" hidden><kbd>E</kbd><span></span></button>
-    </div>
-    <p id="held" class="held" hidden></p>
-    <p class="touch-instruction">拖动画面转向</p>
-  </footer>
-
-  <div id="phone" hidden></div>
-  <section id="comic-overlay" hidden></section>
-  <section id="lesson-test" class="lesson-test" hidden></section>
-  <dialog id="workbench" class="game-panel" aria-labelledby="panel-title"><div id="panel"></div></dialog>
-  <noscript>请启用 JavaScript，才能探索温室。</noscript>
-</main>
-</body>
+      <noscript>请启用 JavaScript 后再打开星图。</noscript>
+    </main>
+  </body>
 </html>

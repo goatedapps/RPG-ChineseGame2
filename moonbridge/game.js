@@ -1,3 +1,4 @@
+import { markLessonComplete } from '../shared/lesson-progress.js';
 import { createWorld } from './world.js';
 import {
   opening,
@@ -910,8 +911,10 @@ function openTest(mode) {
       persist();
     },
     onPass: () => {
-      if (currentTestView === 'final') save.passed = true;
-      else save.practice = null;
+      if (currentTestView === 'final') {
+        save.passed = true;
+        markLessonComplete('p3', 1);
+      } else save.practice = null;
       persist();
       play('finish');
     },

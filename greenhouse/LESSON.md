@@ -1,7 +1,7 @@
 # P6 Lesson 1 · 暴雨后的温室
 
 The greenhouse is the reference implementation for the shared lesson requirements in [AGENTS.md](../AGENTS.md).
-The public GitHub Pages site serves this lesson from [`index.html`](../index.html).
+The public GitHub Pages site opens the universe at [`index.html`](../index.html). The greenhouse has its own entry at [`p6-lesson1.html`](../p6-lesson1.html).
 The mission follows a student preparing the school science exhibition after a downpour, from finding the west-window leak to rescuing the bean seedling and preparing its display.
 
 ## Story and interactions

@@ -739,3 +739,12 @@ dialog header button {
   color: #ffeb99;
   text-shadow: 0 0 8px #ffb744;
 }
+
+.universe-return {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gold2);
+  margin-top: 8px;
+  text-underline-offset: .22em;
+}
