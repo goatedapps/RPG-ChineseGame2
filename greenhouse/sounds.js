@@ -35,7 +35,7 @@ function fileURL(category, name) {
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
 }
 
-export function createGreenhouseAudio({ radioAlerts = false } = {}) {
+export function createGreenhouseAudio({ radioAlerts = false, effectsGain = 1, musicGain = 1 } = {}) {
   let context;
   let master;
   let effects;
@@ -139,8 +139,8 @@ export function createGreenhouseAudio({ radioAlerts = false } = {}) {
     const active = audible();
     const effectActive = active && enabled;
     ramp(master.gain, active ? .69 : 0);
-    ramp(effects.gain, ducked ? .46 : 1, ducked ? .02 : .09);
-    ramp(music.gain, ducked ? .28 : 1, ducked ? .04 : .21);
+    ramp(effects.gain, effectsGain * (ducked ? .46 : 1), ducked ? .02 : .09);
+    ramp(music.gain, musicGain * (ducked ? .28 : 1), ducked ? .04 : .21);
     refreshMusic(active);
     if (effectActive && ambience) {
       startRain();

@@ -3,7 +3,7 @@
 The `sfx/` MP3 files are original sound effects rendered for this project, with no third-party samples.
 They combine shaped and filtered noise, short resonant tones, and offset left and right room reflections.
 The stereo rain bed layers diffuse wind, wet glass, and scattered droplets.
-Footstep files alternate four heel and toe textures.
+Footstep files alternate four heel and toe textures. Both lessons reuse these recordings and time them by actual distance walked. Moonbridge uses a slightly wider stride for its faster walking speed and gives effects more gain relative to music.
 Paper uses staggered crackle and flutter layers.
 The phone notification is an original three-note synthesized chime, with soft harmonics and short stereo reflections.
 The game uses it for new phone messages and hint notifications. Moonbridge preloads a separate `moonbridge-radio-alert.mp3` with a short burst of synthesized squelch and a two-tone call signal.

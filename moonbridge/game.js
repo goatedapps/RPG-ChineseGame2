@@ -1,5 +1,5 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js?v=radio-briefings';
+import { createWorld } from './world.js?v=field-sounds';
 import {
   opening,
   parts,
@@ -12,7 +12,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
 import { mountWriting, mountTest } from './assess.js?v=radio-briefings';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=radio-briefings';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=field-sounds';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 
@@ -21,7 +21,7 @@ import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js';
 
 const $ = (id) => document.getElementById(id);
-const audio = createGreenhouseAudio({ radioAlerts: true });
+const audio = createGreenhouseAudio({ radioAlerts: true, effectsGain: 1.65, musicGain: .8 });
 const dialog = $('dialog');
 const body = $('dialog-body');
 const canvas = $('world');
@@ -130,6 +130,8 @@ let testing = false;
 let currentTestView = null;
 let devSkipDictation = false;
 let moveStart;
+const stepSpacing = 1.25;
+let footstepDistance = 0;
 
 function play(name) {
   audio.cue(name);
@@ -253,7 +255,11 @@ function showComic(content, title, onFinish) {
         : '开始课末测试'
       : '进入车站',
     ending: closing,
-    onPage: () => play('page'),
+    onPage(page) {
+      if (!closing && page === 1) audio.prepareGameplay();
+      else if (!closing && page === 2) play('storm');
+      else play('page');
+    },
   });
 }
 
@@ -440,7 +446,11 @@ function worldEvent(event) {
     );
     return;
   }
-  if (event.moving) play('step');
+  footstepDistance += event.distance ?? 0;
+  if (footstepDistance >= stepSpacing) {
+    footstepDistance %= stepSpacing;
+    play('step');
+  }
   if (save.stage === 0 && event.moving) {
     moveStart ??= performance.now();
     if (performance.now() - moveStart > 620) go(1);
@@ -473,6 +483,7 @@ function startWorld() {
   world.reset(save.stage === 12);
   driving = false;
   moveStart = null;
+  footstepDistance = 0;
   setView('hud');
   update(true);
   audio.prepareGameplay();
@@ -739,6 +750,7 @@ function firstRun() {
   if (testing) return;
   showPanel('equipment', '第一次试跑');
   body.append(fieldImage('test-lever-v2'));
+  play('seal');
   runVisual(false);
   play('wrong');
   body.append(make('p', '灯车一颠，火种就弹出了架子。', 'dialog-copy'));
@@ -789,6 +801,7 @@ function practiceRun() {
       launch.disabled = true;
       range.disabled = true;
       body.querySelector('.test-strip')?.remove();
+      play('seal');
       runVisual(ok);
       play(ok ? 'correct' : 'wrong');
       note.textContent = ok
@@ -1188,6 +1201,14 @@ function settings() {
 }
 document.querySelectorAll('[data-settings]').forEach((control) => {
   control.onclick = settings;
+});
+
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element)) return;
+  const control = event.target.closest('button');
+  if (!control || control.matches('.comic-hit,#action,.options button')) return;
+  audio.start();
+  play('ui');
 });
 
 const developer = createDeveloperMode({

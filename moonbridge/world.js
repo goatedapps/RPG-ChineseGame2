@@ -1137,8 +1137,9 @@ export function createWorld(canvas, notify, finished) {
       if (input.has('left')) desired.add(V(forward.z, 0, -forward.x));
       desired.addScaledVector(forward, -stick.y);
       desired.addScaledVector(V(-forward.z, 0, forward.x), stick.x);
-      const moving = desired.lengthSq() > 0;
-      if (moving) {
+      const startX = player.x;
+      const startZ = player.z;
+      if (desired.lengthSq() > 0) {
         desired
           .clampLength(0, 1)
           .multiplyScalar(dt * 4.15)
@@ -1147,13 +1148,15 @@ export function createWorld(canvas, notify, finished) {
         if (walkable(desired.x, player.z, far)) player.x = desired.x;
         if (walkable(player.x, desired.z, far)) player.z = desired.z;
       }
+      const distance = Math.hypot(player.x - startX, player.z - startZ);
+      const moving = distance > 0;
       camera.position.set(
         player.x,
         player.y +
           (moving && !reducedMotion.matches ? Math.sin(tick * 14) * 0.042 : 0),
         player.z,
       );
-      notify({ mode, moving, target: currentTarget() });
+      notify({ mode, moving, distance, target: currentTarget() });
     } else {
       race = advanceRace(
         race,
