@@ -16,55 +16,6 @@
   stroke-linejoin: round;
 }
 
-#workbench:has(.developer-unlock, .developer-option) { width: min(35rem, calc(100% - 2rem)); }
-.developer-unlock { max-width: 26rem; }
-.developer-unlock label { display: block; color: var(--muted); }
-
-.developer-password-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: .65rem;
-  margin-top: .4rem;
-}
-
-#developer-password {
-  background: var(--night);
-  border: 1px solid var(--line);
-  border-radius: .45rem;
-  color: var(--cream);
-  font: inherit;
-  min-height: 2.75rem;
-  padding: .5rem .7rem;
-  width: 100%;
-}
-
-#developer-password[aria-invalid="true"] { border-color: var(--sun); }
-.developer-error { margin-top: .45rem; color: var(--sun); }
-.developer-error:empty { margin: 0; }
-
-.developer-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .8rem;
-  padding: .65rem 0;
-  border-block: 1px solid var(--line);
-  cursor: pointer;
-}
-
-.developer-option input {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin: 0;
-  accent-color: var(--jade);
-  cursor: pointer;
-}
-
-#developer-password:focus-visible,
-.developer-option input:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
-.developer-actions { justify-content: space-between; }
-
 @media (max-width: 400px) {
   .hud { gap: .5rem; }
   .hud .identity, .hud .identity div { min-width: 0; }

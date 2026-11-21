@@ -13,7 +13,14 @@ function makeButton(text, className) {
   return button;
 }
 
-export function createDeveloperMode({ panel, openPanel, canSkip, getSkipLabel, onSkip, onSkipDictation }) {
+export function createDeveloperMode({
+  panel,
+  openPanel,
+  canSkip,
+  getSkipLabel,
+  onSkip,
+  onSkipDictation,
+}) {
   let unlocked = false;
   let skipDictation = false;
 
@@ -98,5 +105,10 @@ export function createDeveloperMode({ panel, openPanel, canSkip, getSkipLabel, o
     panel.append(row, buttons);
   }
 
-  return { open, get skipDictation() { return unlocked && skipDictation; } };
+  return {
+    open,
+    get skipDictation() {
+      return unlocked && skipDictation;
+    },
+  };
 }

@@ -1,3 +1,4 @@
+import { createHintPortal } from '../shared/hint-portal.js';
 import * as T from '../greenhouse/vendor/three.module.min.js';
 import { advanceRace, FORK, MERGE } from './race.js';
 
@@ -846,16 +847,14 @@ export function createWorld(canvas, notify, finished) {
     launch: V(0, 0.7, 1.1),
     beacon: V(12.4, 1.6, -89),
   };
-  const marker = new T.Mesh(
-    new T.TorusGeometry(0.32, 0.028, 7, 24),
-    new T.MeshBasicMaterial({
-      color: 0xffda80,
-      transparent: true,
-      opacity: 0.9,
+  const hintTargets = new Map(
+    Object.entries(positions).map(([id, position]) => {
+      const object = new T.Object3D();
+      object.position.copy(position);
+      return [id, { object, hintAnchor: [0, 0.61, 0] }];
     }),
   );
-  marker.visible = false;
-  scene.add(marker);
+  const showHint = createHintPortal(T, scene, hintTargets);
   const cue = { visible: false, id: null };
   let targets = [];
   let carrying = false;
@@ -1058,14 +1057,7 @@ export function createWorld(canvas, notify, finished) {
         });
       }
     }
-    if (cue.visible && positions[cue.id]) {
-      marker.visible = true;
-      marker.position
-        .copy(positions[cue.id])
-        .add(V(0, 0.61 + Math.sin(tick * 2.5) * 0.12, 0));
-      marker.lookAt(camera.position);
-      marker.scale.setScalar(1 + Math.sin(tick * 3) * 0.12);
-    } else marker.visible = false;
+    showHint(cue.visible ? cue.id : null, camera, tick, !reducedMotion.matches);
     if (!carrying) spark.rotation.y = tick * 0.55;
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);

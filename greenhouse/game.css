@@ -249,8 +249,6 @@ dialog .body { margin-top: .6rem; }
 .dialog-section { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--line); }
 .dialog-section p + p { margin-top: .55rem; }
 @media (any-pointer: coarse) {
-  .joystick { display: grid; place-items: center; position: relative; justify-self: start; grid-column: 1; grid-row: 1; width: clamp(4.7rem, 12vw, 6rem); aspect-ratio: 1; border-radius: 50%; border: 1px solid #b6e3cc93; background: #102b30a6; touch-action: none; }
-  .joystick span { width: 42%; aspect-ratio: 1; border-radius: 50%; border: 1px solid #e4ffef96; background: #96c4b39c; transform: translate(var(--stick-x,0),var(--stick-y,0)); pointer-events: none; }
   .touch-instruction { display: block; grid-column: 3; grid-row: 1; text-align: end; }
   .desktop-control, .action kbd { display: none; }
 }

@@ -13,6 +13,9 @@
     />
     <title>月桥竞速 · 三年级华文第一课</title>
     <link rel="stylesheet" href="moonbridge/game.css" />
+    <link rel="stylesheet" href="shared/comic.css" />
+    <link rel="stylesheet" href="shared/game-menus.css" />
+    <link rel="stylesheet" href="shared/joystick.css" />
     <link rel="preload" href="moonbridge/art/prelude-1.webp" as="image" />
     <script defer src="greenhouse/vendor/gsap.min.js"></script>
     <script type="module" src="moonbridge/game.js"></script>
@@ -39,31 +42,7 @@
           <p id="boot-status" class="note" role="status"></p>
         </div>
       </section>
-      <section
-        id="comic"
-        class="screen comic"
-        aria-labelledby="comic-title"
-        hidden
-      >
-        <div class="comic-frame">
-          <header>
-            <h2 id="comic-title">序幕</h2>
-            <span id="beat-count"></span>
-          </header>
-          <button
-            id="comic-page"
-            class="comic-page"
-            type="button"
-            aria-label="继续"
-          >
-            <img id="beat-art" alt="" /><span id="beat-caption" hidden></span>
-          </button>
-          <div class="buttons comic-nav">
-            <button id="prev-beat">上一幕</button
-            ><button id="next-beat" class="gold">继续</button>
-          </div>
-        </div>
-      </section>
+      <section id="comic" hidden></section>
       <section id="hud" aria-label="游戏操作" hidden>
         <header class="hud-header">
           <div class="identity">
@@ -171,7 +150,7 @@
           </button>
         </footer>
       </section>
-      <dialog id="dialog" aria-labelledby="dialog-title">
+      <dialog id="dialog" class="game-panel" aria-labelledby="dialog-title">
         <header>
           <h2 id="dialog-title" tabindex="-1"></h2>
           <button id="dialog-close" type="button" aria-label="关闭">×</button>

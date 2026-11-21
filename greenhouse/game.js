@@ -6,7 +6,9 @@ import { createGreenhouseAudio } from './sounds.js';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
-import { createDeveloperMode } from './developer-mode.js';
+import { createDeveloperMode } from '../shared/developer-mode.js';
+import { bindJoystick } from '../shared/joystick.js';
+import { openGameSettings } from '../shared/settings.js';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
@@ -1117,20 +1119,25 @@ function showBank(index, total) {
 }
 
 function showSettings() {
-  openPanel(null, '设置');
-  const sound = makeButton(effectsEnabled ? '关闭音效' : '开启音效', 'text-button', () => {
-    effectsEnabled = !effectsEnabled;
-    audio.setEnabled(effectsEnabled);
-    if (effectsEnabled) startAudio();
-    sound.textContent = effectsEnabled ? '关闭音效' : '开启音效';
+  openGameSettings({
+    panel, openPanel,
+    effects: {
+      get: () => effectsEnabled,
+      set(enabled) {
+        effectsEnabled = enabled;
+        audio.setEnabled(enabled);
+        if (enabled) startAudio();
+      },
+    },
+    music: {
+      get: () => musicEnabled,
+      set(enabled) {
+        setMusicPreference(enabled);
+        if (enabled) startAudio();
+      },
+    },
+    onHome: returnHome,
   });
-  const music = makeButton(musicEnabled ? '关闭音乐' : '开启音乐', 'text-button', () => {
-    setMusicPreference(!musicEnabled);
-    if (musicEnabled) startAudio();
-    music.textContent = musicEnabled ? '关闭音乐' : '开启音乐';
-  });
-  const controls = row(sound, music, makeButton('返回首页', 'text-button', returnHome));
-  addTranslation(controls, 'Sound effects · Music · Return to home');
 }
 
 function canSkipTask() {
@@ -1242,39 +1249,7 @@ function begin() {
   }
 }
 
-const joystick = $('#joystick');
-let stickOwner;
-
-function moveStick(event) {
-  if (stickOwner !== event.pointerId) return;
-  const bounds = joystick.getBoundingClientRect();
-  let x = (event.clientX - bounds.left - bounds.width / 2) / (bounds.width * .38);
-  let y = (event.clientY - bounds.top - bounds.height / 2) / (bounds.height * .38);
-  const length = Math.max(1, Math.hypot(x, y));
-  x /= length;
-  y /= length;
-  joystick.style.setProperty('--stick-x', x * bounds.width * .29 + 'px');
-  joystick.style.setProperty('--stick-y', y * bounds.height * .29 + 'px');
-  engine?.setVector(x, -y);
-}
-
-joystick.addEventListener('pointerdown', (event) => {
-  event.preventDefault();
-  if (stickOwner !== undefined) return;
-  stickOwner = event.pointerId;
-  joystick.setPointerCapture(event.pointerId);
-  moveStick(event);
-});
-joystick.addEventListener('pointermove', moveStick);
-for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-  joystick.addEventListener(type, (event) => {
-    if (stickOwner !== event.pointerId) return;
-    stickOwner = undefined;
-    joystick.style.removeProperty('--stick-x');
-    joystick.style.removeProperty('--stick-y');
-    engine?.setVector(0, 0);
-  });
-}
+bindJoystick($('#joystick'), (x, forward) => engine?.setVector(x, forward));
 
 function beginWithComic() {
   if (unavailable || started || !$('#comic-overlay').hidden) return;

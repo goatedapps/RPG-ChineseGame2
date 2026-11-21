@@ -1,6 +1,8 @@
 :root {
   color-scheme: dark;
   --night: #0d1327;
+  --cream: var(--paper);
+  --sun: var(--gold);
   --panel: #17203a;
   --glass: #10172af0;
   --line: #465273;
@@ -143,62 +145,12 @@ canvas {
   font-size: 0.9rem;
   margin-top: 10px;
 }
-.comic {
-  display: grid;
-  place-items: center;
-  background: radial-gradient(ellipse at center, #252d4c, #0c1021 78%);
-  padding: 12px;
-}
-.comic-frame {
-  width: min(980px, 100%);
-  margin: auto;
-}
-.comic-frame header,
 dialog header,
 .test-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-.comic-frame header {
-  margin-bottom: 8px;
-  color: var(--muted);
-}
-.comic-frame h2 {
-  font-size: 1.18rem;
-  color: var(--gold);
-}
-.comic-page {
-  position: relative;
-  display: block;
-  width: 100%;
-  padding: 0;
-  overflow: hidden;
-  border-color: #69758e;
-  background: #121b32;
-  text-align: left;
-}
-.comic-page img {
-  display: block;
-  width: 100%;
-  max-height: min(67dvh, 650px);
-  object-fit: contain;
-}
-.comic-page span {
-  position: absolute;
-  top: 5%;
-  left: 4%;
-  max-width: 65%;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: #fff5dd;
-  color: #241929;
-  font-weight: 800;
-  box-shadow: 0 3px 12px #0006;
-}
-.comic-nav {
-  justify-content: flex-end;
 }
 #hud {
   position: absolute;
@@ -452,27 +404,6 @@ dialog header,
   text-align: right;
 }
 @media (any-pointer: coarse) {
-  .joystick {
-    display: grid;
-    place-items: center;
-    width: clamp(70px, 12vw, 94px);
-    aspect-ratio: 1;
-    border: 1px solid #a8c6e07f;
-    border-radius: 50%;
-    background: #122438a3;
-    pointer-events: auto;
-    touch-action: none;
-    user-select: none;
-  }
-  .joystick span {
-    width: 43%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 1px solid #e7f6f380;
-    background: #acd5d3a6;
-    transform: translate(var(--stick-x, 0), var(--stick-y, 0));
-    pointer-events: none;
-  }
   .touch-instruction {
     display: block;
   }
@@ -618,26 +549,6 @@ dialog header button {
   font-style: normal;
   font-size: 1.3rem;
 }
-.developer-unlock input {
-  background: #101932;
-  border: 1px solid #7a87a3;
-  color: var(--paper);
-  border-radius: 6px;
-  padding: 6px;
-  font: inherit;
-  min-height: 44px;
-}
-.developer-password-row {
-  display: flex;
-  gap: 8px;
-}
-.developer-error {
-  color: #ffd0be;
-}
-.developer-option {
-  display: block;
-  margin: 8px 0;
-}
 .assessment {
   display: grid;
   place-items: center;
@@ -747,17 +658,10 @@ dialog header button {
   .definition-list {
     grid-template-columns: 1fr;
   }
-  .comic-page span {
-    max-width: 80%;
-    font-size: 0.85rem;
-  }
 }
 @media (max-height: 510px) and (orientation: landscape) {
   .assessment {
     display: block;
-  }
-  .comic-page img {
-    max-height: 65dvh;
   }
   .mission {
     max-width: 270px;
@@ -834,15 +738,4 @@ dialog header button {
   top: -14px;
   color: #ffeb99;
   text-shadow: 0 0 8px #ffb744;
-}
-.setting-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-}
-.setting-row input {
-  width: 19px;
-  height: 19px;
-  accent-color: var(--gold);
 }

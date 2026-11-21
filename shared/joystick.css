@@ -1,0 +1,30 @@
+.joystick {
+  display: none;
+}
+@media (any-pointer: coarse) {
+  .joystick {
+    display: grid;
+    place-items: center;
+    position: relative;
+    justify-self: start;
+    grid-column: 1;
+    grid-row: 1;
+    width: clamp(4.7rem, 12vw, 6rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid #b6e3cc93;
+    background: #102b30a6;
+    touch-action: none;
+    pointer-events: auto;
+    user-select: none;
+  }
+  .joystick span {
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid #e4ffef96;
+    background: #96c4b39c;
+    transform: translate(var(--stick-x, 0), var(--stick-y, 0));
+    pointer-events: none;
+  }
+}

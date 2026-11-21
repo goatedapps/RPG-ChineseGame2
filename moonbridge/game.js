@@ -12,7 +12,11 @@ import { testPart } from './race.js';
 import { mountWriting, mountTest } from './assess.js';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js';
 import { createVoice } from '../greenhouse/voice.js';
-import { createDeveloperMode } from '../greenhouse/developer-mode.js';
+import { createDeveloperMode } from '../shared/developer-mode.js';
+
+import { playLessonComic } from '../shared/comic.js';
+import { bindJoystick } from '../shared/joystick.js';
+import { openGameSettings } from '../shared/settings.js';
 
 const $ = (id) => document.getElementById(id);
 const audio = createGreenhouseAudio();
@@ -84,9 +88,6 @@ function persist() {
 const voice = createVoice((status) => audio.setDucked(status === 'playing'));
 let view = 'home';
 let world;
-let openingBeat = 0;
-let pages = opening;
-let finishComic;
 let radioUnread = false;
 let currentTarget = null;
 let hintCount = 0;
@@ -203,47 +204,25 @@ function home() {
   $('start').focus();
 }
 function showComic(content, title, onFinish) {
-  pages = content;
-  openingBeat = 0;
-  finishComic = onFinish;
-  $('comic-title').textContent = title;
   setView('comic');
-  paintComic();
-  $('comic-page').focus();
+  const closing = content === ending;
+  const panels = content.map(({ image, description, caption }) => ({
+    image: new URL('./art/' + image, import.meta.url).href,
+    alt: description,
+    caption,
+  }));
+  playLessonComic($('comic'), onFinish, {
+    panels,
+    titleText: title,
+    lastLabel: closing
+      ? save.passed
+        ? '回到首页'
+        : '开始课末测试'
+      : '进入车站',
+    ending: closing,
+    onPage: () => play('page'),
+  });
 }
-function paintComic() {
-  const info = pages[openingBeat];
-  const art = $('beat-art');
-  art.src = new URL('./art/' + info.image, import.meta.url).href;
-  art.alt = info.description;
-  const caption = $('beat-caption');
-  caption.textContent = info.caption ?? '';
-  caption.hidden = !info.caption;
-  $('beat-count').textContent = openingBeat + 1 + ' / ' + pages.length;
-  $('prev-beat').disabled = openingBeat === 0;
-  $('next-beat').textContent =
-    openingBeat === pages.length - 1
-      ? pages === ending
-        ? '开始课末测试'
-        : '进入车站'
-      : '继续';
-  play('page');
-  animate($('comic-page'), 0);
-}
-function nextComic() {
-  if (openingBeat < pages.length - 1) {
-    openingBeat++;
-    paintComic();
-  } else finishComic();
-}
-$('comic-page').onclick = nextComic;
-$('next-beat').onclick = nextComic;
-$('prev-beat').onclick = () => {
-  if (openingBeat > 0) {
-    openingBeat--;
-    paintComic();
-  }
-};
 
 function showPanel(backdrop, title) {
   disposeWriting();
@@ -826,43 +805,12 @@ window.addEventListener('keydown', (event) => {
   if (driving && event.code === 'ArrowLeft') world.chooseRoute('rough');
   if (driving && event.code === 'ArrowRight') world.chooseRoute('smooth');
 });
-const joystick = $('joystick');
-let stickPointer;
-function moveJoystick(event) {
-  const bounds = joystick.getBoundingClientRect();
-  const radius = bounds.width * 0.36;
-  const x = (event.clientX - bounds.left - bounds.width / 2) / radius;
-  const y = (event.clientY - bounds.top - bounds.height / 2) / radius;
-  const magnitude = Math.hypot(x, y);
-  const scale = magnitude > 1 ? 1 / magnitude : 1;
-  const sx = x * scale;
-  const sy = y * scale;
-  joystick.style.setProperty('--stick-x', sx * radius + 'px');
-  joystick.style.setProperty('--stick-y', sy * radius + 'px');
-  world?.setStick(magnitude < 0.18 ? 0 : sx, magnitude < 0.18 ? 0 : sy);
-  if (driving && Math.abs(sx) > 0.65 && Math.abs(sy) < 0.5) {
-    world.chooseRoute(sx < 0 ? 'rough' : 'smooth');
+bindJoystick($('joystick'), (x, forward) => {
+  world?.setStick(x, -forward);
+  if (driving && Math.abs(x) > 0.65 && Math.abs(forward) < 0.5) {
+    world.chooseRoute(x < 0 ? 'rough' : 'smooth');
   }
-}
-joystick.addEventListener('pointerdown', (event) => {
-  if (stickPointer !== undefined) return;
-  event.preventDefault();
-  stickPointer = event.pointerId;
-  joystick.setPointerCapture(event.pointerId);
-  moveJoystick(event);
 });
-joystick.addEventListener('pointermove', (event) => {
-  if (event.pointerId === stickPointer) moveJoystick(event);
-});
-for (const eventName of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-  joystick.addEventListener(eventName, (event) => {
-    if (event.pointerId !== stickPointer) return;
-    stickPointer = undefined;
-    joystick.style.removeProperty('--stick-x');
-    joystick.style.removeProperty('--stick-y');
-    world?.setStick(0, 0);
-  });
-}
 $('left-route').onclick = () => world.chooseRoute('rough');
 $('right-route').onclick = () => world.chooseRoute('smooth');
 
@@ -980,22 +928,23 @@ $('practice').onclick = () => {
 };
 function settings() {
   audio.start();
-  showPanel(null, '声音设置');
-  function toggle(label, key) {
-    const wrapper = make('label', '', 'setting-row');
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.checked = save[key];
-    input.onchange = () => {
-      save[key] = input.checked;
-      setAudio();
-      persist();
+  function preference(key) {
+    return {
+      get: () => save[key],
+      set(enabled) {
+        save[key] = enabled;
+        setAudio();
+        persist();
+      },
     };
-    wrapper.append(input, make('span', label));
-    return wrapper;
   }
-  body.append(toggle('背景音乐', 'music'), toggle('音效', 'effects'));
-  if (view === 'hud') body.append(group(button('保存并回到首页', home)));
+  openGameSettings({
+    panel: body,
+    openPanel: showPanel,
+    effects: preference('effects'),
+    music: preference('music'),
+    onHome: view === 'hud' ? home : undefined,
+  });
 }
 document.querySelectorAll('[data-settings]').forEach((control) => {
   control.onclick = settings;

@@ -11,19 +11,19 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish.
 - Give each lesson a coherent storyline with one overarching mission and an illustrated title that fits its setting.
 - Open with a short, picture-led comic that establishes the stakes through clear, expressive action, and close with an illustrated epilogue that shows what the player achieved.
-- Put Simplified Chinese dialogue inside the opening and closing comic panels. Use GSAP to reveal one story beat at a time as the player taps or clicks the scene.
+- Use the shared [comic player](shared/comic.js) and [layout](shared/comic.css) for every prelude and epilogue. Put Simplified Chinese dialogue inside centred artwork on the dark background, with progress marks at the lower left. Tap or click the scene to advance, or use the keyboard. Keep visible navigation buttons out of the comic, and use the shared GSAP chapter reveal and reduced-motion behaviour.
 - Begin with a hands-on tutorial for walking, looking around, and interacting with the lesson's objects and story guidance.
 
 ## Exploration and story guidance
 
 - Build a compact, animated first-person 3D space where the player can walk, look around, examine objects, and pick up or use items.
-- Prioritize tablet touch controls and desktop keyboard and mouse controls.
+- Prioritize tablet touch controls and desktop keyboard and mouse controls. Reuse the greenhouse [joystick input](shared/joystick.js) and [joystick appearance](shared/joystick.css) across 3D lessons. Adapt its movement vector to the lesson rather than reimplementing the control.
 - Use the [mobile game HUD reference](references/mobile-game-hud.jpg) across lessons. Put the title and tools at the top, the current task and Mandarin replay button directly below, the touch joystick at lower left, and the story helper at lower right. Show the current item and interaction near the lower centre. Follow the language rules below for all new UI.
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone.
 - Explain why the current task matters, let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
-- When the player gets stuck, offer a contextual hint first and an optional visual cue at the exact target as a second step.
+- When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
 - Show item close-ups directly, with the relevant page, note, or object and only the words the player needs.
 - Let players tap or click outside a close-up to dismiss it, and show any image a question refers to.
 
@@ -53,7 +53,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Developer mode
 
-- Put Developer mode in the top-right game toolbar in place of the old help instructions.
+- Put Settings and Developer mode in the top-right game toolbar. Reuse the greenhouse [settings menu](shared/settings.js), [Developer mode panel](shared/developer-mode.js), and [menu styling](shared/game-menus.css). Connect settings to the lesson’s music, effects, and home actions.
 - Require the password `greenhouse` and keep Developer mode locked by default on every page load.
 - Reuse the Developer mode panel and connect its controls to each lesson's progression.
 - Let developers skip the current task and turn on automatic skipping of mission dictation.
