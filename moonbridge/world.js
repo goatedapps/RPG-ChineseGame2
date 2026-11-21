@@ -767,6 +767,7 @@ export function createWorld(canvas, notify, finished) {
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const forward = V(0, 0, -1);
   const input = new Set();
+  const stick = new T.Vector2();
   const desired = V(0, 0, 0);
   const aim = V(0, 0, 0);
   let drag;
@@ -800,7 +801,10 @@ export function createWorld(canvas, notify, finished) {
   }
   window.addEventListener('keydown', (event) => key(event, true));
   window.addEventListener('keyup', (event) => key(event, false));
-  window.addEventListener('blur', () => input.clear());
+  window.addEventListener('blur', () => {
+    input.clear();
+    stick.set(0, 0);
+  });
   canvas.addEventListener('pointerdown', (event) => {
     if (!active || mode !== 'walk' || drag) return;
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
@@ -872,10 +876,12 @@ export function createWorld(canvas, notify, finished) {
       if (input.has('down')) desired.sub(forward);
       if (input.has('right')) desired.add(V(-forward.z, 0, forward.x));
       if (input.has('left')) desired.add(V(forward.z, 0, -forward.x));
+      desired.addScaledVector(forward, -stick.y);
+      desired.addScaledVector(V(-forward.z, 0, forward.x), stick.x);
       const moving = desired.lengthSq() > 0;
       if (moving) {
         desired
-          .normalize()
+          .clampLength(0, 1)
           .multiplyScalar(dt * 4.15)
           .add(player);
         const far = player.z < -70;
@@ -909,7 +915,12 @@ export function createWorld(canvas, notify, finished) {
       );
       notify({ mode, moving, target: currentTarget() });
     } else {
-      race = advanceRace(race, dt, input.has('up'), input.has('down'));
+      race = advanceRace(
+        race,
+        dt,
+        input.has('up') || stick.y < -0.24,
+        input.has('down') || stick.y > 0.24,
+      );
       if (race.progress >= FORK && !race.locked)
         race = { ...race, locked: true };
       const tangent = positionCart(playerCart, race.progress, race.route, 0.68);
@@ -962,6 +973,7 @@ export function createWorld(canvas, notify, finished) {
     if (finishId) cancelAnimationFrame(finishId);
     finishId = undefined;
     input.clear();
+    stick.set(0, 0);
     last = 0;
   }
   function resume() {
@@ -997,9 +1009,8 @@ export function createWorld(canvas, notify, finished) {
     interact(id) {
       return positions[id] && currentTarget() === id;
     },
-    press(key, down) {
-      if (down) input.add(key);
-      else input.delete(key);
+    setStick(x, y) {
+      stick.set(x, y);
     },
     lookNudge() {
       yaw += 0.13;

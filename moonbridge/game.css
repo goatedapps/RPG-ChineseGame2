@@ -230,7 +230,10 @@ dialog header,
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 7px 12px;
+  padding: 7px 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .identity > span {
   color: var(--gold);
@@ -259,21 +262,89 @@ dialog header,
   color: var(--gold);
   font-variant-numeric: tabular-nums;
 }
+.hud-header nav button {
+  border-radius: 999px;
+}
+.round-tool {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--jade);
+  background: #16243a;
+}
+.round-tool svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .mission {
-  width: min(325px, calc(100vw - 26px));
-  margin-top: 10px;
-  padding: 9px 12px;
+  width: min(27rem, 100%);
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 0;
+  border-left: 2px solid var(--jade);
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(105deg, #111d31f5, #111d31b7);
+}
+.mission-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mission-title {
+  flex: 1;
+  min-width: 0;
 }
 .mission h2 {
-  font-size: 1.19rem;
-  margin: 5px 0;
+  font-size: 1.2rem;
+  margin-top: 4px;
 }
 .mission .tag {
-  font-size: 0.72rem;
+  color: var(--jade);
+  font-size: 0.75rem;
 }
-.mission p:last-child {
-  font-size: 0.84rem;
+.mission-wave {
+  width: 29px;
+  flex: 0 0 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 24px;
+  color: var(--jade);
+}
+.mission-wave i {
+  width: 2px;
+  height: 45%;
+  border-radius: 3px;
+  background: currentColor;
+}
+.mission-wave i:nth-child(even) {
+  height: 66%;
+}
+.mission-wave i:nth-child(3) {
+  height: 93%;
+}
+#control-hint {
+  margin-top: 8px;
+  color: var(--paper);
+  font-size: 0.93rem;
+}
+#voice-status {
+  margin-top: 4px;
   color: var(--muted);
+  font-size: 0.8rem;
+}
+#voice-status:empty {
+  display: none;
 }
 #reticle {
   position: absolute;
@@ -286,56 +357,134 @@ dialog header,
   box-shadow: 0 0 0 2px #0b143386;
   transform: translate(-50%, -50%);
 }
+#reticle.targeted {
+  width: 15px;
+  height: 15px;
+  border-color: var(--gold);
+}
 .controls {
   position: absolute;
-  left: 14px;
-  right: 14px;
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
   bottom: max(13px, env(safe-area-inset-bottom));
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: end;
   gap: 10px;
 }
-.pad {
-  display: grid;
-  grid-template-columns: repeat(3, 48px);
-  grid-template-rows: repeat(2, 44px);
-  gap: 4px;
+.joystick,
+.touch-instruction {
+  display: none;
 }
-.pad button {
-  background: #142039d9;
-  padding: 0;
-  min-height: 44px;
-  touch-action: none;
-  user-select: none;
-  border-color: #6884a3;
+.desktop-control,
+.touch-instruction,
+#held {
+  margin: 0;
+  text-shadow: 0 2px 6px #060b1a;
+  color: var(--paper);
+  font-size: 0.86rem;
 }
-.pad button[data-move='up'] {
-  grid-column: 2;
-}
-.pad button[data-move='left'] {
+.desktop-control,
+.joystick {
   grid-column: 1;
+  grid-row: 1;
 }
-.pad button.is-held {
-  background: #465d83;
+.desktop-control kbd {
+  background: #101d32c9;
+  border: 1px solid #596988;
+  border-radius: 5px;
+  padding: 2px 5px;
+  font: inherit;
 }
-.context {
-  display: flex;
-  align-items: end;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+.scene-action {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 27px;
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 5px;
 }
-.context button {
-  background: var(--glass);
+.scene-action #action {
+  min-width: 112px;
+  border-radius: 999px;
 }
-.context #action {
-  min-width: 114px;
-  background: var(--gold);
+.scene-action #action:disabled {
+  visibility: hidden;
+}
+#held {
+  color: var(--gold2);
+  white-space: nowrap;
+}
+#hud .radio-dock {
+  position: relative;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  grid-column: 3;
+  grid-row: 1;
+  height: 67px;
+  width: 49px;
+  padding: 5px;
+  border: 2px solid #877caa;
+  border-radius: 15px;
+  background: radial-gradient(ellipse at 50% 67%, #4b3b71, #1d1a30);
+  box-shadow: 0 3px 11px #080a19e0;
+  color: #fff4df;
+}
+.radio-dock svg {
+  display: block;
+  width: 26px;
+  height: 38px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 #unread {
+  position: absolute;
+  top: 5px;
+  right: 5px;
   color: var(--gold);
-  margin-left: 3px;
+  font-size: 0.65rem;
+}
+.touch-instruction {
+  grid-row: 1;
+  grid-column: 3;
+  text-align: right;
+}
+@media (any-pointer: coarse) {
+  .joystick {
+    display: grid;
+    place-items: center;
+    width: clamp(70px, 12vw, 94px);
+    aspect-ratio: 1;
+    border: 1px solid #a8c6e07f;
+    border-radius: 50%;
+    background: #122438a3;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+  }
+  .joystick span {
+    width: 43%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid #e7f6f380;
+    background: #acd5d3a6;
+    transform: translate(var(--stick-x, 0), var(--stick-y, 0));
+    pointer-events: none;
+  }
+  .touch-instruction {
+    display: block;
+  }
+  .desktop-control {
+    display: none;
+  }
+  #hud .radio-dock {
+    margin-bottom: 23px;
+  }
 }
 .toast {
   position: absolute;
@@ -579,9 +728,6 @@ dialog header button {
   .cover h1 {
     font-size: clamp(3.4rem, 15vw, 6rem);
   }
-  .mission {
-    width: min(285px, 76vw);
-  }
   .mission h2 {
     font-size: 1rem;
   }
@@ -597,19 +743,9 @@ dialog header button {
   .identity > span {
     display: none;
   }
-  .context button {
-    padding: 6px 8px;
-    font-size: 0.82rem;
-  }
-  .context #action {
-    min-width: 77px;
-  }
   .controls {
     left: 7px;
     right: 7px;
-  }
-  .pad {
-    grid-template-columns: repeat(3, 41px);
   }
   .definition-list {
     grid-template-columns: 1fr;
@@ -629,8 +765,8 @@ dialog header button {
   .mission {
     max-width: 270px;
   }
-  .mission p:last-child {
-    display: none;
+  #control-hint {
+    font-size: 0.8rem;
   }
   .drive {
     bottom: 72px;

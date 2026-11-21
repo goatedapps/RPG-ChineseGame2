@@ -18,6 +18,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 - Build a compact, animated first-person 3D space where the player can walk, look around, examine objects, and pick up or use items.
 - Prioritize tablet touch controls and desktop keyboard and mouse controls.
+- Use the [mobile game HUD reference](references/mobile-game-hud.jpg) across lessons. Put the title and tools at the top, the current task and Mandarin replay button directly below, the touch joystick at lower left, and the story helper at lower right. Show the current item and interaction near the lower centre. Follow the language rules below for all new UI.
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone.

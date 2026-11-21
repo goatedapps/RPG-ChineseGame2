@@ -281,7 +281,27 @@ function update() {
   const task = tasks[save.stage];
   $('objective').textContent = task?.title ?? '月桥重新亮了';
   $('control-hint').textContent = task?.cue ?? '';
-  $('district').textContent = save.stage === 12 ? '对岸车站' : '起点车站';
+  const missionNumber =
+    save.stage < 4
+      ? 1
+      : save.stage < 7
+        ? 2
+        : save.stage < 10
+          ? 3
+          : save.stage < 12
+            ? 4
+            : 5;
+  $('district').textContent = '任务 ' + missionNumber + ' / 5';
+  $('voice-status').hidden = true;
+  $('voice-status').textContent = '';
+  const item =
+    save.stage === 5 || save.stage === 12
+      ? '火种'
+      : save.stage === 9
+        ? parts[save.part]?.name
+        : '';
+  $('held').textContent = item ? '手上 · ' + item : '';
+  $('held').hidden = !item;
   $('radio').hidden = save.stage < 3;
   $('unread').hidden = !radioUnread;
   $('word-count').textContent = save.discoveries.length + ' / ' + words.length;
@@ -303,7 +323,6 @@ function update() {
   if (!driving) {
     $('reticle').hidden = false;
     $('drive').hidden = true;
-    $('pad').hidden = false;
   }
   paintAction();
 }
@@ -319,6 +338,7 @@ function go(stage) {
 }
 function paintAction() {
   const action = $('action');
+  $('reticle').classList.toggle('targeted', Boolean(currentTarget) && !driving);
   if (driving) {
     action.disabled = true;
     return;
@@ -421,7 +441,10 @@ function start() {
 }
 $('start').onclick = start;
 $('speak').onclick = () => {
-  if (tasks[save.stage]?.cue) speaker(tasks[save.stage].cue, $('control-hint'));
+  const status = $('voice-status');
+  status.textContent = '';
+  status.hidden = false;
+  if (tasks[save.stage]?.cue) speaker(tasks[save.stage].cue, status);
 };
 
 function openRadio() {
@@ -710,11 +733,10 @@ function enterRace() {
   driving = true;
   $('reticle').hidden = true;
   $('drive').hidden = false;
-  $('district').textContent = '月桥';
+  $('district').textContent = '任务 4 / 5 · 月桥';
   $('objective').textContent = '把火种送过桥';
   $('control-hint').textContent =
     '按前方加速，按后方刹车。到分岔前可以换路线。';
-  $('pad').hidden = false;
   $('action').disabled = true;
   closePanel();
   world.startRace(save.part);
@@ -804,21 +826,42 @@ window.addEventListener('keydown', (event) => {
   if (driving && event.code === 'ArrowLeft') world.chooseRoute('rough');
   if (driving && event.code === 'ArrowRight') world.chooseRoute('smooth');
 });
-for (const control of document.querySelectorAll('[data-move]')) {
-  const key = control.dataset.move;
-  control.addEventListener('pointerdown', (event) => {
-    event.preventDefault();
-    control.setPointerCapture(event.pointerId);
-    control.classList.add('is-held');
-    world?.press(key, true);
-    if (driving && key === 'left') world.chooseRoute('rough');
-    if (driving && key === 'right') world.chooseRoute('smooth');
+const joystick = $('joystick');
+let stickPointer;
+function moveJoystick(event) {
+  const bounds = joystick.getBoundingClientRect();
+  const radius = bounds.width * 0.36;
+  const x = (event.clientX - bounds.left - bounds.width / 2) / radius;
+  const y = (event.clientY - bounds.top - bounds.height / 2) / radius;
+  const magnitude = Math.hypot(x, y);
+  const scale = magnitude > 1 ? 1 / magnitude : 1;
+  const sx = x * scale;
+  const sy = y * scale;
+  joystick.style.setProperty('--stick-x', sx * radius + 'px');
+  joystick.style.setProperty('--stick-y', sy * radius + 'px');
+  world?.setStick(magnitude < 0.18 ? 0 : sx, magnitude < 0.18 ? 0 : sy);
+  if (driving && Math.abs(sx) > 0.65 && Math.abs(sy) < 0.5) {
+    world.chooseRoute(sx < 0 ? 'rough' : 'smooth');
+  }
+}
+joystick.addEventListener('pointerdown', (event) => {
+  if (stickPointer !== undefined) return;
+  event.preventDefault();
+  stickPointer = event.pointerId;
+  joystick.setPointerCapture(event.pointerId);
+  moveJoystick(event);
+});
+joystick.addEventListener('pointermove', (event) => {
+  if (event.pointerId === stickPointer) moveJoystick(event);
+});
+for (const eventName of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  joystick.addEventListener(eventName, (event) => {
+    if (event.pointerId !== stickPointer) return;
+    stickPointer = undefined;
+    joystick.style.removeProperty('--stick-x');
+    joystick.style.removeProperty('--stick-y');
+    world?.setStick(0, 0);
   });
-  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
-    control.addEventListener(type, () => {
-      control.classList.remove('is-held');
-      world?.press(key, false);
-    });
 }
 $('left-route').onclick = () => world.chooseRoute('rough');
 $('right-route').onclick = () => world.chooseRoute('smooth');
