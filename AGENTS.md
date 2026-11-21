@@ -54,7 +54,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Developer mode
 
-- Put Settings and Developer mode in the top-right game toolbar. Reuse the greenhouse [settings menu](shared/settings.js), [Developer mode panel](shared/developer-mode.js), and [menu styling](shared/game-menus.css). Connect settings to the lesson’s music, effects, and home actions.
+- Put Settings and Developer mode in the top-right game toolbar. Reuse the greenhouse [settings menu](shared/settings.js), [Developer mode panel](shared/developer-mode.js), and [menu styling](shared/game-menus.css). Use the shared labeled switches for music and effects, and the separate return-home action during gameplay. Connect these controls to the lesson’s existing preferences and save flow.
 - Require the password `greenhouse` and keep Developer mode locked by default on every page load.
 - Reuse the Developer mode panel and connect its controls to each lesson's progression.
 - Let developers skip the current task and turn on automatic skipping of mission dictation.

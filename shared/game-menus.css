@@ -66,14 +66,171 @@
   justify-content: space-between;
 }
 
-.game-settings {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem 0.8rem;
-  margin-top: 1rem;
+dialog.game-panel:has(.game-settings) {
+  --settings-surface: var(--panel, var(--deep));
+  width: min(26rem, calc(100% - 1.75rem));
+  padding: clamp(1rem, 4vw, 1.4rem);
+  border: 1px solid color-mix(in srgb, var(--jade) 35%, var(--settings-surface));
+  border-radius: 1.25rem;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--settings-surface), var(--jade) 9%),
+    var(--settings-surface) 56%,
+    var(--night)
+  );
+  box-shadow: 0 18px 64px #0008, inset 0 1px 0 #fffcaa13;
 }
-.game-settings button,
+dialog.game-panel:has(.game-settings) :is(.panel-top, header) {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+dialog.game-panel:has(.game-settings) h2 {
+  color: var(--cream);
+  margin: 0;
+  font-family: inherit;
+  font-weight: 750;
+  font-size: clamp(1.55rem, 6vw, 1.95rem);
+  line-height: 1.2;
+}
+dialog.game-panel:has(.game-settings) h2:focus {
+  outline: none;
+}
+dialog.game-panel:has(.game-settings) :is(.panel-top, header) button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--settings-surface), var(--jade) 6%);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  line-height: 1;
+  font-size: 1.3rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.game-settings {
+  display: grid;
+  gap: .85rem;
+}
+.settings-sound {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--settings-surface), var(--night) 45%);
+  border: 1px solid var(--line);
+  border-radius: .85rem;
+}
+.game-settings :is(.settings-toggle, .settings-home) {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  min-height: 3.4rem;
+  gap: clamp(.4rem, 2vw, .68rem);
+  padding: .5rem .62rem;
+  color: var(--cream);
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.game-settings button.settings-toggle {
+  grid-template-columns: auto 1fr auto auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.settings-toggle + button.settings-toggle {
+  border-top: 1px solid var(--line);
+}
+.game-settings button.settings-home {
+  grid-template-columns: auto 1fr auto;
+  border: 1px solid var(--line);
+  border-radius: .8rem;
+  background: color-mix(in srgb, var(--settings-surface), var(--jade) 5%);
+}
+.game-settings :is(.settings-toggle, .settings-home):active,
+dialog.game-panel:has(.game-settings) :is(.panel-top, header) button:active {
+  background: color-mix(in srgb, var(--settings-surface), var(--jade) 12%);
+}
+@media (hover: hover) {
+  .game-settings :is(.settings-toggle, .settings-home):hover,
+  dialog.game-panel:has(.game-settings) :is(.panel-top, header) button:hover {
+    background: color-mix(in srgb, var(--settings-surface), var(--jade) 12%);
+  }
+}
+.game-settings .settings-toggle:focus-visible {
+  outline: 2px solid var(--sun);
+  outline-offset: -3px;
+}
+.settings-icon,
+.settings-arrow {
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.settings-icon {
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: .45rem;
+  color: var(--jade);
+  background: color-mix(in srgb, var(--settings-surface), var(--jade) 11%);
+  border-radius: .6rem;
+}
+.settings-arrow {
+  width: 1rem;
+  height: 1rem;
+  margin-inline: .22rem;
+  color: var(--muted);
+}
+.settings-state {
+  color: var(--muted);
+  white-space: nowrap;
+  font-size: .76rem;
+  font-weight: 600;
+}
+.settings-track {
+  position: relative;
+  width: 2.75rem;
+  height: 1.55rem;
+  border-radius: 2rem;
+  border: 1px solid color-mix(in srgb, var(--muted) 50%, var(--night));
+  background: var(--night);
+  transition: background-color 160ms, border-color 160ms;
+}
+.settings-track::after {
+  position: absolute;
+  content: '';
+  width: 1.05rem;
+  height: 1.05rem;
+  top: .19rem;
+  left: .19rem;
+  border-radius: 50%;
+  background: var(--cream);
+  transition: transform 160ms, background-color 160ms;
+}
+.settings-toggle[aria-checked='true'] .settings-state {
+  color: var(--jade);
+}
+.settings-toggle[aria-checked='true'] .settings-track {
+  background: var(--jade);
+  border-color: var(--jade);
+}
+.settings-toggle[aria-checked='true'] .settings-track::after {
+  transform: translateX(1.18rem);
+  background: var(--night);
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-track,
+  .settings-track::after {
+    transition: none;
+  }
+}
+
 .developer-actions .text-button {
   border: 0;
   background: transparent;
@@ -82,7 +239,6 @@
   text-decoration: underline;
   text-underline-offset: 0.22em;
 }
-.game-settings button:hover,
 .developer-actions .text-button:hover {
   color: var(--sun);
 }
