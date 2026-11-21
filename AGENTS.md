@@ -48,7 +48,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Start the final test when the player dismisses the closing story beat.
 - Build final and practice tests from the lesson's sentence bank, with one Chinese fill-in-the-blank Hanzi Writer question for every vocabulary entry.
 - Offer **看字** (Show word) as explicit help and retry each revealed word at the end in a different sentence until the player writes it unaided.
-- Keep unaided test attempts free of automatic stroke hints, and save test progress so the player can resume.
+- Keep unaided test attempts free of automatic stroke hints, and save test progress so the player can resume. When the title screen offers both quiz resume and replay, ask for confirmation before replay discards an unfinished run and starts from the prelude.
 - Celebrate a passed final test and return the player to the home screen, where they can take a practice test, replay the mission, and open the completed notebook.
 - Preserve lesson completion and practice access when the player replays the mission.
 

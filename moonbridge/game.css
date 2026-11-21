@@ -486,6 +486,15 @@ dialog header button {
   min-width: 43px;
   padding: 1px 8px;
 }
+dialog:has(.restart-confirmation) {
+  width: min(26rem, calc(100% - 2rem));
+}
+.restart-confirmation p {
+  color: var(--muted);
+}
+.restart-confirmation .buttons {
+  justify-content: flex-end;
+}
 .dialog-copy,
 .helper-message {
   padding: 10px 12px;

@@ -201,6 +201,9 @@ function setView(next) {
 function matchesTest(test) {
   return Array.isArray(test?.queue) && test.queue.length > 0;
 }
+function canReplay() {
+  return save.storyFinished && save.stage === tasks.length;
+}
 function home() {
   disposeTest();
   disposeTest = () => {};
@@ -208,7 +211,7 @@ function home() {
   closePanel();
   setView('home');
   $('start').textContent =
-    save.storyFinished && save.stage === tasks.length
+    canReplay()
       ? '重玩任务'
       : save.stage
         ? '继续冒险'
@@ -219,7 +222,7 @@ function home() {
   $('practice').textContent = matchesTest(save.practice)
     ? '继续词语练习'
     : '词语练习';
-  $('bank').hidden = !save.storyFinished;
+  $('bank').hidden = !save.storyFinished && !save.passed;
   $('start').focus();
 }
 function showComic(content, title, onFinish) {
@@ -431,21 +434,39 @@ function startWorld() {
   update();
   audio.prepareGameplay();
 }
+function restartMission() {
+  closePanel();
+  Object.assign(save, structuredClone(initial), {
+    passed: save.passed,
+    discoveries: save.passed ? save.discoveries : [],
+    practice: save.practice,
+    music: save.music,
+    effects: save.effects,
+  });
+  persist();
+  showComic(opening, '序幕', startWorld);
+}
+function confirmRestart() {
+  showPanel(null, '要重玩任务吗？');
+  const confirmation = make('div', '', 'restart-confirmation');
+  const message = make('p', '这次的任务和课末测试进度将清除。你将从序幕重新开始。');
+  message.id = 'restart-message';
+  const cancel = button('保留进度', closePanel);
+  confirmation.append(
+    message,
+    group(cancel, button('确认重玩', restartMission, 'gold')),
+  );
+  body.append(confirmation);
+  dialog.setAttribute('aria-describedby', message.id);
+  dialog.addEventListener('close', () => dialog.removeAttribute('aria-describedby'), { once: true });
+  cancel.focus();
+}
 function start() {
   audio.start();
   $('boot-status').textContent = '';
-  if (save.storyFinished && !save.passed) {
-    openTest('final');
-    return;
-  }
-  if (save.storyFinished && save.stage === tasks.length) {
-    save.stage = 0;
-    save.part = null;
-    save.won = false;
-    save.fieldDone = [];
-    save.fieldProgress = null;
-    persist();
-    showComic(opening, '序幕', startWorld);
+  if (canReplay()) {
+    if (save.passed) restartMission();
+    else confirmRestart();
   } else if (save.stage > 0 && save.stage < tasks.length) {
     startWorld();
   } else showComic(opening, '序幕', startWorld);
