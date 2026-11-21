@@ -12,3 +12,5 @@ ImageGen artwork for this lesson uses the approved Moonbridge comic as its visua
 Texture sheets and radio views are cropped and exported as WebP for use in the game. The 3D meshes define the shape and placement of the painted surfaces.
 
 The fieldwork close-ups `lookout.webp`, `archive.webp`, `workshop.webp`, and `dispatch.webp` came from a new ImageGen sheet using the third prelude panel as reference. Each quadrant was cropped and exported at 540 × 540 pixels. The archive and dispatch illustrations also appear on their in-world signs.
+
+The prop close-ups use ImageGen. `radio-closeup.webp` is a transparent front view based on the in-game radio artwork. `test-lever.webp` is a transparent close-up of the station’s red-handled control. The four paper surfaces (`note-paper.webp`, `archive-paper.webp`, `repair-paper.webp`, and `ledger-paper.webp`) were cropped from a generated atlas. The game renders the Chinese text as HTML over the paper so it can wrap, scale and be read aloud.

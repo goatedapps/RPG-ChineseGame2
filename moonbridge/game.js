@@ -5,9 +5,9 @@ import {
   parts,
   tasks,
   objects,
-} from './story.js?v=storm-briefing';
+} from './story.js?v=physical-clues';
 import { words, bank } from './curriculum.js';
-import { fieldwork } from './fieldwork.js?v=storm-briefing';
+import { fieldwork } from './fieldwork.js?v=physical-clues';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { speakerButton } from '../shared/speaker.js';
 import { testPart } from './race.js';
@@ -250,7 +250,8 @@ function showComic(content, title, onFinish) {
   });
 }
 
-function showPanel(backdrop, title, language = 'zh-Hans') {
+function showPanel(appearance, title, language = 'zh-Hans') {
+  dialog.dataset.appearance = appearance ?? 'panel';
   dialog.lang = language;
   $('dialog-close').setAttribute('aria-label', language === 'en' ? 'Close' : '关闭');
   disposeWriting();
@@ -557,14 +558,24 @@ function openRadio() {
   const task = objective();
   const guide = task?.guide;
   if (!guide) return;
-  showPanel(null, 'Mei’s Walkie-Talkie', 'en');
+  showPanel('radio', 'Mei’s Walkie-Talkie', 'en');
+  const scene = make('div', '', 'radio-closeup');
+  const device = fieldImage('radio-closeup', 'radio-closeup-device');
+  device.alt = 'Mei’s walkie-talkie';
+  const transmission = make('div', '', 'radio-transmission');
+  const wave = make('span', '', 'radio-airwaves');
+  wave.setAttribute('aria-hidden', 'true');
+  wave.append(make('i'), make('i'), make('i'));
+  scene.append(device, transmission);
+  transmission.append(wave);
+  body.append(scene);
   if (stage === 3) {
     const acknowledge = button('Got it', () => {
       go(4);
       closePanel();
     }, 'gold');
     acknowledge.disabled = true;
-    body.append(
+    transmission.append(
       radioMessage(guide, 'guide', () => { acknowledge.disabled = false; }),
       group(acknowledge),
     );
@@ -572,7 +583,7 @@ function openRadio() {
     return;
   }
   const message = radioMessage(guide, 'guide');
-  body.append(message);
+  transmission.append(message);
   syncRadio();
   const places = {
     spark:
@@ -596,7 +607,8 @@ function openRadio() {
       closePanel();
     }
   });
-  body.append(group(help));
+  const acknowledge = button('Got it', closePanel);
+  transmission.append(group(acknowledge, help));
   if (hintCount > 0) {
     message.after(radioMessage(hint, 'hint'));
     help.textContent = 'Show location';
@@ -605,11 +617,11 @@ function openRadio() {
 $('radio').onclick = openRadio;
 
 function handbook() {
-  showPanel(null, '司机手册');
+  showPanel('artifact', '司机手册');
   play('paper');
   let page = 1;
-  const title = make('p', '', 'dialog-copy');
-  const description = make('p', '', 'note');
+  const title = make('p', '', 'artifact-heading');
+  const description = make('p', '', 'artifact-ink');
   const previous = button('上一页', () => {
     page--;
     render();
@@ -646,8 +658,7 @@ function handbook() {
     see.disabled = page !== 3;
   }
   body.append(
-    title,
-    description,
+    artifactPage('ledger-paper', title, description),
     group(
       previous,
       next,
@@ -661,7 +672,7 @@ function handbook() {
   speaker('把手册翻到第三页，读一读。');
 }
 function choosePart() {
-  showPanel(null, '挑选车扣');
+  showPanel('equipment', '挑选车扣');
   body.append(fieldImage('workshop'), make('p', '想走哪条路？看看两个车扣有什么不同。'));
   for (const [id, part] of Object.entries(parts)) {
     const item = make('div', '', 'part');
@@ -706,7 +717,8 @@ function runVisual(ok) {
 }
 function firstRun() {
   if (testing) return;
-  showPanel(null, '第一次试跑');
+  showPanel('equipment', '第一次试跑');
+  body.append(fieldImage('test-lever'));
   runVisual(false);
   play('wrong');
   body.append(make('p', '灯车一颠，火种就弹出了架子。', 'dialog-copy'));
@@ -729,7 +741,8 @@ function practiceRun() {
     openFieldwork();
     return;
   }
-  showPanel(null, '试跑台');
+  showPanel('equipment', '试跑台');
+  body.append(fieldImage('test-lever'));
   const part = parts[save.part];
   const note = make(
     'p',
@@ -776,11 +789,33 @@ function pronounce(label, text, status) {
   return speakerButton(() => speaker(text, status), label);
 }
 
-function fieldImage(name) {
-  const image = make('img', '', 'field-image');
+function fieldImage(name, className = 'field-image') {
+  const image = make('img', '', className);
   image.src = new URL('./art/' + name + '.webp', import.meta.url).href;
   image.alt = '';
   return image;
+}
+
+function artifactPage(paper, ...content) {
+  const page = make('article', '', 'artifact-page');
+  page.style.setProperty('--artifact', 'url("' + new URL('./art/' + paper + '.webp', import.meta.url).href + '")');
+  page.append(...content);
+  return page;
+}
+
+function fieldArtifact(field) {
+  const vocabulary = [...field.words].sort((a, b) => b.length - a.length);
+  const terms = new RegExp('(' + vocabulary.join('|') + ')', 'g');
+  const heading = make('p', field.heading, 'artifact-heading');
+  const lines = field.clue.split('\n\n').map((paragraph) => {
+    const line = make('p', '', 'artifact-ink');
+    paragraph.split(terms).forEach((part, index) => {
+      line.append(index % 2 ? make('mark', part) : document.createTextNode(part));
+    });
+    return line;
+  });
+  if (field.signature) lines.push(make('p', field.signature, 'artifact-signature'));
+  return artifactPage(field.paper, heading, ...lines);
 }
 
 function openFieldwork() {
@@ -790,28 +825,22 @@ function openFieldwork() {
     fieldCheck(field);
     return;
   }
-  showPanel(null, field.title);
+  showPanel('artifact', field.title);
   play('paper');
-  if (field.image) body.append(fieldImage(field.image));
   addWords(field.words);
   persist();
   const pronunciation = make('p', '', 'note');
-  const vocab = make('dl', '', 'field-words');
-  for (const term of words.filter(({ word }) => field.words.includes(word))) {
-    const label = make('dt', term.word);
-    label.append(pronounce('听' + term.word + '的发音', term.word, pronunciation));
-    vocab.append(label, make('dd', term.meaning));
-  }
   body.append(
-    make('p', field.clue, 'dialog-copy'),
-    pronounce('朗读线索', field.clue, pronunciation),
-    vocab,
+    fieldArtifact(field),
+    group(
+      pronounce('朗读线索', field.clue, pronunciation),
+      button('检查理解', () => {
+        save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
+        persist();
+        fieldCheck(field);
+      }, 'gold'),
+    ),
     pronunciation,
-    group(button('检查理解', () => {
-      save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
-      persist();
-      fieldCheck(field);
-    }, 'gold')),
   );
 }
 
@@ -823,7 +852,7 @@ function fieldCheck(field) {
     return;
   }
   showPanel(null, '理解检查');
-  const clue = make('p', field.clue, 'field-clue');
+  const clue = fieldArtifact(field);
   clue.hidden = true;
   const reviewClue = button('回看线索', () => {
     clue.hidden = !clue.hidden;
@@ -872,16 +901,17 @@ function fieldDictation(field) {
     return;
   }
   const term = words.find(({ word }) => word === target);
+  const sentence = field.clue.match(/[^。！？]+[。！？]?/g)
+    ?.find((line) => line.includes(target))?.trim();
   showDictation(term, '听写 · ' + (progress.writing + 1) + ' / ' + field.writing.length, () => {
     progress.writing++;
     persist();
     fieldDictation(field);
-  });
+  }, undefined, sentence);
 }
 
-function showDictation(term, title, onComplete, onBack) {
+function showDictation(term, title, onComplete, onBack, text = term.sentences[0]) {
   showPanel(null, title);
-  const text = term.sentences[0];
   const sentence = make('p', text.replaceAll(term.word, '＿'.repeat([...term.word].length)), 'sentence');
   const status = make('p', '', 'note');
   const writing = make('div', '', 'field-writing');

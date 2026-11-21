@@ -23,18 +23,18 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues. Spread story beats and fieldwork across distinct walkable locations with visible landmarks.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone. For radios and phones, briefly shake the device when a new message arrives and show an unread indicator until the message is opened.
-- Give the story briefing before showing the related task. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
+- Give the story briefing before showing the related task. Write the helper’s messages as a conversation that reacts to what just happened and explains why the next action matters. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
 - When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
-- Show item close-ups directly, with the relevant page, note, or object and only the words the player needs.
+- Show close-ups as full images of the actual objects with ImageGen artwork. Put readable clues and relevant controls on or near the object itself. Use live text over generated paper for handwritten notes and pages. Keep the close-up free of generic dialog cards.
 - Let players tap or click outside a close-up to dismiss it, and show any image a question refers to.
 
 ## Curriculum and language
 
-- Use the lesson's Tingxie wordlist in `content/<level>/tingxie/` as the required curriculum and give students practice reading, understanding, and writing every entry.
+- Use the lesson's Tingxie wordlist in `content/<level>/tingxie/` as the required curriculum and teach every entry through clues and actions in context. Follow P6 Lesson 1’s pattern of object clues, usage checks with feedback, and handwriting. Keep standalone word lists in the notebook. Give every Tingxie entry at least one mission dictation before the separate final assessment.
 - Use the supplied stories as optional references.
 - Include practice from the supplied question bank, with lesson-tagged questions used in their matching lesson and untagged questions eligible anywhere in that primary level.
 - **Across all levels and every lesson, only the dedicated helper who tells the storyline uses English. Everything else in the game is in Chinese.** Use Simplified Chinese for player-facing text and Mandarin for spoken content. Use English for the helper’s storyline narration, next-action guidance, contextual hints, and walkie-talkie interface.
-- Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Use Chinese for helper controls outside the walkie-talkie. Use English for every walkie-talkie label, control, and status message. Keep Mandarin task instructions and audio controls in the task interface.
+- Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Use Chinese for helper controls outside the walkie-talkie. Use English for every walkie-talkie label, control, and status message. Open the walkie-talkie as an illustrated close-up and have its dialogue appear from the speaker. Keep Mandarin task instructions and audio controls in the task interface.
 - Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
 - Use the [shared vocabulary rows](shared/vocabulary.js) and [layout](shared/vocabulary.css). Show discovery progress and reveal each word with its Chinese meaning, Hanyu Pinyin, pronunciation control, sentence-bank example, and writing review.

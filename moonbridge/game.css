@@ -789,31 +789,6 @@ dialog:has(.restart-confirmation) {
   border-radius: .6rem;
   border: 1px solid var(--line);
 }
-.field-words {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: .35rem .8rem;
-  margin: .65rem 0;
-}
-.field-words dt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .4rem;
-  font-weight: 700;
-}
-.field-words dt button {
-  padding: .15rem .5rem;
-}
-.field-words dd {
-  margin: 0;
-  color: var(--muted);
-}
-.field-clue {
-  padding: .5rem;
-  color: var(--muted);
-}
 .options .wrong {
   border-color: #f296a0;
 }
@@ -821,4 +796,156 @@ dialog:has(.restart-confirmation) {
   color: var(--jade);
   border-color: var(--jade);
   opacity: 1;
+}
+
+#dialog:is([data-appearance='artifact'], [data-appearance='equipment'], [data-appearance='radio']) {
+  width: min(38rem, calc(100% - 1rem));
+  max-height: min(92dvh, 54rem);
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#dialog:is([data-appearance='artifact'], [data-appearance='equipment'], [data-appearance='radio'])::backdrop {
+  background: radial-gradient(ellipse at center, #0a1020cd, #050914eb);
+}
+#dialog:is([data-appearance='artifact'], [data-appearance='equipment'], [data-appearance='radio']) header button {
+  margin-left: auto;
+  border-radius: 50%;
+  background: #172038dd;
+}
+#dialog[data-appearance='equipment'] .field-image {
+  max-height: min(30dvh, 15rem);
+  object-fit: contain;
+  border: 0;
+}
+#dialog[data-appearance='artifact'] header h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+#dialog[data-appearance='radio'] header h2:focus,
+#dialog[data-appearance='artifact'] header h2:focus {
+  outline: none;
+}
+.artifact-page {
+  padding: clamp(22px, 7.3%, 48px);
+  color: #302218;
+  background: var(--artifact) center / 100% 100% no-repeat #eddfbf;
+  filter: drop-shadow(0 12px 15px #08071483);
+}
+.artifact-heading {
+  margin-bottom: .6rem;
+  font-family: 'Kaiti SC', KaiTi, 'Songti SC', 'Noto Serif CJK SC', serif;
+  font-size: clamp(1.45rem, 5.7vw, 2.05rem);
+  font-weight: 700;
+}
+.artifact-ink {
+  max-width: 34em;
+  font-family: 'Kaiti SC', KaiTi, 'Songti SC', 'Noto Serif CJK SC', serif;
+  font-size: clamp(1rem, 3.9vw, 1.2rem);
+  line-height: 1.72;
+}
+.artifact-ink + .artifact-ink {
+  margin-top: .48em;
+}
+.artifact-ink mark {
+  color: inherit;
+  background: transparent;
+  white-space: nowrap;
+  text-decoration: underline #9353369c;
+  text-underline-offset: .22em;
+}
+.artifact-signature {
+  margin-top: .6rem;
+  text-align: right;
+  font-family: 'Kaiti SC', KaiTi, 'Songti SC', serif;
+}
+.radio-closeup {
+  display: grid;
+  grid-template-columns: minmax(125px, 33%) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 2rem;
+}
+.radio-closeup-device {
+  display: block;
+  width: 100%;
+  height: min(38dvh, 18rem);
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 12px 14px #080716a8);
+}
+.radio-transmission {
+  position: relative;
+  padding-top: .4rem;
+}
+.radio-transmission .helper-message {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #fff1d6;
+  white-space: pre-line;
+  text-shadow: 0 1px 8px #090617;
+}
+.radio-transmission .helper-message + .helper-message {
+  margin-top: .65rem;
+  color: #ffd58c;
+}
+.radio-transmission .helper-typing {
+  inset: 0;
+}
+.radio-airwaves {
+  position: absolute;
+  top: min(23dvh, 10rem);
+  right: calc(100% + .2rem);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #ffd280;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.radio-airwaves i {
+  width: 7px;
+  height: 16px;
+  border-radius: 0 100% 100% 0;
+  border-right: 2px solid currentColor;
+  opacity: .62;
+}
+.radio-airwaves i:nth-child(2) { height: 23px; }
+.radio-airwaves i:nth-child(3) { height: 30px; }
+@keyframes radio-airwave {
+  from { opacity: .42; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .radio-transmission:has(.helper-typing) .radio-airwaves i {
+    animation: radio-airwave .39s alternate infinite;
+  }
+  .radio-transmission:has(.helper-typing) .radio-airwaves i:nth-child(2) { animation-delay: .1s; }
+  .radio-transmission:has(.helper-typing) .radio-airwaves i:nth-child(3) { animation-delay: .2s; }
+}
+@media (max-width: 520px) {
+  .radio-closeup {
+    grid-template-columns: 1fr;
+    gap: .5rem;
+  }
+  .radio-closeup-device {
+    height: min(30dvh, 14rem);
+  }
+  .radio-transmission {
+    padding-top: 1.1rem;
+  }
+  .radio-airwaves {
+    top: -.28rem;
+    right: 50%;
+    transform: translate(50%, -50%) rotate(90deg);
+  }
+}
+.radio-transmission .helper-transcript {
+  text-shadow: none;
 }

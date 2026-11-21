@@ -24,7 +24,7 @@ export const parts = {
 };
 
 export const lookoutBriefing =
-  'It’s Mei, the keeper across the bridge. The storm knocked out both bridge lamps. The night freight carts won’t see the crossing in the dark. Can you help me relight it? Cross the right-hand footbridge to the lookout. My father’s record is beside the telescope. It explains what the last keeper did.';
+  'Hello? Can you hear me? It’s Mei. I’m across the bridge. The storm knocked out both bridge lamps. There’s a freight cart due tonight, and its driver won’t see the crossing in the dark. Can you help me get the lights back on?\n\nMy father left a note beside the telescope. He dealt with this before. Take the footbridge on your right and see what he wrote.';
 
 export const tasks = [
   { title: '走到工作台前', cue: '按方向键或拖动摇杆，向前走几步。' },
@@ -41,63 +41,63 @@ export const tasks = [
     cue: '回发车站，拿起对讲机桌上的备用火种。',
     item: 'spark',
     guide:
-      'That glowing canister beside the radio sends a new flame across. Bring it to the cart so we can get it over the bridge without it going out.',
+      'So Dad kept a spare! That explains the glowing canister back on the table. Bring it to the cream cart. It’s the only spark we have, so we’ll make sure it won’t bounce out.',
   },
   {
     title: '把火种装上灯车',
     cue: '走近米黄色的灯车，把火种放进车尾的架子。',
     item: 'cart',
     guide:
-      'The cream cart is yours. Put the spark in its rear holder, then we can try a practice run.',
+      'See the bracket at the back of the cream cart? That’s where the canister goes. Set it in there, then we’ll give the cart a short run here at the station.',
   },
   {
     title: '拉下试跑杆',
     cue: '到左边的试跑台拉下红色手柄。',
     item: 'lever',
     guide:
-      'Pull the red lever across from the cart. We’ll see if the holder can take a bumpy run.',
+      'Ready? Pull the red lever across from the cart. The test track has a bump just like the bridge. Watch what the canister does when the cart hits it.',
   },
   {
     title: '查找手册里的图',
     cue: '把手册翻到第三页，读一读。',
     item: 'handbook',
     guide:
-      'The record says page three. Check the handbook on the workshop table. The drawing shows where to fit a clasp so the spark stays put.',
+      'You found a page number? Three, right. Open the handbook on the workshop table. I think that’s where they drew the clasp that keeps the canister in.',
   },
   {
     title: '选一个车扣',
     cue: '到西侧修理坊的零件架，挑一个适合你路线的车扣。',
     item: 'shelf',
     guide:
-      'The stabilizer is made for the bumpy shortcut. The runner rolls faster on the smooth bend. Take whichever suits the route you want.',
+      'Which way are you thinking of going? The shortcut is rough, so take the stabilizer if you want to use it. The runner is quicker on the smooth bend. Either route gets you here.',
   },
   {
     title: '装好车扣',
     cue: '回到灯车旁，把车扣装在火种架上。',
     item: 'cart',
     guide:
-      'Bring the fitting back to your cart and attach it to the spark holder.',
+      'Found a clasp? Great. Bring it back to the cream cart and fit it around the canister. Give it a tug once it’s on.',
   },
   {
     title: '再练习一次',
     cue: '回到试跑台。先练习，再出发。',
     item: 'lever',
     guide:
-      'Let’s try again. The stabilizer can handle a hard run. With the runner, ease the speed up and keep it steady.',
+      'Before you leave, let’s see if the clasp holds. The stabilizer can handle a hard run. If you fitted the runner, bring the speed up slowly and keep it steady.',
   },
   {
     title: '上车参加竞速',
     cue: '回到灯车旁。上桥后选近路或平路，把火种送到对岸。',
     item: 'cart',
     guide:
-      'The spark held! The routes fork past the first ridge. Choose the one that fits your cart. Whatever happens in the race, keep going to the far landing.',
+      'All right, you’re ready. The track splits just past the first ridge. Take the route that suits your clasp. I’ll be waiting at the far landing, right under the tall lamp.',
   },
   {
     title: '把火种交给小梅',
     cue: '走到对岸车站的高灯旁，把火种放进去。',
     item: 'beacon',
     guide:
-      'You made it! I’m beside the tall lantern. Bring the spark here and I’ll light this end of the bridge.',
+      'I’ve got the lamp open. Bring the canister over when you’re ready. Once it’s in place, we can light both ends from here.',
   },
 ];
 
