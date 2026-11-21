@@ -201,6 +201,10 @@ p {
 .map-screen canvas {
   display: block;
   touch-action: none;
+  cursor: grab;
+}
+.map-screen canvas:active {
+  cursor: grabbing;
 }
 .map-screen canvas:focus:not(:focus-visible) {
   outline: none;

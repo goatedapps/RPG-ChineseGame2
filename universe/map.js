@@ -237,6 +237,8 @@ export function createUniverse(
   let travelPosition;
   let leaving = false;
   let frameZoom = 1;
+  let heading = 0;
+  let tilt = 0;
 
   function resize() {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -254,21 +256,50 @@ export function createUniverse(
     const item = entries.get(number);
     if (!item) return;
     target = number;
-    travelPosition = item.root.position.clone().add(V(0, 0, 2.18));
+    travelPosition = item.root.position
+      .clone()
+      .add(V(0, 0, 2.18).applyAxisAngle(UP, heading));
     if (reduce.matches) player.position.copy(travelPosition);
   }
 
   function pointerDown(event) {
-    if (event.button !== 0) return;
-    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    if (leaving || pointer || event.button !== 0) return;
+    pointer = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: event.clientX,
+      y: event.clientY,
+      dragged: false,
+    };
+    canvas.setPointerCapture(event.pointerId);
+  }
+  function pointerMove(event) {
+    if (leaving || pointer?.id !== event.pointerId) return;
+    const { clientX: x, clientY: y } = event;
+    if (!pointer.dragged) {
+      if (Math.hypot(x - pointer.startX, y - pointer.startY) < 8) return;
+      pointer.dragged = true;
+    }
+    heading -= (x - pointer.x) * 0.006;
+    tilt = clamp(tilt + (y - pointer.y) * 0.005, -0.42, 0.47);
+    pointer.x = x;
+    pointer.y = y;
+  }
+  function cancelPointer(event) {
+    if (pointer?.id === event.pointerId) pointer = null;
   }
   function pointerUp(event) {
     if (pointer?.id !== event.pointerId) return;
-    const box = canvas.getBoundingClientRect();
     const isTap =
-      Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) < 12;
+      !pointer.dragged &&
+      Math.hypot(
+        event.clientX - pointer.startX,
+        event.clientY - pointer.startY,
+      ) < 8;
     pointer = null;
-    if (!isTap) return;
+    if (!isTap || leaving) return;
+    const box = canvas.getBoundingClientRect();
     cursor.set(
       ((event.clientX - box.left) * 2) / box.width - 1,
       1 - ((event.clientY - box.top) * 2) / box.height,
@@ -278,8 +309,16 @@ export function createUniverse(
       ray.intersectObjects(portals)[0]?.object.userData.worldNumber;
     if (picked) flyTo(picked);
   }
-  canvas.addEventListener('pointerdown', pointerDown);
-  canvas.addEventListener('pointerup', pointerUp);
+  const pointerEvents = {
+    pointerdown: pointerDown,
+    pointermove: pointerMove,
+    pointerup: pointerUp,
+    pointercancel: cancelPointer,
+    lostpointercapture: cancelPointer,
+  };
+  for (const [type, handler] of Object.entries(pointerEvents)) {
+    canvas.addEventListener(type, handler);
+  }
 
   function setKey(event, held) {
     if (!keyNames[event.code]) return;
@@ -330,7 +369,10 @@ export function createUniverse(
       const x = stick.x + Number(keys.has('right')) - Number(keys.has('left'));
       const forward =
         stick.y + Number(keys.has('up')) - Number(keys.has('down'));
-      velocity.set(x, 0, -forward).clampLength(0, 1);
+      velocity
+        .set(x, 0, -forward)
+        .clampLength(0, 1)
+        .applyAxisAngle(UP, heading);
       if (velocity.lengthSq() > 0.01) travelPosition = null;
       if (travelPosition) {
         velocity.copy(travelPosition).sub(player.position);
@@ -351,14 +393,21 @@ export function createUniverse(
     }
     const item = entries.get(leaving ? target : nearby);
     hover.copy(leaving && item ? item.root.position : player.position);
-    hover.z -= leaving ? 0 : 1.65;
+    if (!leaving) {
+      hover.x -= Math.sin(heading) * 1.65;
+      hover.z -= Math.cos(heading) * 1.65;
+    }
     viewFocus.lerp(hover, reduce.matches ? 1 : Math.min(1, dt * 4.5));
     const portrait = camera.aspect < 1;
-    const offset = portrait ? 1.19 : 1;
+    const height = portrait ? 13.65 : 11.75;
+    const depth = portrait ? 13.8 * 1.19 : 13.8;
+    const distance = Math.hypot(height, depth) * frameZoom;
+    const elevation = Math.atan2(height, depth) + tilt;
+    const horizontal = distance * Math.cos(elevation);
     camera.position.set(
-      viewFocus.x,
-      (portrait ? 13.65 : 11.75) * frameZoom,
-      viewFocus.z + 13.8 * frameZoom * offset,
+      viewFocus.x + Math.sin(heading) * horizontal,
+      viewFocus.y + distance * Math.sin(elevation),
+      viewFocus.z + Math.cos(heading) * horizontal,
     );
     camera.up.copy(UP);
     camera.lookAt(viewFocus);
@@ -384,7 +433,9 @@ export function createUniverse(
         .add(V(0, 3.74, 0))
         .project(camera);
       const visible =
-        Math.abs(screenPoint.x) < 0.95 && Math.abs(screenPoint.y) < 0.81;
+        Math.abs(screenPoint.x) < 0.95 &&
+        Math.abs(screenPoint.y) < 0.81 &&
+        Math.abs(screenPoint.z) < 1;
       onMarker(
         visible
           ? {
@@ -424,8 +475,9 @@ export function createUniverse(
     destroy() {
       cancelAnimationFrame(raf);
       observer.disconnect();
-      canvas.removeEventListener('pointerdown', pointerDown);
-      canvas.removeEventListener('pointerup', pointerUp);
+      for (const [type, handler] of Object.entries(pointerEvents)) {
+        canvas.removeEventListener(type, handler);
+      }
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
       window.removeEventListener('blur', stopInput);

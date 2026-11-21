@@ -99,7 +99,7 @@ function selectWorld(world) {
           : ''
     : mapFailed
       ? '这个设备暂时无法显示三维星图。'
-      : '用摇杆或方向键移动，也可以点选星球。';
+      : '拖动画面转向，点选星球可飞近。';
   $('enter').hidden =
     !world?.href || !['open', 'complete'].includes(world.status);
   $('enter').textContent =
