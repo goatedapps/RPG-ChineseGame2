@@ -23,6 +23,9 @@ export const parts = {
   },
 };
 
+export const lookoutBriefing =
+  'It’s Mei, the keeper across the bridge. The storm knocked out both bridge lamps. The night freight carts won’t see the crossing in the dark. Can you help me relight it? Cross the right-hand footbridge to the lookout. My father’s record is beside the telescope. It explains what the last keeper did.';
+
 export const tasks = [
   { title: '走到工作台前', cue: '按方向键或拖动摇杆，向前走几步。' },
   { title: '看看四周', cue: '拖动画面，看看车站和月桥。' },
@@ -31,8 +34,7 @@ export const tasks = [
     title: '听听小梅怎么说',
     cue: '打开对讲机，看看新消息。',
     item: 'radio',
-    guide:
-      'It’s Mei, the keeper across the bridge. I saw you two getting ready to race. Then the storm put out the lamps. The freight carts will be here soon, and they won’t see the way. Can you help me light the bridge before they reach it?',
+    guide: lookoutBriefing,
   },
   {
     title: '拿起火种',

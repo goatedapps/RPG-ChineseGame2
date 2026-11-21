@@ -1,4 +1,5 @@
 import { bank } from './curriculum.js';
+import { lookoutBriefing } from './story.js?v=storm-briefing';
 
 const question = (prompt, choices, correct, feedback) => ({ prompt, choices, correct, feedback });
 
@@ -7,7 +8,7 @@ export const fieldwork = {
     title: '东侧瞭望台',
     item: 'signal',
     cue: '过东侧木桥，到望远镜旁查看守灯人的记录。',
-    guide: 'The storm knocked out both bridge lamps. Without them, the night freight carts can’t see the crossing. Go across the right-hand footbridge to the lookout. My father’s record is beside the telescope. It explains what the last keeper did.',
+    guide: lookoutBriefing,
     hint: 'From the radio table, face the tracks. Take the footbridge on your right, beside the blue lantern, then look for the brass telescope.',
     image: 'lookout',
     clue: '爷爷以前当灯车司机。他希望我将来也能成为一名司机。他教我用科学的方法观察桥灯。风把灯吹灭后，只要把备用火种交给对岸的守灯人，就能重新点灯。',

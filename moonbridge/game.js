@@ -5,9 +5,9 @@ import {
   parts,
   tasks,
   objects,
-} from './story.js';
+} from './story.js?v=storm-briefing';
 import { words, bank } from './curriculum.js';
-import { fieldwork } from './fieldwork.js';
+import { fieldwork } from './fieldwork.js?v=storm-briefing';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { speakerButton } from '../shared/speaker.js';
 import { testPart } from './race.js';
@@ -127,10 +127,10 @@ let moveStart;
 function play(name) {
   audio.cue(name);
 }
-function speaker(text, status, unavailableMessage = '这个设备暂时无法播放普通话。') {
+function speaker(text, status) {
   voice.speak(text, 0.86, (state) => {
     if (state === 'unavailable' && status)
-      status.textContent = unavailableMessage;
+      status.textContent = '这个设备暂时无法播放普通话。';
   });
 }
 function animate(element, y = 6) {
@@ -507,18 +507,25 @@ $('speak').onclick = () => {
 };
 
 function radioMessageKey(kind) {
+  // Keep the initial briefing available once the lookout task begins.
+  if (save.stage === 3 && kind === 'guide') return '4:field:guide';
   const variant = pendingFieldwork()?.cue ? 'field' : 'task';
   return save.stage + ':' + variant + ':' + kind;
 }
 
-function radioMessage(text, kind) {
+function radioMessage(text, kind, onDisplayed) {
   const message = make('p', text, 'helper-message');
   message.lang = 'en';
   const key = radioMessageKey(kind);
-  if (save.seenRadioMessages.includes(key)) return message;
-  save.seenRadioMessages.push(key);
-  persist();
-  if (reducedMotion.matches) return message;
+  const seen = save.seenRadioMessages.includes(key);
+  if (!seen) {
+    save.seenRadioMessages.push(key);
+    persist();
+  }
+  if (seen || reducedMotion.matches) {
+    onDisplayed?.();
+    return message;
+  }
 
   // Reserve the final text layout and expose the complete message to screen readers.
   const full = make('span', text, 'helper-transcript');
@@ -534,6 +541,7 @@ function radioMessage(text, kind) {
     if (count >= characters.length || reducedMotion.matches ||
         !message.isConnected || !dialog.open) {
       message.textContent = text;
+      onDisplayed?.();
       return;
     }
     typed.textContent = characters.slice(0, count).join('');
@@ -550,25 +558,22 @@ function openRadio() {
   const guide = task?.guide;
   if (!guide) return;
   showPanel(null, 'Mei’s Walkie-Talkie', 'en');
-  body.append(radioMessage(guide, 'guide'));
-  syncRadio();
   if (stage === 3) {
+    const acknowledge = button('Got it', () => {
+      go(4);
+      closePanel();
+    }, 'gold');
+    acknowledge.disabled = true;
     body.append(
-      group(
-        button(
-          'Got it',
-          () => {
-            go(4);
-            closePanel();
-          },
-          'gold',
-        ),
-      ),
+      radioMessage(guide, 'guide', () => { acknowledge.disabled = false; }),
+      group(acknowledge),
     );
+    syncRadio();
     return;
   }
-  const status = make('p', '', 'dialog-note');
-  status.setAttribute('role', 'status');
+  const message = radioMessage(guide, 'guide');
+  body.append(message);
+  syncRadio();
   const places = {
     spark:
       'The spark is on the right side of the same table where you found the radio.',
@@ -584,22 +589,16 @@ function openRadio() {
   const help = button('Get a hint', () => {
     hintCount++;
     if (hintCount === 1) {
-      status.before(radioMessage(hint, 'hint'));
+      message.after(radioMessage(hint, 'hint'));
       help.textContent = 'Show location';
     } else {
       world.point(task.item);
       closePanel();
     }
   });
-  body.append(
-    group(
-      button('Replay Mandarin cue', () => speaker(task.cue, status, 'Mandarin audio is unavailable on this device.')),
-      help,
-    ),
-    status,
-  );
+  body.append(group(help));
   if (hintCount > 0) {
-    status.before(radioMessage(hint, 'hint'));
+    message.after(radioMessage(hint, 'hint'));
     help.textContent = 'Show location';
   }
 }

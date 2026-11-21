@@ -23,7 +23,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues. Spread story beats and fieldwork across distinct walkable locations with visible landmarks.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone. For radios and phones, briefly shake the device when a new message arrives and show an unread indicator until the message is opened.
-- Explain why the current task matters, let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
+- Give the story briefing before showing the related task. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
 - When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
 - Show item close-ups directly, with the relevant page, note, or object and only the words the player needs.
 - Let players tap or click outside a close-up to dismiss it, and show any image a question refers to.
@@ -34,7 +34,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use the supplied stories as optional references.
 - Include practice from the supplied question bank, with lesson-tagged questions used in their matching lesson and untagged questions eligible anywhere in that primary level.
 - **Across all levels and every lesson, only the dedicated helper who tells the storyline uses English. Everything else in the game is in Chinese.** Use Simplified Chinese for player-facing text and Mandarin for spoken content. Use English for the helper’s storyline narration, next-action guidance, contextual hints, and walkie-talkie interface.
-- Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Use Chinese for helper controls outside the walkie-talkie. Use English for every walkie-talkie label, control, and status message.
+- Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Use Chinese for helper controls outside the walkie-talkie. Use English for every walkie-talkie label, control, and status message. Keep Mandarin task instructions and audio controls in the task interface.
 - Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
 - Use the [shared vocabulary rows](shared/vocabulary.js) and [layout](shared/vocabulary.css). Show discovery progress and reveal each word with its Chinese meaning, Hanyu Pinyin, pronunciation control, sentence-bank example, and writing review.
