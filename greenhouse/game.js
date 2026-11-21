@@ -6,6 +6,7 @@ import { createGreenhouseAudio } from './sounds.js';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
+import { createDeveloperMode } from './developer-mode.js';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
@@ -115,6 +116,19 @@ const phone = createPhone($('#phone'), {
   onNotify() {
     audio.cue('notification');
     releaseMouse();
+  },
+});
+const developerMode = createDeveloperMode({
+  panel, openPanel,
+  canSkip: canSkipTask,
+  getSkipLabel: () => state.tutorialDone ? '跳过当前任务' : '跳过操作练习',
+  onSkip: skipCurrentTask,
+  onSkipDictation(enabled) {
+    if (enabled && state.phase === 'dictation') {
+      moveToHandover(missions[state.mission]);
+      save();
+      syncPhoneActivity();
+    }
   },
 });
 
@@ -383,7 +397,7 @@ function syncPhoneActivity() {
     return;
   }
   const actions = {
-    question: ['Open field check', 'Record what you discovered, then complete the Chinese listening and writing check.'],
+    question: ['Open field check', 'Record what you discovered.'],
     dictation: ['Continue dictation', 'Pick up where you left off in the field check.'],
     handover: ['Send handover', 'Send Ah Ning a short update and move the fair forward.'],
   };
@@ -859,15 +873,21 @@ function record(word, guided) {
   save();
 }
 
+function moveToHandover(mission) {
+  state.phase = 'handover';
+  state.wordIndex = mission.dictation.length;
+}
+
 function openTask() {
   const mission = missions[state.mission];
   if (!mission) return;
   if (state.phase === 'question') {
     showQuestion(mission.question, mission.titleCN, () => {
-      state.phase = 'dictation';
+      if (developerMode.skipDictation) moveToHandover(mission);
+      else state.phase = 'dictation';
       save();
       syncPhoneActivity();
-      return { label: '开始听写', run: openTask };
+      return { label: state.phase === 'handover' ? '完成交接' : '开始听写', run: openTask };
     }, { cn: mission.actions.at(-1).resultCN, en: mission.actions.at(-1).resultEN });
   } else if (state.phase === 'dictation') {
     const entry = mission.dictation[state.wordIndex];
@@ -1096,15 +1116,8 @@ function showBank(index, total) {
   }));
 }
 
-function showHelp() {
-  openPanel(null, '操作帮助');
-  const help = [
-    '电脑：用 W、A、S、D 或方向键移动。点击场景后，用鼠标转向。也可以按住画面拖动。',
-    '平板：用左下角摇杆行走，用手指拖动画面转向。对准物品后，点按出现的按钮。',
-    '按 E 互动，按 F 打开手机。按 Esc 释放鼠标，按 P 打开词语手册，按 R 重听任务。',
-    '点击 EN 看英文翻译。线索提示会发到手机上。',
-  ];
-  help.forEach((line) => panel.append(node('p', line, 'body')));
+function showSettings() {
+  openPanel(null, '设置');
   const sound = makeButton(effectsEnabled ? '关闭音效' : '开启音效', 'text-button', () => {
     effectsEnabled = !effectsEnabled;
     audio.setEnabled(effectsEnabled);
@@ -1117,7 +1130,37 @@ function showHelp() {
     music.textContent = musicEnabled ? '关闭音乐' : '开启音乐';
   });
   const controls = row(sound, music, makeButton('返回首页', 'text-button', returnHome));
-  addTranslation(controls, 'Desktop: use WASD or arrows to walk and drag to look. Press E to interact, F to open the phone, and Esc to release the mouse. Tablet: move with the joystick, drag to look, and tap the phone or action button. P opens the notebook, R replays the task, and EN shows English.');
+  addTranslation(controls, 'Sound effects · Music · Return to home');
+}
+
+function canSkipTask() {
+  return started && !pickingPhone && state.phase !== 'done';
+}
+
+function skipCurrentTask() {
+  if (!canSkipTask()) return;
+  if (!state.tutorialDone) {
+    tutorialIndex = tutorial.length - 1;
+    state.tutorialDone = true;
+    state.phonePicked = true;
+    save();
+    phone.setVisible(true);
+    afterClose = () => {
+      sendStep(missions[0], 0);
+      objective();
+    };
+    desk.close();
+    return;
+  }
+
+  for (const { target } of missions[state.mission].actions) {
+    if (Object.hasOwn(screenChecks, target) && !state.unlocked.includes(target)) state.unlocked.push(target);
+  }
+  state.notePending = false;
+  announceAfterPhone = false;
+  phone.setChallenge(null);
+  last = null;
+  finishMission();
 }
 
 function replayMission() {
@@ -1141,7 +1184,8 @@ function replayCue() {
 
 $('#replay-cue').addEventListener('click', replayCue);
 $('#book').addEventListener('click', showBook);
-$('#help').addEventListener('click', showHelp);
+$('#settings').addEventListener('click', showSettings);
+$('#developer-mode').addEventListener('click', developerMode.open);
 interact.addEventListener('click', () => engine?.interact());
 window.addEventListener('keydown', (event) => {
   if (!started || desk.open || phone.isOpen || pickingPhone || !$('#comic-overlay').hidden ||
