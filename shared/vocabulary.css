@@ -1,0 +1,20 @@
+.speaker-icon { display: block; width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.speaker-button { display: inline-grid; place-items: center; padding: 0; }
+
+.vocab { list-style: none; margin: 1rem 0 0; padding: 0; }
+.vocab li { display: grid; grid-template-columns: minmax(4.5rem,auto) 1fr auto; gap: .35rem .75rem; align-items: center; padding: .56rem .16rem; border-top: 1px solid var(--line); }
+.vocab strong { font-size: 1.16rem; }
+.vocab .pinyin { display: block; color: var(--sun); font-size: .82rem; font-family: system-ui,sans-serif; }
+.vocab .definition { font-size: .91rem; color: var(--muted); }
+.vocab .word-example { margin-top: .28rem; color: var(--cream); font-size: .92rem; }
+.vocab .row-buttons { display: flex; gap: .32rem; }
+.vocab .icon-button { min-width: 2.35rem; min-height: 2.35rem; }
+.vocab .locked strong { color: var(--muted); font-size: .98rem; }
+.vocab li [data-translation] { grid-column: 1 / -1; }
+.vocab .vocab-note { font-size: .83rem; color: var(--muted); }
+
+@media (max-width: 610px) {
+  .vocab li { grid-template-columns: 1fr auto; }
+  .vocab .word-details { grid-row: 2; }
+  .vocab .row-buttons { grid-row: 1 / 3; grid-column: 2; }
+}

@@ -5,10 +5,11 @@ import {
   parts,
   tasks,
   objects,
-  discoveries,
-  guardWords,
 } from './story.js';
 import { words, bank } from './curriculum.js';
+import { fieldwork } from './fieldwork.js';
+import { vocabularyList } from '../shared/vocabulary.js';
+import { speakerButton } from '../shared/speaker.js';
 import { testPart } from './race.js';
 import { mountWriting, mountTest } from './assess.js';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js';
@@ -34,7 +35,9 @@ const ending = [
   },
 ];
 const initial = {
-  version: 1,
+  version: 2,
+  fieldDone: [],
+  fieldProgress: null,
   stage: 0,
   part: null,
   won: false,
@@ -47,10 +50,14 @@ const initial = {
   effects: true,
 };
 
+function limitProgress(value, max) {
+  return Number.isInteger(value) ? Math.max(0, Math.min(value, max)) : 0;
+}
+
 function readSave() {
   try {
     const value = JSON.parse(localStorage.getItem(saveKey));
-    if (value?.version !== 1) return structuredClone(initial);
+    if (![1, 2].includes(value?.version)) return structuredClone(initial);
     return {
       ...structuredClone(initial),
       stage:
@@ -59,6 +66,14 @@ function readSave() {
         value.stage <= tasks.length
           ? value.stage
           : 0,
+      fieldDone: Object.keys(fieldwork).map(Number).filter((stage) =>
+        stage < value.stage || value.fieldDone?.includes?.(stage) === true),
+      fieldProgress: value.version === 2 && value.fieldProgress?.stage === value.stage &&
+        fieldwork[value.stage] ? {
+          stage: value.stage,
+          question: limitProgress(value.fieldProgress.question, fieldwork[value.stage].questions.length),
+          writing: limitProgress(value.fieldProgress.writing, fieldwork[value.stage].writing.length),
+        } : null,
       part: Object.hasOwn(parts, value.part) ? value.part : null,
       won: value.won === true,
       storyFinished: value.storyFinished === true,
@@ -80,7 +95,10 @@ function readSave() {
   }
 }
 const save = readSave();
-if (save.stage >= 9 && !save.part && save.stage < tasks.length) save.stage = 8;
+if (save.stage >= 9 && save.stage < 12 && !save.part) {
+  save.stage = 8;
+  save.fieldProgress = null;
+}
 function persist() {
   try {
     localStorage.setItem(saveKey, JSON.stringify(save));
@@ -257,8 +275,19 @@ dialog.addEventListener('close', () => {
     lastFocused.focus();
 });
 
-function update() {
+function pendingFieldwork() {
+  return save.fieldDone.includes(save.stage) ? null : fieldwork[save.stage];
+}
+
+function objective() {
   const task = tasks[save.stage];
+  const field = pendingFieldwork();
+  if (!field?.cue) return task;
+  return { title: field.title, cue: field.cue, item: field.item, guide: field.guide, hint: field.hint };
+}
+
+function update() {
+  const task = objective();
   $('objective').textContent = task?.title ?? '月桥重新亮了';
   $('control-hint').textContent = task?.cue ?? '';
   const missionNumber =
@@ -290,7 +319,7 @@ function update() {
     save.stage === 2
       ? ['radio']
       : task?.item && save.stage !== 3
-        ? [task.item, ...(save.stage >= 7 && save.stage <= 11 ? ['board'] : [])]
+        ? [task.item]
         : [],
   );
   world?.setWorldState({
@@ -307,11 +336,11 @@ function update() {
   paintAction();
 }
 function go(stage) {
-  if (discoveries[save.stage]) addWords(discoveries[save.stage]);
   save.stage = stage;
+  save.fieldProgress = null;
   hintCount = 0;
   currentTarget = null;
-  radioUnread = Boolean(tasks[stage]?.guide);
+  radioUnread = Boolean(objective()?.guide);
   if (radioUnread) play('notification');
   persist();
   update();
@@ -395,7 +424,7 @@ function startWorld() {
     return;
   }
   world.reset(save.stage === 12);
-  radioUnread = Boolean(tasks[save.stage]?.guide);
+  radioUnread = Boolean(objective()?.guide);
   driving = false;
   moveStart = null;
   setView('hud');
@@ -413,6 +442,8 @@ function start() {
     save.stage = 0;
     save.part = null;
     save.won = false;
+    save.fieldDone = [];
+    save.fieldProgress = null;
     persist();
     showComic(opening, '序幕', startWorld);
   } else if (save.stage > 0 && save.stage < tasks.length) {
@@ -424,13 +455,14 @@ $('speak').onclick = () => {
   const status = $('voice-status');
   status.textContent = '';
   status.hidden = false;
-  if (tasks[save.stage]?.cue) speaker(tasks[save.stage].cue, status);
+  if (objective()?.cue) speaker(objective().cue, status);
 };
 
 function openRadio() {
   if (save.stage < 3 || driving) return;
   const stage = save.stage;
-  const guide = tasks[stage]?.guide;
+  const task = objective();
+  const guide = task?.guide;
   if (!guide) return;
   radioUnread = false;
   $('unread').hidden = true;
@@ -465,23 +497,23 @@ function openRadio() {
           'The spark is on the right side of the same table where you found the radio.',
         cart: 'Look for the brass bell on the cart in the middle of the station.',
         lever: 'The red handle is on the left-hand workbench.',
-        handbook: 'The paper handbook is on the radio workbench.',
+        handbook: 'The handbook is on the worktable in the west workshop, just beside the archive.',
         shelf:
-          'Follow the right railing towards the bridge. The two fittings are on the shelf.',
+          'The shelf at the back of the west workshop holds the two fittings, one brass and one blue.',
         beacon:
           'Look right from the track. The tall brass lamp has an empty socket.',
       };
-      additional.textContent = places[tasks[stage]?.item] ?? guide;
+      additional.textContent = task.hint ?? places[task.item] ?? guide;
       status.before(additional);
       status.textContent = '需要时可再点一次，显示位置。';
     } else {
-      world.point(tasks[stage]?.item);
+      world.point(task.item);
       closePanel();
     }
   });
   body.append(
     group(
-      button('听华文提示', () => speaker(tasks[stage].cue, status)),
+      button('听华文提示', () => speaker(task.cue, status)),
       help,
     ),
     status,
@@ -547,7 +579,7 @@ function handbook() {
 }
 function choosePart() {
   showPanel(null, '挑选车扣');
-  body.append(make('p', '想走哪条路？看看两个车扣有什么不同。'));
+  body.append(fieldImage('workshop'), make('p', '想走哪条路？看看两个车扣有什么不同。'));
   for (const [id, part] of Object.entries(parts)) {
     const item = make('div', '', 'part');
     item.append(make('i', part.icon), make('p', part.line));
@@ -561,26 +593,6 @@ function choosePart() {
       }),
     );
   }
-}
-function guard() {
-  addWords(guardWords);
-  persist();
-  $('word-count').textContent = save.discoveries.length + ' / ' + words.length;
-  showPanel(null, '守桥人的留言');
-  body.append(
-    make(
-      'p',
-      '我年轻时是一名军人，保卫家乡。现在我守着这座桥，给每一位过桥的人点灯。',
-      'dialog-copy',
-    ),
-    group(
-      button('朗读留言', () =>
-        speaker(
-          '我年轻时是一名军人，保卫家乡。现在我守着这座桥，给过桥的人点灯。',
-        ),
-      ),
-    ),
-  );
 }
 function runVisual(ok) {
   const strip = make('div', '', 'test-strip');
@@ -630,6 +642,10 @@ function firstRun() {
 }
 function practiceRun() {
   if (testing) return;
+  if (save.fieldProgress?.stage === 10) {
+    openFieldwork();
+    return;
+  }
   showPanel(null, '试跑台');
   const part = parts[save.part];
   const note = make(
@@ -663,7 +679,7 @@ function practiceRun() {
         ? '这一次，火种稳稳地留在架子上！'
         : '火种又晃了。把速度调到中间，再试一次。';
       testing = false;
-      if (ok) body.append(group(button('写下试跑记录', writeLog, 'gold')));
+      if (ok) body.append(group(button('查看试跑记录', openFieldwork, 'gold')));
       else {
         launch.disabled = false;
         range.disabled = false;
@@ -673,40 +689,146 @@ function practiceRun() {
   );
   body.append(note, value, range, group(launch));
 }
-function writeLog() {
-  if (devSkipDictation) {
-    go(11);
-    closePanel();
+function pronounce(label, text, status) {
+  return speakerButton(() => speaker(text, status), label);
+}
+
+function fieldImage(name) {
+  const image = make('img', '', 'field-image');
+  image.src = new URL('./art/' + name + '.webp', import.meta.url).href;
+  image.alt = '';
+  return image;
+}
+
+function openFieldwork() {
+  const field = pendingFieldwork();
+  if (!field) return;
+  if (save.fieldProgress?.stage === save.stage) {
+    fieldCheck(field);
     return;
   }
-  showPanel(null, '试跑记录');
-  addWords(['练习', '努力', '复习']);
+  showPanel(null, field.title);
+  play('paper');
+  if (field.image) body.append(fieldImage(field.image));
+  addWords(field.words);
   persist();
-  const text = '每次出发前，我都会先练习。';
-  const sentence = make('p', '每次出发前，我都会先＿＿。', 'sentence');
-  const writing = make('div');
-  const audioStatus = make('p', '', 'note');
+  const pronunciation = make('p', '', 'note');
+  const vocab = make('dl', '', 'field-words');
+  for (const term of words.filter(({ word }) => field.words.includes(word))) {
+    const label = make('dt', term.word);
+    label.append(pronounce('听' + term.word + '的发音', term.word, pronunciation));
+    vocab.append(label, make('dd', term.meaning));
+  }
   body.append(
-    sentence,
-    group(
-      button('重听', () => speaker(text, audioStatus)),
-      button('看字', () => {
-        sentence.textContent = text;
-      }),
-    ),
-    audioStatus,
-    writing,
+    make('p', field.clue, 'dialog-copy'),
+    pronounce('朗读线索', field.clue, pronunciation),
+    vocab,
+    pronunciation,
+    group(button('检查理解', () => {
+      save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
+      persist();
+      fieldCheck(field);
+    }, 'gold')),
   );
-  disposeWriting = mountWriting(writing, '练习', {
+}
+
+function fieldCheck(field) {
+  const progress = save.fieldProgress;
+  const item = field.questions[progress.question];
+  if (!item) {
+    fieldDictation(field);
+    return;
+  }
+  showPanel(null, '理解检查');
+  const clue = make('p', field.clue, 'field-clue');
+  clue.hidden = true;
+  const reviewClue = button('回看线索', () => {
+    clue.hidden = !clue.hidden;
+    reviewClue.setAttribute('aria-expanded', String(!clue.hidden));
+  });
+  reviewClue.setAttribute('aria-expanded', 'false');
+  const status = make('p', '', 'dialog-note');
+  status.setAttribute('role', 'status');
+  const options = make('div', '', 'options');
+  const prompt = item.prompt.replaceAll('__', '');
+  for (const choice of item.choices) {
+    const control = button(choice.replaceAll('__', ''), () => {
+      options.querySelector('.wrong')?.classList.remove('wrong');
+      if (choice !== item.correct) {
+        control.classList.add('wrong');
+        status.textContent = '再回看线索，试试另一个答案。';
+        play('wrong');
+        return;
+      }
+      for (const option of options.children) option.disabled = true;
+      control.classList.add('correct');
+      status.textContent = item.feedback ?? '答对了。';
+      play('correct');
+      progress.question++;
+      persist();
+      const next = button(progress.question === field.questions.length ? '开始听写' : '下一题',
+        () => fieldCheck(field), 'gold');
+      body.append(group(next));
+      next.focus();
+    });
+    options.append(control);
+  }
+  body.append(
+    make('p', field.title + ' · ' + (progress.question + 1) + ' / ' + field.questions.length, 'tag'),
+    make('p', prompt, 'dialog-copy'),
+    group(pronounce('重听题目', prompt), reviewClue),
+    clue, options, status,
+  );
+}
+
+function fieldDictation(field) {
+  const progress = save.fieldProgress;
+  const target = field.writing[progress.writing];
+  if (!target || devSkipDictation) {
+    finishFieldwork(field);
+    return;
+  }
+  const term = words.find(({ word }) => word === target);
+  showDictation(term, '听写 · ' + (progress.writing + 1) + ' / ' + field.writing.length, () => {
+    progress.writing++;
+    persist();
+    fieldDictation(field);
+  });
+}
+
+function showDictation(term, title, onComplete, onBack) {
+  showPanel(null, title);
+  const text = term.sentences[0];
+  const sentence = make('p', text.replaceAll(term.word, '＿'.repeat([...term.word].length)), 'sentence');
+  const status = make('p', '', 'note');
+  const writing = make('div', '', 'field-writing');
+  const audioLine = text + ' 要写的是：' + term.word + '。';
+  body.append(sentence, group(pronounce('重听听写', audioLine, status),
+    button('看字', () => { sentence.textContent = text; })), writing, status);
+  if (onBack) body.append(group(button('返回词语手册', onBack)));
+  disposeWriting = mountWriting(writing, term.word, {
     hints: 5,
     onComplete: () => {
       play('correct');
-      go(11);
-      closePanel();
-      showToast('试跑记录已写好。');
+      onComplete();
     },
   });
-  speaker(text, audioStatus);
+  speaker(audioLine, status);
+}
+
+function finishFieldwork(field) {
+  const stage = save.stage;
+  save.fieldDone.push(stage);
+  save.fieldProgress = null;
+  persist();
+  if (stage === 10) go(11);
+  else {
+    hintCount = 0;
+    radioUnread = Boolean(objective()?.guide);
+    update();
+  }
+  closePanel();
+  showToast(field.done);
 }
 function enterRace() {
   if (driving || save.stage !== 11) return;
@@ -736,7 +858,6 @@ function launchPanel() {
 }
 function endStory() {
   play('finish');
-  addWords(guardWords);
   go(tasks.length);
   save.storyFinished = true;
   persist();
@@ -752,11 +873,11 @@ function action() {
     return;
   }
   const target = world.currentTarget();
-  if (target === 'board') {
-    guard();
+  if (!target || target !== objective()?.item) return;
+  if (target === pendingFieldwork()?.item && save.stage !== 10) {
+    openFieldwork();
     return;
   }
-  if (!target || target !== tasks[save.stage]?.item) return;
   switch (save.stage) {
     case 2:
       play('pickup');
@@ -817,44 +938,26 @@ $('right-route').onclick = () => world.chooseRoute('smooth');
 
 function notebook() {
   showPanel(null, '词语手册');
-  const collection = words.filter(({ word }) =>
-    save.discoveries.includes(word),
-  );
-  if (!collection.length)
-    body.append(make('p', '探索车站时，词语会记在这里。'));
-  const list = make('div', '', 'definition-list');
-  for (const term of collection)
-    list.append(button(term.word + ' · ' + term.pinyin, () => showWord(term)));
-  body.append(list);
-}
-function showWord(term) {
-  showPanel(null, term.word);
+  const known = new Set(save.discoveries);
+  const status = make('p', '', 'note');
+  const { list } = vocabularyList(words, known, (term) => {
+    const review = button('写', () => showDictation(term, '词语复习', () => {
+      notebook();
+      showToast('写好了！');
+    }, notebook), 'icon-button');
+    review.setAttribute('aria-label', '复习' + term.word + '的听写');
+    return {
+      pinyin: term.pinyin,
+      meaning: term.meaning,
+      sentence: term.sentences[0],
+      controls: [pronounce('听' + term.word + '的发音', term.word, status), review],
+    };
+  });
   body.append(
-    make('p', term.pinyin, 'term-pinyin'),
-    make('p', term.meaning, 'dialog-copy'),
-    make('p', term.sentences[0]),
-  );
-  body.append(
-    group(
-      button('朗读词语', () => speaker(term.word)),
-      button('朗读例句', () => speaker(term.sentences[0])),
-      button('练写', () => {
-        const host = make('div');
-        body.querySelector('.word-writing')?.remove();
-        disposeWriting();
-        host.className = 'word-writing';
-        body.append(host);
-        disposeWriting = mountWriting(host, term.word, {
-          guided: true,
-          hints: 5,
-          onComplete: () => {
-            play('correct');
-            showToast('写好了！');
-          },
-        });
-      }),
-      button('返回词语手册', notebook),
-    ),
+    make('p', '已发现 ' + known.size + ' / ' + words.length + ' 个词语。'),
+    group(button('练习题库', () => showBank(), 'gold')),
+    status,
+    list,
   );
 }
 $('book').onclick = notebook;
@@ -959,6 +1062,12 @@ const developer = createDeveloperMode({
   canSkip: () => view === 'hud' && !driving && save.stage < tasks.length,
   getSkipLabel: () => '跳过当前任务',
   onSkip: () => {
+    const field = pendingFieldwork();
+    if (field) {
+      addWords(field.words);
+      finishFieldwork(field);
+      return;
+    }
     if (save.stage === 8) save.part = 'stabilizer';
     if (save.stage === 11) {
       world.reset(true);

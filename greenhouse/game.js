@@ -1,3 +1,5 @@
+import { vocabularyList } from '../shared/vocabulary.js';
+import { speakerButton } from '../shared/speaker.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
@@ -188,21 +190,6 @@ function makeButton(text, className, click, label) {
   if (label) result.setAttribute('aria-label', label);
   result.addEventListener('click', () => click());
   return result;
-}
-
-function speakerButton(click, label) {
-  const button = makeButton('', 'icon-button speaker-button', click, label);
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const icon = document.createElementNS(svgNS, 'svg');
-  icon.setAttribute('class', 'speaker-icon');
-  icon.setAttribute('viewBox', '0 0 24 24');
-  icon.setAttribute('aria-hidden', 'true');
-  const path = document.createElementNS(svgNS, 'path');
-  path.setAttribute('d', 'M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12');
-  icon.append(path);
-  button.append(icon);
-  button.title = label;
-  return button;
 }
 
 function animate(target, from, to, duration = .26) {
@@ -1055,37 +1042,26 @@ function showBook() {
   addTranslation(controls, 'Vocabulary notebook. Entries appear as you discover them. Tap the speaker to hear a word or tap EN for its English meaning.');
   panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。`, 'body'));
   voiceMessage();
-  const list = node('ol', '', 'vocab');
-  const examples = new Map();
-  for (const [index, entry] of entries.entries()) {
-    const line = node('li');
-    if (!known.has(entry.word)) {
-      line.className = 'locked';
-      line.append(node('strong', '待发现'), node('span', '第 ' + (index + 1) + ' 个词', 'vocab-note'));
-    } else {
-      const data = lexicon[entry.word];
-      const term = node('strong', entry.word);
-      term.append(node('span', data.pinyin, 'pinyin'));
-      const details = node('div', '', 'word-details');
-      const definition = node('p', data.cn, 'definition');
-      const example = node('p', '', 'word-example');
-      example.hidden = true;
-      examples.set(entry.word, example);
-      details.append(definition, example);
-      const buttons = node('span', '', 'row-buttons');
-      const hint = translation(data.en);
-      const speak = speakerButton(() => voice.speak(data.spoken ?? entry.word), '听' + entry.word + '的发音');
-      const review = makeButton('写', 'icon-button', () => showWord(entry, '词语复习', (guided) => {
-        record(entry.word, guided);
+  const { list, examples } = vocabularyList(entries, known, (entry) => {
+    const { word } = entry;
+    const data = lexicon[word];
+    const hint = translation(data.en);
+    hint.control.setAttribute('aria-label', word + '的英文意思');
+    const speak = speakerButton(() => voice.speak(data.spoken ?? word), '听' + word + '的发音');
+    const review = makeButton('写', 'icon-button', () => {
+      showWord(entry, '词语复习', (guided) => {
+        record(word, guided);
         return { label: '返回词语手册', run: showBook };
-      }), '复习' + entry.word + '的听写');
-      if (state.written[entry.word] === 'guided') definition.append(node('span', ' · 可再试听写', 'vocab-note'));
-      hint.control.setAttribute('aria-label', entry.word + '的英文意思');
-      buttons.append(speak, hint.control, review);
-      line.append(term, details, buttons, hint.block);
-    }
-    list.append(line);
-  }
+      });
+    }, '复习' + word + '的听写');
+    return {
+      pinyin: data.pinyin,
+      meaning: data.cn,
+      reminder: state.written[word] === 'guided' ? '可再试听写' : '',
+      controls: [speak, hint.control, review],
+      extra: hint.block,
+    };
+  });
   panel.append(list);
   if (examples.size) void loadExamples();
 

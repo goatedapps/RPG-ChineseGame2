@@ -24,7 +24,7 @@ export const parts = {
 };
 
 export const tasks = [
-  { title: '走到工作台前', cue: '按方向键或点方向按钮，向前走几步。' },
+  { title: '走到工作台前', cue: '按方向键或拖动摇杆，向前走几步。' },
   { title: '看看四周', cue: '拖动画面，看看车站和月桥。' },
   { title: '拿起对讲机', cue: '走近右边的工作台，拿起对讲机。', item: 'radio' },
   {
@@ -32,14 +32,14 @@ export const tasks = [
     cue: '打开对讲机，看看新消息。',
     item: 'radio',
     guide:
-      'Hey, rookie! It’s Mei, the lantern keeper. I’m at the far landing. The bridge lights are out. Can you bring a spark across?',
+      'It’s Mei, the keeper across the bridge. I saw you two getting ready to race. Then the storm put out the lamps. The freight carts will be here soon, and they won’t see the way. Can you help me light the bridge before they reach it?',
   },
   {
     title: '拿起火种',
-    cue: '拿起工作台上发光的火种。',
+    cue: '回发车站，拿起对讲机桌上的备用火种。',
     item: 'spark',
     guide:
-      'See the glowing canister on the workbench? That’s the spark. Pick it up and carry it to your cart.',
+      'That glowing canister beside the radio sends a new flame across. Bring it to the cart so we can get it over the bridge without it going out.',
   },
   {
     title: '把火种装上灯车',
@@ -60,11 +60,11 @@ export const tasks = [
     cue: '把手册翻到第三页，读一读。',
     item: 'handbook',
     guide:
-      'That was quite a rattle. The depot crew left a diagram in the handbook. Listen for the page number.',
+      'The record says page three. Check the handbook on the workshop table. The drawing shows where to fit a clasp so the spark stays put.',
   },
   {
     title: '选一个车扣',
-    cue: '到车站右边的零件架，挑一个适合你路线的车扣。',
+    cue: '到西侧修理坊的零件架，挑一个适合你路线的车扣。',
     item: 'shelf',
     guide:
       'The stabilizer is made for the bumpy shortcut. The runner rolls faster on the smooth bend. Take whichever suits the route you want.',
@@ -106,16 +106,9 @@ export const objects = {
   lever: '红色手柄',
   handbook: '司机手册',
   shelf: '零件架',
-  board: '守桥人的留言',
+  signal: '望远镜旁的记录',
+  archive: '档案柜',
+  dispatch: '发车牌',
+  arrival: '交接簿',
   beacon: '月桥灯',
 };
-
-export const discoveries = {
-  3: ['希望', '将来', '当', '成为', '司机'],
-  6: ['科学', '做', '件', '就'],
-  7: ['翻到', '读', '课文', '篇', '讲'],
-  9: ['练习', '努力', '复习'],
-  11: ['举手', '马到成功'],
-  12: ['你追我赶', '龙争虎斗', '第一', '交'],
-};
-export const guardWords = ['军人', '保卫'];

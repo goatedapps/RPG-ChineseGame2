@@ -9,7 +9,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Drag the star map to look around and move relative to the camera. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
 - Use [shared progress](shared/lesson-progress.js) to mark a lesson complete only after passing its final test. Unlock worlds in order within each level and keep completed lessons replayable. Display unpublished lessons as under construction once their prerequisites are met.
 - Give each lesson its own HTML entry point and reuse shared gameplay and learning systems where practical.
-- Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish.
+- Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish. See the [P6 gameplay screenshots](references/p6-lesson1/README.md) for the task HUD, story helper, clues, comprehension, dictation, notebook, and final test.
 - Give each lesson a coherent storyline with one overarching mission and an illustrated title that fits its setting.
 - Open with a short, picture-led comic that establishes the stakes through clear, expressive action, and close with an illustrated epilogue that shows what the player achieved.
 - Use the shared [comic player](shared/comic.js) and [layout](shared/comic.css) for every prelude and epilogue. Put Simplified Chinese dialogue inside centred artwork on the dark background, with progress marks at the lower left. Tap or click the scene to advance, or use the keyboard. Keep visible navigation buttons out of the comic, and use the shared GSAP chapter reveal and reduced-motion behaviour.
@@ -20,7 +20,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Build a compact, animated first-person 3D space where the player can walk, look around, examine objects, and pick up or use items.
 - Prioritize tablet touch controls and desktop keyboard and mouse controls. Reuse the greenhouse [joystick input](shared/joystick.js) and [joystick appearance](shared/joystick.css) across 3D lessons. Adapt its movement vector to the lesson rather than reimplementing the control.
 - Use the [mobile game HUD reference](references/mobile-game-hud.jpg) across lessons. Put the title and tools at the top, the current task and Mandarin replay button directly below, the touch joystick at lower left, and the story helper at lower right. Show the current item and interaction near the lower centre. Follow the language rules below for all new UI.
-- Make the vocabulary useful for finding objects, taking actions, and interpreting clues.
+- Make the vocabulary useful for finding objects, taking actions, and interpreting clues. Spread story beats and fieldwork across distinct walkable locations with visible landmarks.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
 - Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone.
 - Explain why the current task matters, let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
@@ -37,7 +37,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Label the helper's controls in Chinese as well.
 - Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
-- Fill the vocabulary notebook as entries are discovered, with each word's meaning, Hanyu Pinyin, pronunciation control, and a sentence-bank example below its meaning.
+- Use the [shared vocabulary rows](shared/vocabulary.js) and [layout](shared/vocabulary.css). Show discovery progress and reveal each word with its Chinese meaning, Hanyu Pinyin, pronunciation control, sentence-bank example, and writing review.
 - Use browser Speech Synthesis for Mandarin dictation, show the sentence with the target word blanked out, and offer normal-speed replay through a speaker icon.
 - Use Hanzi Writer for Chinese handwriting, with one large active box at a time and separate progress markers for multi-character words.
 - Keep the handwriting box at least 248 CSS pixels per side at typical tablet and desktop sizes.

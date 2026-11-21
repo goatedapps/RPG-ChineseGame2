@@ -327,12 +327,17 @@ function depot(parent, x, z, far = false) {
       0.37,
     );
   for (const s of [-1, 1]) {
+    const sections = far ? [[-6.3, 6.3]] : [[-6.3, -.55], [2.3, 6.3]];
+    for (const [from, to] of sections) {
+      const middle = (from + to) / 2;
+      for (const h of [0.48, 1])
+        box(deck, color.timber, s * 6.18, h, middle, 0.14, 0.13, to - from);
+    }
     for (let p = -5.7; p <= 5.9; p += 1.22) {
+      if (!far && p > -.55 && p < 2.3) continue;
       box(deck, color.timber, s * 6.18, 0.54, p, 0.19, 1.18, 0.19);
       box(deck, color.trim, s * 6.18, 1.1, p, 0.26, 0.1, 0.26);
     }
-    for (const h of [0.48, 1])
-      box(deck, color.timber, s * 6.18, h, 0, 0.14, 0.13, 12.6);
     for (const p of far ? [-4.5, 3.95] : [0.45, 5.7]) {
       box(deck, color.timber, s * 4.9, 2.1, p, 0.39, 4.3, 0.43);
       box(deck, color.brass, s * 4.9, 0.21, p, 0.53, 0.42, 0.54);
@@ -344,12 +349,111 @@ function depot(parent, x, z, far = false) {
   }
   box(deck, color.timber, 0, 4.12, far ? -0.25 : 3.0, 10.45, 0.26, 0.28);
   roof(deck, 0, 4.53, far ? -0.25 : 3.0, 11.55, far ? 9.6 : 6.0);
-  for (const x1 of [-4.8, 4.8]) {
+  for (const x1 of far ? [-4.8, 4.8] : []) {
     box(deck, color.oak, x1, 0.24, 5.6, 2.6, 0.48, 0.6);
     box(deck, color.timber, x1, 0.64, 5.85, 2.6, 0.53, 0.11);
   }
   return deck;
 }
+const wingZ = 6.1;
+const landings = [
+  [-6.03, 6.03, -0.72, 11.82],
+  [-10.75, -5.7, 5.01, 7.18],
+  [5.7, 10.75, 5.01, 7.18],
+  [-18.15, -10.25, 2.4, 9.8],
+  [10.25, 18.15, 2.4, 9.8],
+];
+const nearFurniture = [
+  [1.4, 4.57, 4, 5.26],
+  [-5.6, -2.41, 1.55, 2.88],
+  [-16.6, -13.4, 3.4, 4.55],
+  [-17.95, -16.75, 5.2, 7.1],
+  [15.05, 16.6, 3.95, 5.4],
+  [.95, 2.9, -.8, .1],
+];
+const farFurniture = [[11.96, 12.82, -89.45, -88.55], [11.5, 13.05, -85.25, -84.3]];
+function inArea(x, z, [left, right, front, back]) {
+  return x >= left && x <= right && z >= front && z <= back;
+}
+
+function walkable(x, z, far) {
+  const ground = far ? inArea(x, z, [2.65, 14.14, -94, -82.35]) :
+    landings.some((area) => inArea(x, z, area));
+  const furniture = far ? farFurniture : nearFurniture;
+  return ground && !furniture.some((area) => inArea(x, z, area));
+}
+
+function landingWing(parent, side) {
+  const x = side * 14.25;
+  const path = groupAt(parent, 0, 0, wingZ);
+  const span = side * 8.3;
+  const indigo = side === 1;
+  const trim = indigo ? color.edge : color.red;
+  box(path, color.timber, span, -.28, 0, 4.7, .28, 2.65);
+  for (let i = 0; i < 14; i++)
+    box(path, i % 3 ? color.oak : color.timber, side * (5.98 + .345 * i), -.1, 0, .327, .19, 2.5);
+  for (const z of [-1.19, 1.19]) {
+    box(path, trim, span, .72, z, 4.5, .16, .15);
+    for (const px of [6.28, 8.35, 10.35]) {
+      box(path, color.timber, side * px, .35, z, .19, .92, .19);
+      if (px !== 8.35)
+        lantern(path, side * px, 1.01, z, .69, indigo ? color.path : color.lamp);
+    }
+  }
+  const wing = groupAt(parent, x, 0, wingZ);
+  cliff(parent, x, wingZ, 5.42, -.62, 29, color.blueRock);
+  box(wing, color.stone, 0, -.33, 0, 8.6, .48, 8.06);
+  for (let index = 0; index < 22; index++)
+    box(wing, index % 4 ? color.oak : color.timber, 0, -.10, (index - 10.5) * .365, 8.38, .19, .35);
+  for (const z of [-3.83, 3.83]) {
+    box(wing, color.timber, 0, .61, z, 8.45, .17, .17);
+    for (const p of [-3.94, -2, 0, 2, 3.94]) post(wing, p, 0, z, p === 0, 1.31);
+  }
+  box(wing, color.timber, side * 4.02, .61, 0, .17, .17, 7.8);
+  for (const z of [-2, 0, 2]) post(wing, side * 4.02, 0, z, z === 0, 1.38);
+  if (indigo) {
+    const scope = groupAt(wing, 1.57, 0, -1.46);
+    const barrel = new T.CylinderGeometry(.2, .31, 1.82, 16);
+    for (const [px, pz] of [[-.57, .43], [.57, .43], [0, -.65]])
+      beam(scope, color.timber, V(px, -.02, pz), V(0, 1.07, 0), .14, .14);
+    mesh(scope, barrel, color.brass, [0, 1.43, 0], [1, 1, 1], [1.04, 0, -.53]);
+    ball(scope, color.azure, .21, 1.91, .76, .45, .29, .28);
+    box(scope, color.timber, -.49, 1.05, .41, .47, .055, .38);
+    box(scope, color.paper, -.49, 1.083, .41, .42, .033, .34);
+    for (const px of [-2.9, 3.1]) {
+      post(wing, px, 0, -2.9, true, 2.68);
+      cloth(wing, px, 2, -2.78, color.edge, .65, 1.25);
+    }
+  } else {
+    roof(wing, -.2, 3.95, -1.3, 7.3, 3.8);
+    for (const px of [-3.54, 3.36]) {
+      box(wing, color.timber, px, 1.82, -2.98, .29, 3.63, .29);
+      box(wing, color.timber, px, 1.82, .15, .29, 3.63, .29);
+      cloth(wing, px, 2.7, .34, color.red, .69, .91);
+      lantern(wing, px, 2.65, .25, .82);
+    }
+    table(wing, -.65, -2.09);
+    box(wing, color.timber, -.48, 1.045, -2.11, .63, .09, .43);
+    box(wing, color.paper, -.48, 1.10, -2.11, .54, .055, .35);
+    box(wing, color.dark, -2.04, 1.17, -2.12, .42, .24, .34);
+    box(wing, color.rail, -2.11, 1.32, -2.13, .53, .14, .28);
+    for (const h of [.23, .84, 1.43])
+      box(wing, color.timber, -3.1, h, .3, .65, .13, 1.92);
+    for (const z of [-.57, 1.18])
+      box(wing, color.trim, -3.1, .93, z, .31, 1.87, .14);
+    box(wing, color.brass, -3.05, .98, .06, .42, .18, .34);
+    box(wing, color.azure, -3.05, .98, .55, .42, .18, .32);
+    crate(wing, 2.85, 0, 2.78);
+  }
+}
+
+function noticeBoard(parent, texture, x, y, z, width = 1.65) {
+  box(parent, color.timber, x, y, z - .06, width + .24, 1.38, .18);
+  for (const side of [-1, 1])
+    box(parent, color.timber, x + side * width * .44, y / 2, z - .07, .13, y, .17);
+  artworkFace(parent, texture, x, y, z + .047, width, 1.18);
+}
+
 function table(parent, x, z) {
   box(parent, color.oak, x, 0.92, z, 3.2, 0.19, 1.3);
   for (const dx of [-1.34, 1.34])
@@ -760,13 +864,29 @@ export function createWorld(canvas, notify, finished) {
   cliff(fixed, 8, -88, 11, -0.7, 37, color.rock);
   depot(fixed, 0, 5.3);
   depot(fixed, 8.4, -88, true);
+  landingWing(fixed, -1);
+  landingWing(fixed, 1);
+  const pictureLoader = new T.TextureLoader();
+  function fieldTexture(name) {
+    const map = pictureLoader.load(new URL('./art/' + name + '.webp', import.meta.url).href);
+    map.colorSpace = T.SRGBColorSpace;
+    return new T.MeshStandardMaterial({ map, roughness: .88, color: 0xdcc9b3 });
+  }
+  noticeBoard(fixed, fieldTexture('archive'), -14.8, 2.03, 3.3, 2.12);
+  noticeBoard(fixed, fieldTexture('dispatch'), 2, 1.7, -.41);
+  table(fixed, 12.22, -84.77);
+  box(fixed, color.timber, 12.22, 1.04, -84.77, .55, .065, .48);
+  box(fixed, color.paper, 12.22, 1.095, -84.77, .52, .055, .45);
+  light(scene, 0xa5d9ff, 26, 13, 14.3, 3.4, 4.1);
+  light(scene, 0xffad57, 35, 13, -15.1, 3.3, 4.45);
+  light(scene, 0xffbf71, 20, 8, 12.3, 2.8, -84.35);
   for (const edge of [-1, 1])
     for (let i = 0; i < 6; i++)
       flora(
         fixed,
         edge * (6.9 + i * 0.38),
         -0.8,
-        4 + i * 1.16,
+        i < 2 ? 1.65 + i : 8.15 + (i - 2) * 1.16,
         1 + (i % 3) * 0.32,
       );
   for (let i = 0; i < 5; i++)
@@ -795,17 +915,9 @@ export function createWorld(canvas, notify, finished) {
     [4.9, 0, 1],
     [-4.8, 0, 7.9],
     [-4.6, 0.74, 8.05],
-    [5.05, 0, 7.15],
+    [5.05, 0, 8.54],
   ])
     crate(fixed, x, y, z);
-  box(fixed, color.timber, 4.9, 1.0, 0.45, 1.21, 0.15, 0.72);
-  box(fixed, color.timber, 4.9, 1.75, 0.45, 1.21, 0.15, 0.72);
-  box(fixed, color.trim, 4.23, 0.87, 0.45, 0.1, 1.84, 0.75);
-  box(fixed, color.trim, 5.57, 0.87, 0.45, 0.1, 1.84, 0.75);
-  box(fixed, color.paper, 2.1, 1.055, 4.52, 0.61, 0.03, 0.43, -0.13);
-  box(fixed, color.timber, 2.09, 1.035, 4.52, 0.65, 0.04, 0.46, -0.13);
-  box(fixed, color.brass, 4.68, 1.16, 0.48, 0.37, 0.19, 0.32);
-  box(fixed, color.azure, 5.11, 1.16, 0.48, 0.34, 0.18, 0.32);
   box(fixed, color.red, -3.75, 1.08, 2.16, 0.35, 0.13, 0.33);
   box(fixed, color.brass, -3.75, 1.23, 2.16, 0.08, 0.23, 0.08);
   cloth(fixed, -4.69, 2.21, 5.8, color.red, 1.2, 1.02);
@@ -839,11 +951,14 @@ export function createWorld(canvas, notify, finished) {
   const positions = {
     radio: V(3.05, 1.24, 4.53),
     spark: V(3.9, 1.33, 4.59),
-    handbook: V(2.1, 1.075, 4.52),
-    shelf: V(4.85, 1.23, 0.51),
+    handbook: V(-14.73, 1.15, 3.98),
+    shelf: V(-17.3, 1.11, 6.45),
+    signal: V(15.35, 1.2, 5.05),
+    archive: V(-14.8, 1.72, 3.32),
+    dispatch: V(2, 1.55, -.41),
+    arrival: V(12.22, 1.13, -84.77),
     cart: V(0, 0.86, 3.32),
     lever: V(-3.75, 1.48, 2.16),
-    board: V(-4.65, 2.13, 5.9),
     launch: V(0, 0.7, 1.1),
     beacon: V(12.4, 1.6, -89),
   };
@@ -989,27 +1104,8 @@ export function createWorld(canvas, notify, finished) {
           .multiplyScalar(dt * 4.15)
           .add(player);
         const far = player.z < -70;
-        const nx = between(desired.x, far ? 2.65 : -5.86, far ? 14.14 : 5.86);
-        const nz = between(desired.z, far ? -94 : -0.72, far ? -82.35 : 11.82);
-        const blocks = far
-          ? [[11.96, 12.82, -89.45, -88.55]]
-          : [
-              [1.4, 4.57, 4.0, 5.26],
-              [-5.6, -2.41, 1.55, 2.88],
-              [4.22, 5.58, 0.13, 0.81],
-            ];
-        if (
-          !blocks.some(
-            ([a, b, c, d]) => nx > a && nx < b && player.z > c && player.z < d,
-          )
-        )
-          player.x = nx;
-        if (
-          !blocks.some(
-            ([a, b, c, d]) => player.x > a && player.x < b && nz > c && nz < d,
-          )
-        )
-          player.z = nz;
+        if (walkable(desired.x, player.z, far)) player.x = desired.x;
+        if (walkable(player.x, desired.z, far)) player.z = desired.z;
       }
       camera.position.set(
         player.x,
