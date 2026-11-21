@@ -11,7 +11,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish.
 - Give each lesson a coherent storyline with one overarching mission and an illustrated title that fits its setting.
 - Open with a short, picture-led comic that establishes the stakes through clear, expressive action, and close with an illustrated epilogue that shows what the player achieved.
-- Put dialogue inside the comic panels and use GSAP to reveal one story beat at a time as the player taps or clicks the scene.
+- Put Simplified Chinese dialogue inside the opening and closing comic panels. Use GSAP to reveal one story beat at a time as the player taps or clicks the scene.
 - Begin with a hands-on tutorial for walking, looking around, and interacting with the lesson's objects and story guidance.
 
 ## Exploration and story guidance
@@ -20,7 +20,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Prioritize tablet touch controls and desktop keyboard and mouse controls.
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
-- Help the player understand the situation and next action in natural English through a channel that fits the story, such as a companion, computer, notepad, or phone.
+- Use a dedicated in-game story helper to explain the situation, the next action, and contextual hints in natural English. Deliver the helper's messages through a channel that fits the story, such as a companion, radio, notepad, or phone.
 - Explain why the current task matters, let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
 - When the player gets stuck, offer a contextual hint first and an optional visual cue at the exact target as a second step.
 - Show item close-ups directly, with the relevant page, note, or object and only the words the player needs.
@@ -31,7 +31,9 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Use the lesson's Tingxie wordlist in `content/<level>/tingxie/` as the required curriculum and give students practice reading, understanding, and writing every entry.
 - Use the supplied stories as optional references.
 - Include practice from the supplied question bank, with lesson-tagged questions used in their matching lesson and untagged questions eligible anywhere in that primary level.
-- Use concise Chinese for learning and task cues, read key task cues aloud in Mandarin, and offer English help through an EN control.
+- Use Simplified Chinese for all player-facing game text and Mandarin for spoken game content. The only English in the game is the dedicated story helper's storyline, next-action guidance, and contextual hints.
+- Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Label the helper's controls in Chinese as well.
+- Use concise Chinese for learning and task cues and read key cues aloud in Mandarin. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
 - Fill the vocabulary notebook as entries are discovered, with each word's meaning, Hanyu Pinyin, pronunciation control, and a sentence-bank example below its meaning.
 - Use browser Speech Synthesis for Mandarin dictation, show the sentence with the target word blanked out, and offer normal-speed replay through a speaker icon.
