@@ -13,10 +13,10 @@ const statusText = {
 };
 let currentLevel;
 let worlds = [];
-let selected;
+let nearby;
+let statusTimer;
 let universe;
 let generation = 0;
-let mapFailed = false;
 let leaving = false;
 
 function add(tag, text, className) {
@@ -83,35 +83,10 @@ function renderGrades() {
     );
   }
 }
-function selectWorld(world) {
-  selected = world;
-  $('near-number').textContent = world?.lesson ?? '';
-  $('near-status').textContent = world ? statusText[world.status] : '';
-  $('near-title').textContent =
-    world?.title ?? (mapFailed ? '从目录选择世界' : '接近一个世界');
-  $('near-hint').textContent = world
-    ? world.status === 'locked'
-      ? '完成上一课后，就能解锁这里。'
-      : world.status === 'building' || !world.href
-        ? '这个世界还在建设中。'
-        : world.status === 'complete'
-          ? '随时可以回来重玩。'
-          : ''
-    : mapFailed
-      ? '这个设备暂时无法显示三维星图。'
-      : '拖动画面转向，点选星球可飞近。';
-  $('enter').hidden =
-    !world?.href || !['open', 'complete'].includes(world.status);
-  $('enter').textContent =
-    world?.status === 'complete' ? '再次进入' : '进入世界';
-}
-function setMarker(marker) {
-  const label = $('marker');
-  label.hidden = !marker;
-  if (!marker) return;
-  label.style.left = marker.x + '%';
-  label.style.top = marker.y + '%';
-  if (label.textContent !== marker.text) label.textContent = marker.text;
+function mapStatus(text = '', duration = 0) {
+  clearTimeout(statusTimer);
+  $('map-status').textContent = text;
+  if (duration) statusTimer = setTimeout(mapStatus, duration);
 }
 function refreshWorlds(level) {
   worlds = getWorlds(level, lessonCompleted);
@@ -126,10 +101,8 @@ async function openLevel(level) {
   universe?.destroy();
   universe = undefined;
   currentLevel = level;
-  mapFailed = false;
   leaving = false;
   $('warp').hidden = true;
-  $('enter').disabled = false;
   setAddress(level);
   refreshWorlds(level);
   $('map-title').textContent = levels[level].label + '星域';
@@ -140,8 +113,8 @@ async function openLevel(level) {
   $('universe').hidden = false;
   $('joystick').hidden = false;
   $('map').classList.remove('map-unavailable');
-  selectWorld();
-  setMarker(null);
+  nearby = undefined;
+  mapStatus();
   $('map-title').focus();
   if (!motion.matches && window.gsap)
     window.gsap.fromTo(
@@ -153,8 +126,8 @@ async function openLevel(level) {
     const { createUniverse } = await import('./map.js');
     if (ticket !== generation) return;
     universe = createUniverse($('universe'), levels[level], worlds, {
-      onNearby: selectWorld,
-      onMarker: setMarker,
+      onNearby: (world) => { nearby = world; },
+      onActivate: enterWorld,
       planetImages: Object.values(levels).map(({ image }) => image),
     });
     universe.flyTo(
@@ -162,11 +135,10 @@ async function openLevel(level) {
     );
   } catch {
     if (ticket !== generation) return;
-    mapFailed = true;
     $('universe').hidden = true;
     $('joystick').hidden = true;
     $('map').classList.add('map-unavailable');
-    selectWorld(worlds.find((world) => world.status === 'open') ?? worlds[0]);
+    mapStatus('这个设备暂时无法显示三维星图。请从世界目录进入。');
   }
 }
 function backToLevels() {
@@ -204,7 +176,7 @@ function openDirectory() {
       row.onclick = () => {
         dialog.close();
         if (universe) universe.flyTo(world.number);
-        else selectWorld(world);
+        else enterWorld(world);
       };
       return row;
     }),
@@ -212,16 +184,16 @@ function openDirectory() {
   universe?.setStick(0, 0);
   dialog.showModal();
 }
-function enterWorld() {
-  if (
-    leaving ||
-    !selected?.href ||
-    !['open', 'complete'].includes(selected.status)
-  )
+function enterWorld(world) {
+  if (leaving || !world) return;
+  if (!world.href || !['open', 'complete'].includes(world.status)) {
+    mapStatus(
+      world.status === 'locked' ? '完成上一课后，就能解锁这里。' : '这个世界还在建设中。',
+      2800,
+    );
     return;
+  }
   leaving = true;
-  const world = selected;
-  $('enter').disabled = true;
   $('map').inert = true;
   $('warp-kicker').textContent =
     levels[currentLevel].label + ' · ' + world.lesson;
@@ -280,16 +252,12 @@ function enterWorld() {
 $('back').onclick = backToLevels;
 $('directory').onclick = openDirectory;
 $('close-directory').onclick = () => dialog.close();
-$('enter').onclick = enterWorld;
 window.addEventListener('keydown', (event) => {
   if (event.code === 'KeyE' && currentLevel && !dialog.open && !event.repeat)
-    enterWorld();
+    enterWorld(nearby);
 });
 window.addEventListener('pageshow', (event) => {
-  if (event.persisted && currentLevel) {
-    $('enter').disabled = false;
-    openLevel(currentLevel);
-  }
+  if (event.persisted && currentLevel) openLevel(currentLevel);
 });
 bindJoystick($('joystick'), (x, forward) => universe?.setStick(x, forward));
 renderGrades();

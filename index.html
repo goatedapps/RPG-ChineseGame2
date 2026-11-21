@@ -42,7 +42,7 @@
         <canvas
           id="universe"
           tabindex="0"
-          aria-label="星图。按方向键移动，拖动画面转向。"
+          aria-label="星图。双击星球进入。按方向键移动，拖动画面转向。也可按键盘 E 进入附近的世界。"
         ></canvas>
         <div class="map-hud">
           <header class="map-header">
@@ -53,21 +53,13 @@
             </div>
             <button id="directory" type="button">世界目录</button>
           </header>
-          <div id="marker" class="map-marker" hidden aria-hidden="true"></div>
+          <p id="map-status" role="status"></p>
           <div class="map-footer">
             <div id="joystick" class="joystick" aria-label="拖动摇杆移动">
               <span></span>
             </div>
-            <div class="step-panel" aria-live="polite">
-              <div class="step-label">
-                <span id="near-number"></span><span id="near-status"></span>
-              </div>
-              <h2 id="near-title"></h2>
-              <p id="near-hint"></p>
-              <button id="enter" class="gold" type="button">进入世界</button>
-            </div>
-            <p class="motion-key">方向键移动 · 拖动画面转向</p>
-            <p class="motion-touch">摇杆移动 · 拖动画面转向</p>
+            <p class="motion-key">双击星球进入<br />方向键移动 · 拖动转向</p>
+            <p class="motion-touch">轻点星球两次进入<br />摇杆移动 · 拖动转向</p>
           </div>
         </div>
       </section>

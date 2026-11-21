@@ -4,6 +4,7 @@ import { createHintPortal } from '../shared/hint-portal.js';
 const V = (x, y, z) => new T.Vector3(x, y, z);
 const UP = V(0, 1, 0);
 const clamp = T.MathUtils.clamp;
+const doubleTapWindow = 420;
 const access = (world) =>
   world.status === 'open' || world.status === 'complete';
 
@@ -44,7 +45,7 @@ function makeLabel(number, status) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(
-    String(number).padStart(2, '0') + (status === 'complete' ? ' ✓' : ''),
+    String(number).padStart(2, '0'),
     64,
     32,
   );
@@ -89,7 +90,7 @@ export function createUniverse(
   canvas,
   level,
   worlds,
-  { onNearby, onMarker, planetImages },
+  { onNearby, onActivate, planetImages },
 ) {
   const renderer = new T.WebGLRenderer({
     canvas,
@@ -117,7 +118,7 @@ export function createUniverse(
   });
   const gradeTexture = planetImages.indexOf(level.image);
   const hover = new T.Vector3();
-  const screenPoint = new T.Vector3();
+  const screenUp = new T.Vector3();
   const stick = new T.Vector2();
   const velocity = new T.Vector3();
   const player = new T.Group();
@@ -179,8 +180,6 @@ export function createUniverse(
     orbit.position.y = -0.12;
     root.add(orbit);
     const label = makeLabel(world.number, world.status);
-    label.position.y = 0.24;
-    label.position.z = 1.12;
     label.scale.set(1.08, 0.54, 1);
     root.add(label);
     scene.add(root);
@@ -232,6 +231,7 @@ export function createUniverse(
   let elapsed = 0;
   let raf;
   let pointer;
+  let pendingTap;
   let nearby;
   let target;
   let travelPosition;
@@ -251,7 +251,13 @@ export function createUniverse(
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
+  function clearTap() {
+    clearTimeout(pendingTap?.timer);
+    pendingTap = undefined;
+  }
+
   function flyTo(number) {
+    clearTap();
     if (leaving) return;
     const item = entries.get(number);
     if (!item) return;
@@ -280,6 +286,7 @@ export function createUniverse(
     if (!pointer.dragged) {
       if (Math.hypot(x - pointer.startX, y - pointer.startY) < 8) return;
       pointer.dragged = true;
+      clearTap();
     }
     heading -= (x - pointer.x) * 0.006;
     tilt = clamp(tilt + (y - pointer.y) * 0.005, -0.42, 0.47);
@@ -287,7 +294,9 @@ export function createUniverse(
     pointer.y = y;
   }
   function cancelPointer(event) {
-    if (pointer?.id === event.pointerId) pointer = null;
+    if (pointer?.id !== event.pointerId) return;
+    pointer = null;
+    clearTap();
   }
   function pointerUp(event) {
     if (pointer?.id !== event.pointerId) return;
@@ -305,9 +314,28 @@ export function createUniverse(
       1 - ((event.clientY - box.top) * 2) / box.height,
     );
     ray.setFromCamera(cursor, camera);
-    const picked =
-      ray.intersectObjects(portals)[0]?.object.userData.worldNumber;
-    if (picked) flyTo(picked);
+    const hit = ray.intersectObjects(portals).find(({ uv }) =>
+      uv && Math.hypot(uv.x - 0.5, uv.y - 0.5) <= 0.5,
+    );
+    const picked = hit?.object.userData.worldNumber;
+    if (!picked) {
+      clearTap();
+      return;
+    }
+    if (pendingTap?.number === picked && pendingTap.type === event.pointerType &&
+        event.timeStamp <= pendingTap.deadline) {
+      clearTap();
+      onActivate(entries.get(picked).world);
+      return;
+    }
+    clearTap();
+    // Delay the single-tap flight so the planet stays under the second tap.
+    pendingTap = {
+      number: picked,
+      type: event.pointerType,
+      deadline: event.timeStamp + doubleTapWindow,
+      timer: setTimeout(() => flyTo(picked), doubleTapWindow),
+    };
   }
   const pointerEvents = {
     pointerdown: pointerDown,
@@ -427,25 +455,11 @@ export function createUniverse(
       elapsed,
       !reduce.matches,
     );
-    if (item && !leaving) {
-      screenPoint
-        .copy(item.root.position)
-        .add(V(0, 3.74, 0))
-        .project(camera);
-      const visible =
-        Math.abs(screenPoint.x) < 0.95 &&
-        Math.abs(screenPoint.y) < 0.81 &&
-        Math.abs(screenPoint.z) < 1;
-      onMarker(
-        visible
-          ? {
-              x: (screenPoint.x * 0.5 + 0.5) * 100,
-              y: (0.5 - screenPoint.y * 0.5) * 100,
-              text: item.world.title,
-            }
-          : null,
-      );
-    } else onMarker(null);
+    screenUp.copy(UP).applyQuaternion(camera.quaternion);
+    for (const { planet, label } of entries.values()) {
+      label.position.copy(planet.position)
+        .addScaledVector(screenUp, -(planet.scale.y / 2 + 0.24));
+    }
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
@@ -457,6 +471,7 @@ export function createUniverse(
       stick.set(x, forward);
     },
     warp(number) {
+      clearTap();
       leaving = true;
       target = number;
       stopInput();
@@ -473,6 +488,7 @@ export function createUniverse(
       }
     },
     destroy() {
+      clearTap();
       cancelAnimationFrame(raf);
       observer.disconnect();
       for (const [type, handler] of Object.entries(pointerEvents)) {
