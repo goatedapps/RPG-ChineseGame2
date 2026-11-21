@@ -1,5 +1,5 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js';
+import { createWorld } from './world.js?v=radio-pickup';
 import {
   opening,
   parts,
@@ -111,7 +111,7 @@ function persist() {
 const voice = createVoice((status) => audio.setDucked(status === 'playing'));
 let view = 'home';
 let world;
-let radioUnread = false;
+let radioBuzz;
 let currentTarget = null;
 let hintCount = 0;
 let toastTimer;
@@ -293,7 +293,28 @@ function objective() {
   return { title: field.title, cue: field.cue, item: field.item, guide: field.guide, hint: field.hint };
 }
 
-function update() {
+function syncRadio(notify = false) {
+  const radio = $('radio');
+  const unread = !radio.hidden && Boolean(objective()?.guide) &&
+    !save.seenRadioMessages.includes(radioMessageKey('guide'));
+  $('unread').hidden = !unread;
+  radio.setAttribute('aria-label', unread ? '打开小梅的对讲机，有新消息' : '打开小梅的对讲机');
+  if (!unread) radioBuzz?.cancel();
+  if (!unread || !notify) return;
+  play('notification');
+  if (reducedMotion.matches) return;
+  radioBuzz?.cancel();
+  radioBuzz = radio.animate([
+    { transform: 'translateX(0) rotate(0)' },
+    { transform: 'translateX(-4px) rotate(-5deg)' },
+    { transform: 'translateX(4px) rotate(5deg)' },
+    { transform: 'translateX(-3px) rotate(-3deg)' },
+    { transform: 'translateX(0) rotate(0)' },
+  ], { duration: 270, iterations: 2 });
+  navigator.vibrate?.([45, 40, 45]);
+}
+
+function update(notifyRadio = false) {
   const task = objective();
   $('objective').textContent = task?.title ?? '月桥重新亮了';
   $('control-hint').textContent = task?.cue ?? '';
@@ -319,7 +340,7 @@ function update() {
   $('held').textContent = item ? '手上 · ' + item : '';
   $('held').hidden = !item;
   $('radio').hidden = save.stage < 3;
-  $('unread').hidden = !radioUnread;
+  syncRadio(notifyRadio);
   $('word-count').textContent = save.discoveries.length + ' / ' + words.length;
   $('speak').disabled = !task?.cue;
   world?.setTargets(
@@ -347,10 +368,8 @@ function go(stage) {
   save.fieldProgress = null;
   hintCount = 0;
   currentTarget = null;
-  radioUnread = Boolean(objective()?.guide);
-  if (radioUnread) play('notification');
   persist();
-  update();
+  update(true);
 }
 function paintAction() {
   const action = $('action');
@@ -431,7 +450,6 @@ function startWorld() {
     return;
   }
   world.reset(save.stage === 12);
-  radioUnread = Boolean(objective()?.guide);
   driving = false;
   moveStart = null;
   setView('hud');
@@ -526,10 +544,9 @@ function openRadio() {
   const task = objective();
   const guide = task?.guide;
   if (!guide) return;
-  radioUnread = false;
-  $('unread').hidden = true;
   showPanel(null, '小梅的对讲机');
   body.append(radioMessage(guide, 'guide'));
+  syncRadio();
   if (stage === 3) {
     body.append(
       group(
@@ -886,8 +903,7 @@ function finishFieldwork(field) {
   if (stage === 10) go(11);
   else {
     hintCount = 0;
-    radioUnread = Boolean(objective()?.guide);
-    update();
+    update(true);
   }
   closePanel();
   showToast(field.done);

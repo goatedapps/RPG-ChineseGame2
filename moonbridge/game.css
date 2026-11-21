@@ -393,10 +393,26 @@ dialog header,
 }
 #unread {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  color: var(--gold);
-  font-size: 0.65rem;
+  display: grid;
+  place-items: center;
+  top: -8px;
+  right: -7px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #171329;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #261628;
+  box-shadow: 0 2px 8px #110921aa;
+  pointer-events: none;
+}
+#unread svg {
+  width: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .touch-instruction {
   grid-row: 1;

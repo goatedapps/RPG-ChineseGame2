@@ -922,7 +922,9 @@ export function createWorld(canvas, notify, finished) {
   box(fixed, color.brass, -3.75, 1.23, 2.16, 0.08, 0.23, 0.08);
   cloth(fixed, -4.69, 2.21, 5.8, color.red, 1.2, 1.02);
 
-  const radio = device(effects, 3.05, 1.03, 4.53);
+  const radio = device(effects, 2.77, 1.015, 4.82);
+  radio.scale.setScalar(1.28);
+  radio.rotation.y = -0.24;
   const spark = canister(effects, 3.9, 1.025, 4.59);
   const playerCart = cart(effects);
   playerCart.object.position.set(0, 0.03, 3.32);
@@ -949,7 +951,7 @@ export function createWorld(canvas, notify, finished) {
   batch(fixed, scene);
 
   const positions = {
-    radio: V(3.05, 1.24, 4.53),
+    radio: radio.position.clone().add(V(0, 0.25, 0)),
     spark: V(3.9, 1.33, 4.59),
     handbook: V(-14.73, 1.15, 3.98),
     shelf: V(-17.3, 1.11, 6.45),
@@ -962,6 +964,21 @@ export function createWorld(canvas, notify, finished) {
     launch: V(0, 0.7, 1.1),
     beacon: V(12.4, 1.6, -89),
   };
+  const radioReach = 2.85;
+  const radioArea = new T.Sphere(positions.radio, radioReach);
+  const meshBounds = new T.Box3();
+  const radioOccluders = [];
+  // Only bench-area meshes can block the short ray used for radio pickup.
+  fixed.traverse((object) => {
+    if (!object.isMesh) return;
+    const geometry = object.geometry;
+    if (!geometry.boundingBox) geometry.computeBoundingBox();
+    meshBounds.copy(geometry.boundingBox).applyMatrix4(object.matrixWorld);
+    if (meshBounds.intersectsSphere(radioArea)) radioOccluders.push(object);
+  });
+  const radioRay = new T.Raycaster();
+  const radioScreen = new T.Vector3();
+  const radioDirection = new T.Vector3();
   const hintTargets = new Map(
     Object.entries(positions).map(([id, position]) => {
       const object = new T.Object3D();
@@ -1043,6 +1060,20 @@ export function createWorld(canvas, notify, finished) {
   canvas.addEventListener('pointerup', stopDrag);
   canvas.addEventListener('pointercancel', stopDrag);
 
+  function canReachRadio() {
+    if (!radio.visible) return false;
+    const center = positions.radio;
+    radioDirection.copy(center).sub(camera.position);
+    const distance = radioDirection.length();
+    if (distance > radioReach) return false;
+    radioScreen.copy(center).project(camera);
+    if (Math.abs(radioScreen.x) > 0.56 || Math.abs(radioScreen.y) > 0.48 ||
+        radioScreen.z < -1 || radioScreen.z > 1) return false;
+    radioRay.set(camera.position, radioDirection.normalize());
+    radioRay.far = distance - 0.1;
+    return radioRay.intersectObjects(radioOccluders, false).length === 0;
+  }
+
   function currentTarget() {
     if (mode !== 'walk') return null;
     camera.getWorldDirection(forward);
@@ -1050,7 +1081,7 @@ export function createWorld(canvas, notify, finished) {
       score = -Infinity;
     for (const id of targets) {
       const p = positions[id];
-      if (!p) continue;
+      if (!p || (id === 'radio' && !canReachRadio())) continue;
       aim.copy(p).sub(player);
       const length = aim.length();
       if (length > 4.95) continue;
