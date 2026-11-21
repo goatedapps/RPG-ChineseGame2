@@ -1,98 +1,58 @@
 export const phoneStory = {
   storm: {
-    briefing: [
-      'Hey! It’s Ah Ning. The science fair opens this morning. Last night’s rain was awful, and I saw a puddle in the greenhouse when I walked past.',
-      'I’m helping get the entrance ready. Could you check the greenhouse windows for me? See if you can work out where the water’s coming from.',
-    ],
-    actions: {},
-    checkpoint: [
-      'Puddle sorted? Nice! Let’s log what caused it so the next group knows what to check after heavy rain.',
-    ],
+    steps: {
+      westNote: 'Hey! It’s Ah Ning. The fair opens this morning, and I spotted a puddle in the greenhouse after last night’s rain. Could you check the greenhouse windows for me?',
+      seal: 'That explains the puddle. Could you grab the spare weatherstripping from the storeroom?',
+      westWindow: 'You’ve got the strip! Press it over the gap in the west window.',
+    },
+    checkpoint: 'The window’s sealed! Can you log what caused the leak so the next group knows what to look for?',
   },
   equipment: {
-    briefing: [
-      'One problem down. We still need to move our bean plant to the exhibition room, but its stem’s looking a bit wobbly.',
-      'There’s a lamp, bright tape, and a carrying tray in the storeroom. The tape makes our pot easy to spot. Check the picture by the tray before you lift anything.',
-    ],
-    actions: {},
-    checkpoint: [
-      'Got the kit? Great. The pot gets really heavy when the soil’s wet. Check how the picture shows us to hold it before we try moving it.',
-    ],
+    steps: {
+      brightLamp: 'Nice, the leak’s sorted. Can you grab the inspection lamp with the dazzling beam from the storeroom?',
+      vividTape: 'The pots all look alike from a distance. Grab a roll of brightly coloured tape so we can mark ours.',
+      tray: 'Our pot’s heavy with all that wet soil. Grab the carrying tray.',
+    },
+    checkpoint: 'That’s the whole kit! Check the carrying picture to see how we should hold the pot.',
   },
   seedling: {
-    briefing: [
-      'I left the circulation fan on yesterday. If it’s still blowing right at our bean plant, that might be why the poor thing’s bent over.',
-      'Let’s move it somewhere sheltered. There’s a spare seed to plant too. It won’t grow in time for today, but the camera has footage from a bean we started last week.',
-    ],
-    actions: {
-      weakPlant: [
-        'That sheltered spot is much better. I’m glad we can still show our original plant. The spare seed can be our next experiment.',
-      ],
+    steps: {
+      fan: 'I think the fan’s blowing right at our bean plant. Could you turn the fan away?',
+      weakPlant: 'That’s better. Use the tray to move the seedling with the thin stem somewhere sheltered.',
+      soilPot: 'Our bean’s out of the draft now. Bury the spare seed in the soil pot for our next experiment.',
+      rootCam: 'Today’s seed will take a while to sprout. Check the root camera for footage of the bean we started last week.',
     },
-    checkpoint: [
-      'The old footage will be great for showing visitors what goes on under the soil. Can you log what we changed to protect today’s plant?',
-    ],
+    checkpoint: 'That footage will be great for the fair. Can you log what we changed to protect today’s plant?',
   },
   records: {
-    briefing: [
-      'Next problem: I can’t remember which way everything goes on our display stand! An older student showed us at rehearsal and I recorded it.',
-      'I left the recording somewhere on the prep bench. Feel free to check my diary, exercise log, and science quiz. I left them there with the recording, and one of the pages might jog your memory.',
-    ],
-    actions: {},
-    checkpoint: [
-      'You found it! Past me actually did us a favour by recording that rehearsal. Can you add the recording to the handover log before we take it to the exhibition room?',
-    ],
+    steps: {
+      diary: 'I can’t remember how our display was set up. Could you check my diary on the prep bench for a clue?',
+      exerciseLog: 'I really did dream our bean grew taller than the school! See if I wrote anything useful in the morning exercise log.',
+      testSheet: 'Looks like the exercise log is all about running. Check the note I left on my science quiz paper.',
+      rehearsalTape: 'Oh right, we filmed our rehearsal! Pick up the recording marked Exhibit Setup.',
+    },
+    checkpoint: 'You found it! Could you add the recording to the handover log?',
   },
   exhibit: {
-    briefing: [
-      'The exhibition room should be empty for a few more minutes. Take a look at the rehearsal recording on the player so we can set things up the way our mentor showed us.',
-      'I drew a backup layout while we practised. It’s worth checking that too if you need to see exactly where the pot, label, and lamp go.',
-    ],
-    actions: {
-      rehearsalScreen: [
-        'See how easy she makes the demo look? She practised it a little every day. I used to put rehearsing off, but watching her made me want to give it a proper go.',
-      ],
+    steps: {
+      rehearsalScreen: 'The exhibition room’s still quiet. Play the rehearsal recording to see how our mentor set things up.',
+      backupNotes: 'She made that look easy! I sketched the setup while we practised. Could you check the layout beside the player?',
+      exhibitStand: 'Now we know where everything goes. Use the sketch to set up our display stand.',
     },
-    checkpoint: [
-      'The display light’s on and the plant’s right where it should be! Let’s log what we used to piece it all back together. That’ll save us time if we ever move the display again.',
-    ],
+    checkpoint: 'The light’s on and the bean’s in place! Let’s log what helped us put the display back together.',
   },
   handover: {
-    briefing: [
-      'We’re almost there. Keep the final notes at the handover desk so the next group knows what happened with the window and the plant.',
-    ],
-    actions: {
-      exhibitStand: [
-        'Can I tell you something? The first time I tried presenting here, I got so nervous that I stopped halfway through.',
-        'I kept practising after class, even when I messed it up again. Eventually I made it all the way through. I’m still nervous about today, but I know I can give it a go.',
-      ],
+    steps: {
+      exhibitStand: 'The first visitors are nearly here. Could you give the display stand one last check?',
+      handoverDesk: 'Thanks. I was so nervous at rehearsal that I stopped halfway through, but I kept practising until I could finish. Could you leave our notes at the handover desk?',
     },
-    checkpoint: [
-      'Thanks for sticking with me through all of this. I can see the first group heading our way. Finish the handover and I’ll meet you at the stand!',
-    ],
+    checkpoint: 'The first group’s heading our way! Wrap up the handover and I’ll meet you at the stand.',
   },
 };
 
-const noteAnswers = new Set([
-  '每逢暴雨', '每逢暴雨时', '每逢下暴雨', '每逢下暴雨时',
-  '每次下暴雨', '每次下暴雨时', '每一次下暴雨', '每一次下暴雨时',
-  '每当下暴雨', '每当下暴雨时', '每当有暴雨',
-]);
-
 export const noteReply = {
-  prompt: 'A note on the sill? Good catch. Can you send me the phrase that means “whenever there’s a downpour”? It’s right at the start of the note. You can copy the Chinese or tell me what it means in English.',
-  placeholder: 'Type your reply',
-  retry: 'Look at the start of the note again. I’m looking for the words that say how often it happens.',
-  success: 'That’s it. So it happens any time there’s a downpour. There’s spare weatherstripping in the storeroom. Press it over the gap in the west window and I’ll flag the leak for the caretaker.',
-  validate(answer) {
-    const chinese = answer.normalize('NFKC').replace(/[\s\p{P}]/gu, '')
-      .replaceAll('時', '时').replaceAll('當', '当').replaceAll('從', '从')
-      .replaceAll('縫', '缝').replaceAll('進', '进').replaceAll('來', '来');
-    if (noteAnswers.has(chinese) || chinese.startsWith('每逢暴雨雨水就从窗框的缝流进来')) return true;
-    const english = answer.normalize('NFKC').toLowerCase().replace(/[’']/g, '').replace(/[.!,?]/g, '').trim().replace(/\s+/g, ' ');
-    return /\b(?:when(?:ever)?|every time|each time|any time) (?:it (?:pours|rains (?:hard|heavily))|its (?:pouring|raining (?:hard|heavily))|there(?: is|s) (?:a (?:heavy )?downpour|heavy rain)|the rain is (?:very )?heavy)\b/.test(english)
-      || /\b(?:during|in) (?:a |any |every )?(?:downpour|heavy rain)\b/.test(english);
-  },
+  prompt: 'A note on the sill? Good catch! Can you write and send me the first four Chinese characters? They mean “whenever there’s a downpour.”',
+  characters: '每逢暴雨',
 };
 
 export const screenChecks = {
@@ -123,8 +83,7 @@ export const screenChecks = {
 };
 
 export const closingMessages = [
-  'We did it! The first group wanted to know how the roots grow. I showed them the footage and made it all the way through the demo.',
-  'Our little bean’s still standing too. Thanks for saving the display with me. Next time I’m bringing an extra roll of weatherstrip.',
+  'We did it! I showed the first group the root footage and made it all the way through the demo. Our little bean’s still standing too. Thanks for saving the display with me.',
 ];
 
 export const statusReplies = {

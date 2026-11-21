@@ -10,9 +10,10 @@
 - Start each storyline with a short, picture-led prelude that establishes the situation before play begins.
 - Give comic art expressive characters, clear action, and exaggerated staging where it suits the story.
 - Put dialogue inside comic panels and reveal story beats one at a time with GSAP when the player clicks or taps the scene.
+- Keep intuitive tap-to-advance instructions out of the visible prelude.
 - Use the title, prelude, and first playable moments to establish what is at stake and why the mission needs attention.
 - Conclude the storyline with a picture-led epilogue showing what the player's actions achieved.
-- Introduce walking, looking around, and opening the in-game phone in a short hands-on tutorial.
+- Introduce walking, looking around, picking up the handset, and opening its messages in a short hands-on tutorial.
 
 ## Gameplay and presentation
 
@@ -22,11 +23,12 @@
 - Let players discover descriptions through what they see, and teach verbs, expressions, and abstract words through actions, consequences, dialogue, or evidence.
 - Connect discoveries to comprehension questions and dictation before advancing to the next clue or story checkpoint.
 - Give players a reason to keep exploring through visible progress, discoveries, and satisfying feedback when their actions change the scene.
-- Keep the interactive phone docked in the bottom-right corner during exploration.
+- Animate the handset lifting from the world into its bottom-right dock with GSAP when the player picks it up.
 - Notify players of new messages with a ringtone and vibration, then let them open the handset to read the messages.
 - Put Ah Ning's casual English messages in the phone chat and keep the on-screen Chinese task cues separate.
+- Send one story message about the current action and wait for the player to finish it before introducing the next action.
 - Explain the situation before directing the player, and let exploration reveal discoveries such as the note by the leaking window.
-- Offer a contextual hint through the phone after a delay, then give players the option to reveal a gold spiral at the exact target.
+- Offer a contextual hint through the phone after a delay, then give players the option to reveal a glowing golden portal ring at the exact target.
 - Use the `imagegen`, `game-feel`, and GSAP skills where they help the lesson.
 - Use generated artwork throughout the lab, including plants, desks, boards, shelving, and cupboards, and reuse matching assets across repeated objects.
 - Show an item close-up directly over the room, with only the item and the words a player needs.
@@ -48,6 +50,7 @@
 - Make English help available on demand through a quiet EN control and use a loudspeaker icon for replaying speech.
 - Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, and a pronunciation control.
 - Use the browser's Speech Synthesis API for Mandarin dictation and Hanzi Writer for stroke-by-stroke practice.
+- Open Hanzi Writer from phone replies that ask the player to write Chinese characters.
 - Give players one large active handwriting box for both touch and mouse input, with progress shown separately for multi-character words.
 - Keep the active box at least 248 CSS pixels per side at typical desktop and tablet sizes, a 50% increase over the original 165-pixel maximum.
 - During dictation, highlight the next stroke after five unsuccessful attempts at that stroke.

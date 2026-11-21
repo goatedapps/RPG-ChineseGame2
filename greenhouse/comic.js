@@ -87,13 +87,14 @@ export function playComic(container, onFinish, { onPage = () => {}, ending = fal
   const skip = button('comic-skip', ending ? '跳过结局' : '跳过序幕');
   const actions = element('div', 'comic-actions');
   actions.append(english, skip);
-  const hint = element('p', 'comic-hint');
+  const hint = ending ? element('p', 'comic-hint') : null;
   const progress = element('div', 'comic-progress');
   const dots = panels.map(() => element('span', 'comic-progress-dot'));
   progress.setAttribute('aria-hidden', 'true');
   progress.append(...dots);
   const rail = element('div', 'comic-rail');
-  rail.append(progress, hint);
+  rail.append(progress);
+  if (hint) rail.append(hint);
   const announcement = element('p', 'comic-hidden');
   announcement.setAttribute('role', 'status');
 
@@ -168,7 +169,7 @@ export function playComic(container, onFinish, { onPage = () => {}, ending = fal
     dots.forEach((dot, position) => dot.classList.toggle('current', position === page));
     const lastLabel = ending ? '回到温室' : '进入科学楼';
     hit.setAttribute('aria-label', page === panels.length - 1 ? lastLabel : '继续看漫画');
-    hint.textContent = page === panels.length - 1 ? '点按画面，' + lastLabel : '点按画面，继续';
+    if (hint) hint.textContent = page === panels.length - 1 ? '点按画面，' + lastLabel : '点按画面，继续';
   }
 
   function render(direction) {

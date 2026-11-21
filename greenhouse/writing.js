@@ -56,8 +56,9 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
   const setViewBox = (square, size) => square.querySelector('svg')?.setAttribute('viewBox', `0 0 ${size} ${size}`);
   const resize = new ResizeObserver(() => {
     const writer = writers[activeIndex];
+    if (!writer || !grid.clientWidth) return;
     const size = drawingSize();
-    if (!writer || size === renderedSize) return;
+    if (size === renderedSize) return;
     renderedSize = size;
     writer.updateDimensions?.(dimensions(size));
     setViewBox(squares[activeIndex], size);

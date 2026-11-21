@@ -1,0 +1,35 @@
+#phone[data-picking-up] .phone-dock { visibility: hidden; }
+
+.phone-dock.phone-pickup {
+  z-index: 12;
+  inset: 0 auto auto 0;
+  transform-origin: center;
+  transition: none;
+  pointer-events: none;
+}
+
+.phone-pickup .phone-dock-glass::before,
+.phone-pickup .phone-dock-glass::after {
+  z-index: 1;
+}
+
+.phone-pickup-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: .47rem;
+  padding-top: .8rem;
+  color: #f3fff8;
+  background: radial-gradient(ellipse at 90% 31%, #a7c4ad, transparent 70%), linear-gradient(25deg, #102c3b, #187168 79%);
+  font: 700 .76rem/1 system-ui, sans-serif;
+}
+
+.phone-pickup-lock::after {
+  width: 84%;
+  height: .85rem;
+  border-radius: .22rem;
+  background: radial-gradient(circle at 86%, #268b67 4%, transparent 5%), #ecf7fbd9;
+  content: '';
+}

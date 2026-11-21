@@ -134,6 +134,25 @@ export function createEngine({
     return null;
   }
 
+  function projectTarget(id) {
+    const object = targets.get(id)?.object;
+    if (!object || !present(object)) return null;
+    const bounds = new THREE.Box3().setFromObject(object);
+    if (bounds.isEmpty()) return null;
+    const center = bounds.getCenter(new THREE.Vector3());
+    camera.updateMatrixWorld();
+    const top = center.clone().setY(bounds.max.y).project(camera);
+    const bottom = center.clone().setY(bounds.min.y).project(camera);
+    const point = center.project(camera);
+    if (Math.abs(point.z) > 1) return null;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: rect.left + (point.x + 1) * rect.width / 2,
+      y: rect.top + (1 - point.y) * rect.height / 2,
+      height: Math.abs(top.y - bottom.y) * rect.height / 2,
+    };
+  }
+
   function choose(next) {
     const changed = selected?.id !== next?.id;
     selected = next;
@@ -327,7 +346,7 @@ export function createEngine({
     const quiet = quietMotion();
     if (active) tickMovement(dt, quiet);
     state.reducedMotion = quiet;
-    update?.(dt, state);
+    update?.(dt, state, camera);
     renderer.render(scene, camera);
     if (active && now >= nextRay) {
       nextRay = now + 66;
@@ -339,7 +358,7 @@ export function createEngine({
   }
 
   return {
-    show, ready, setActive, interact, setVector, look, reset, focus,
+    show, ready, setActive, interact, setVector, look, reset, focus, projectTarget,
     setGameState(next) {
       state = { ...next };
       nextRay = 0;

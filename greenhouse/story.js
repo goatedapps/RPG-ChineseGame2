@@ -11,6 +11,11 @@ export const tutorial = [
   },
   {
     id: 'radio',
+    cn: '走到桌边，拿起手机。',
+    en: 'Walk up to the table and pick up the phone. Aim at it, then press E or tap the action button.',
+  },
+  {
+    id: 'phone-message',
     cn: '点开右下角的手机，看看新消息。',
     en: 'Open the phone in the bottom right to read the new message. On a keyboard, press F.',
   },

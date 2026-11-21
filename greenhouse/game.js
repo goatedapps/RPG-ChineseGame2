@@ -6,6 +6,7 @@ import { createGreenhouseAudio } from './sounds.js';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
+import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -34,7 +35,7 @@ const actionWords = [
 function emptySave() {
   return {
     tutorialDone: false, mission: 0, action: 0, phase: 'explore', wordIndex: 0, held: null, written: {},
-    notePending: false, noteAnswer: '', unlocked: [], endingSeen: false,
+    phonePicked: false, notePending: false, noteAnswer: '', unlocked: [], endingSeen: false,
   };
 }
 
@@ -57,8 +58,9 @@ function load() {
       ? data.unlocked
       : [...missions.slice(0, data.mission).flatMap((item) => item.actions), ...(mission?.actions.slice(0, action) ?? [])]
         .map(({ target }) => target);
+    const tutorialDone = data.tutorialDone === true || phase !== 'explore' || data.mission > 0 || action > 0;
     return {
-      tutorialDone: data.tutorialDone === true || phase !== 'explore' || data.mission > 0 || action > 0,
+      tutorialDone, phonePicked: tutorialDone || data.phonePicked === true,
       mission: data.mission, action, phase, wordIndex, written,
       held: Object.hasOwn(objects, data.held) ? data.held : null,
       notePending: data.notePending === true && data.mission === 0 && action === 1 && phase === 'explore',
@@ -76,7 +78,8 @@ let engine;
 let roomRequest;
 let started = false;
 let unavailable = false;
-let tutorialIndex = 0;
+let tutorialIndex = state.phonePicked ? 3 : 0;
+let pickingPhone = false;
 let walked = 0;
 let turned = 0;
 let footstepDistance = 0;
@@ -253,7 +256,7 @@ function worldState() {
   const active = nextObject();
   engine?.setGameState({
     completed: state.mission, mission: state.mission, action: state.action,
-    used: new Set([...(state.tutorialDone ? ['radio'] : []), ...moves.map(({ target }) => target)]),
+    used: new Set([...(state.phonePicked ? ['radio'] : []), ...moves.map(({ target }) => target)]),
     held: state.held, last, hintTarget, unlocked: new Set(state.unlocked),
     activeTargets: new Set(active ? [active] : []), reducedMotion: motion.matches,
   });
@@ -266,7 +269,7 @@ function updateInterface() {
   wordCount.textContent = counter;
   $('#held').hidden = !state.held;
   $('#held').textContent = state.held ? '手上 · ' + objects[state.held].cn : '';
-  reticle.hidden = !started || desk.open || phone.isOpen;
+  reticle.hidden = !started || desk.open || phone.isOpen || pickingPhone;
   updateTarget(currentTarget);
   worldState();
 }
@@ -286,8 +289,8 @@ function objective(announce = true) {
   const status = $('#mission-number');
   const title = $('#mission-name');
   if (!state.tutorialDone) {
-    status.textContent = '操作练习 · ' + (tutorialIndex + 1) + ' / 3';
-    title.textContent = ['学会行走', '环顾四周', '查看手机'][tutorialIndex];
+    status.textContent = '操作练习 · ' + (tutorialIndex + 1) + ' / ' + tutorial.length;
+    title.textContent = ['学会行走', '环顾四周', '拿起手机', '查看手机'][tutorialIndex];
     setCue(tutorial[tutorialIndex], announce);
   } else if (state.phase === 'done') {
     status.textContent = '六项任务已完成';
@@ -302,7 +305,7 @@ function objective(announce = true) {
     } else if (state.phase === 'explore') {
       setCue(mission.actions[state.action], announce);
     } else {
-      setCue({ cn: '在手机上打开交接记录。', en: 'Open the field check on your phone.' }, announce);
+      setCue({ cn: '打开手机', en: 'Open your phone.' }, announce);
     }
   }
   syncPhoneActivity();
@@ -314,8 +317,10 @@ function sendMessage(text, key, notify = true, direction = 'incoming') {
   if (text) phone.receive(text, { key, notify, direction });
 }
 
-function sendBriefing(mission, notify = true) {
-  sendMessage(phoneStory[mission.id].briefing, 'brief:' + mission.id, notify);
+function sendStep(mission, index, notify = true) {
+  const action = mission.actions[index];
+  if (!action) return;
+  sendMessage(phoneStory[mission.id].steps[action.target], 'step:' + mission.id + ':' + action.target, notify);
 }
 
 function requestNoteReply(notify) {
@@ -323,13 +328,13 @@ function requestNoteReply(notify) {
   phone.setChallenge({
     id: 'window-note',
     prompt: 'Reply to Ah Ning',
-    placeholder: noteReply.placeholder,
-    validate: (answer) => noteReply.validate(answer) || noteReply.retry,
+    placeholder: 'Write your reply',
+    characters: noteReply.characters,
     onSuccess(answer) {
       state.notePending = false;
       state.noteAnswer = answer.slice(0, 180);
       save();
-      sendMessage(noteReply.success, 'note-accepted', false);
+      sendStep(missions[0], state.action, false);
       announceAfterPhone = true;
       objective(false);
     },
@@ -338,22 +343,24 @@ function requestNoteReply(notify) {
 
 function restorePhone() {
   missions.slice(0, state.mission + 1).forEach((mission, index) => {
-    sendBriefing(mission, false);
     const story = phoneStory[mission.id];
     const finished = index < state.mission;
-    const actions = finished ? mission.actions : mission.actions.slice(0, state.action);
-    for (const { target } of actions) {
-      if (target === 'westNote' && state.noteAnswer) {
+    const completed = finished ? mission.actions.length : state.action;
+    const visibleSteps = Math.min(mission.actions.length, completed + 1);
+    for (let step = 0; step < visibleSteps; step += 1) {
+      if (mission.actions[step - 1]?.target === 'westNote') {
+        if (state.notePending) {
+          requestNoteReply(false);
+          break;
+        }
         sendMessage(noteReply.prompt, 'note-question', false);
-        sendMessage(state.noteAnswer, 'note-answer', false, 'outgoing');
-        sendMessage(noteReply.success, 'note-accepted', false);
+        if (state.noteAnswer) sendMessage(state.noteAnswer, 'note-answer', false, 'outgoing');
       }
-      sendMessage(story.actions[target], 'action:' + mission.id + ':' + target, false);
+      sendStep(mission, step, false);
     }
-    if (actions.length === mission.actions.length) sendMessage(story.checkpoint, 'check:' + mission.id, false);
+    if (completed === mission.actions.length) sendMessage(story.checkpoint, 'check:' + mission.id, false);
     if (finished) sendMessage(statusReplies[mission.id], 'reply:' + mission.id, false, 'outgoing');
   });
-  if (state.notePending) requestNoteReply(false);
   if (state.endingSeen) sendMessage(closingMessages, 'closing', false);
 }
 
@@ -382,15 +389,43 @@ function releaseMouse() {
   if (document.pointerLockElement === canvas) document.exitPointerLock?.();
 }
 
+function takePhone() {
+  const from = engine.projectTarget('radio');
+  pickingPhone = true;
+  state.phonePicked = true;
+  last = { id: 'radio', action: 'pickup' };
+  save();
+  engine.setActive(false);
+  voice.stop();
+  const host = $('#phone');
+  host.dataset.pickingUp = '';
+  phone.setVisible(true);
+  const dock = host.querySelector('.phone-dock').getBoundingClientRect();
+  updateInterface();
+  audio.cue('pickup');
+  animatePhonePickup({
+    from,
+    to: { x: dock.left + dock.width / 2, y: dock.top + dock.height / 2, width: dock.width, height: dock.height },
+    parent: $('#app'),
+    onComplete() {
+      pickingPhone = false;
+      delete host.dataset.pickingUp;
+      tutorialIndex = 3;
+      if (!desk.open) engine.setActive(true);
+      sendStep(missions[0], 0);
+      objective(!desk.open);
+    },
+  });
+}
+
 function togglePhone(open) {
   if (!started) return;
   if (open) {
     engine?.setActive(false);
     voice.stop();
     $('#response').hidden = true;
-    if (tutorialIndex === 2 && !state.tutorialDone) {
+    if (state.phonePicked && tutorialIndex === 3 && !state.tutorialDone) {
       state.tutorialDone = true;
-      last = { id: 'radio', action: 'pickup' };
       announceAfterPhone = true;
       save();
       objective(false);
@@ -449,28 +484,28 @@ function response(cn, en) {
 }
 
 function nextObject() {
-  if (!state.tutorialDone) return tutorialIndex === 2 ? 'radio' : null;
+  if (!state.tutorialDone) return tutorialIndex === 2 && !state.phonePicked ? 'radio' : null;
   return state.phase === 'explore' && !state.notePending ? missions[state.mission].actions[state.action].target : null;
 }
 
 function updateTarget(target) {
   currentTarget = target;
   const known = target && objects[target.id];
-  const canInteract = !!known && started && !desk.open && !phone.isOpen;
+  const canInteract = !!known && started && !desk.open && !phone.isOpen && !pickingPhone;
   reticle.classList.toggle('targeted', canInteract);
   interact.hidden = !canInteract;
   if (!canInteract) return;
   const correct = target.id === nextObject();
-  const action = correct && state.tutorialDone ? missions[state.mission].actions[state.action].action : 'inspect';
+  const action = correct ? (state.tutorialDone ? missions[state.mission].actions[state.action].action : 'pickup') : 'inspect';
   const verb = actions[action];
   interact.querySelector('span').textContent = verb + ' · ' + known.cn;
 }
 
 function useObject(target) {
-  if (!target || !started || desk.open || phone.isOpen || !objects[target.id]) return;
+  if (!target || !started || desk.open || phone.isOpen || pickingPhone || !objects[target.id]) return;
   const thing = objects[target.id];
   if (target.id === 'radio') {
-    phone.open();
+    if (target.id === nextObject()) takePhone();
     return;
   }
   if (evidence[target.id]) {
@@ -501,7 +536,6 @@ function completeObject(target, inspected = false) {
     state.notePending = true;
     requestNoteReply(true);
   }
-  sendMessage(phoneStory[mission.id].actions[target.id], 'action:' + mission.id + ':' + target.id);
   if (state.action >= mission.actions.length) {
     state.phase = 'question';
     save();
@@ -512,6 +546,7 @@ function completeObject(target, inspected = false) {
     return;
   }
   save();
+  if (target.id !== 'westNote') sendStep(mission, state.action);
   if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'correct'));
   $('#response').hidden = true;
   objective();
@@ -577,7 +612,7 @@ desk.addEventListener('close', () => {
   backdropPointer = null;
   desk.classList.remove('artifact-inspection');
   clearPanel();
-  if (started) {
+  if (started && !pickingPhone) {
     engine?.setActive(true);
     engine?.focus(false);
   }
@@ -848,7 +883,7 @@ function finishMission() {
       objective(false);
       showFinale();
     } else {
-      sendBriefing(missions[state.mission]);
+      sendStep(missions[state.mission], 0);
       objective();
     }
   };
@@ -966,6 +1001,7 @@ function showHelp() {
 function replay() {
   state = { ...emptySave(), written: state.written };
   phone.reset();
+  phone.setVisible(false);
   announceAfterPhone = false;
   last = null;
   tutorialIndex = 0;
@@ -986,7 +1022,7 @@ $('#book').addEventListener('click', showBook);
 $('#help').addEventListener('click', showHelp);
 interact.addEventListener('click', () => engine?.interact());
 window.addEventListener('keydown', (event) => {
-  if (!started || desk.open || phone.isOpen || !$('#comic-overlay').hidden ||
+  if (!started || desk.open || phone.isOpen || pickingPhone || !$('#comic-overlay').hidden ||
       event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.code === 'KeyF') {
     event.preventDefault();
@@ -1027,11 +1063,12 @@ function begin() {
   $('#toolbar').hidden = false;
   $('#mission-ui').hidden = false;
   $('#play-controls').hidden = false;
-  phone.setVisible(true);
+  phone.setVisible(state.phonePicked);
   if (state.tutorialDone) restorePhone();
+  else if (state.phonePicked) sendStep(missions[0], 0);
   engine.show();
   engine.setActive(true);
-  engine.focus(state.phase === 'explore' && !state.notePending);
+  engine.focus(state.phase === 'explore' && !state.notePending && (state.tutorialDone || !state.phonePicked));
   objective(state.phase !== 'done');
   if (state.phase === 'done') {
     if (state.endingSeen) showEnding();
@@ -1103,9 +1140,9 @@ document.addEventListener('click', (event) => {
   if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
 }, true);
 
-$('#start').addEventListener('click', () => state.tutorialDone ? begin() : beginWithComic());
+$('#start').addEventListener('click', () => state.phonePicked ? begin() : beginWithComic());
 $('#replay-intro').addEventListener('click', beginWithComic);
-if (state.tutorialDone) {
+if (state.phonePicked) {
   $('#start-label').textContent = state.phase === 'done' ? '重返科学楼' : '继续任务';
   $('#replay-intro').hidden = false;
 }
@@ -1135,8 +1172,6 @@ function prepareRoom() {
         turned += Math.abs(dx) + Math.abs(dy);
         if (turned > 92) {
           tutorialIndex = 2;
-          sendBriefing(missions[0]);
-          releaseMouse();
           objective();
         }
       },

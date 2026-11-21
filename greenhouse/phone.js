@@ -1,3 +1,5 @@
+import { createWriting } from './writing.js';
+
 function element(tag, cls, text) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
@@ -80,7 +82,9 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   input.setAttribute('aria-describedby', 'phone-reply-feedback');
   const send = button('phone-send', 'Send');
   send.type = 'submit';
-  replyRow.append(input, send);
+  const handwrittenReply = button('phone-reply phone-handwritten-reply', 'Write a reply');
+  handwrittenReply.setAttribute('aria-labelledby', prompt.id);
+  replyRow.append(input, handwrittenReply, send);
   const choices = element('div', 'phone-choices');
   choices.setAttribute('role', 'group');
   choices.setAttribute('aria-labelledby', prompt.id);
@@ -90,9 +94,28 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   feedback.hidden = true;
   composer.append(prompt, replyRow, choices, feedback);
 
+  const writing = element('section', 'phone-writing');
+  writing.hidden = true;
+  const writingHeader = element('div', 'phone-writing-header');
+  const writingBack = button('phone-writing-back', '‹ Chat', 'Back to chat');
+  const writingTitle = element('h3', 'phone-writing-title', 'Write your reply');
+  writingTitle.tabIndex = -1;
+  writingHeader.append(writingBack, writingTitle);
+  const writingGrid = element('div', 'writing-grid');
+  const writingProgress = element('ol', 'writing-progress');
+  writingProgress.setAttribute('aria-label', 'Character progress');
+  const writingStatus = element('p', 'phone-feedback');
+  writingStatus.setAttribute('role', 'status');
+  writingStatus.hidden = true;
+  const retryWriting = button('phone-writing-back', 'Try again');
+  retryWriting.hidden = true;
+  const sendWriting = button('phone-send phone-send-written', 'Send');
+  sendWriting.disabled = true;
+  writing.append(writingHeader, writingGrid, writingProgress, writingStatus, retryWriting, sendWriting);
+
   const home = button('phone-home', '', 'Put down phone');
   home.append(element('span', 'phone-home-indicator'));
-  screen.append(header, scroll, composer, home);
+  screen.append(header, scroll, composer, writing, home);
   sheet.append(screen);
   host.replaceChildren(alert, dock, status, sheet);
 
@@ -108,6 +131,8 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   let expanded = false;
   let lastBuzz = -Infinity;
   let buzz;
+  let stopWriting;
+  let writtenAnswer = '';
 
   function time() {
     return timeFormat.format(new Date());
@@ -204,6 +229,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   function finishClose() {
     if (!expanded) return;
     expanded = false;
+    backToChat();
     viewport?.removeEventListener('resize', fitViewport);
     viewport?.removeEventListener('scroll', fitViewport);
     dock.setAttribute('aria-expanded', 'false');
@@ -282,6 +308,73 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     if (!replyRow.hidden) input.setAttribute('aria-invalid', String(Boolean(message)));
   }
 
+  function writingFeedback(message) {
+    writingStatus.textContent = message;
+    writingStatus.hidden = !message;
+  }
+
+  function backToChat() {
+    if (writing.hidden) return;
+    writing.hidden = true;
+    sheet.classList.remove('is-writing');
+    scroll.hidden = false;
+    composer.hidden = !activeChallenge;
+    if (expanded) {
+      handwrittenReply.focus({ preventScroll: true });
+      scrollToLatest();
+    }
+  }
+
+  function resetWriting() {
+    stopWriting?.();
+    stopWriting = undefined;
+    writtenAnswer = '';
+    writingGrid.replaceChildren();
+    writingProgress.replaceChildren();
+    retryWriting.hidden = true;
+    sendWriting.disabled = true;
+    writingFeedback('');
+  }
+
+  function startWriting() {
+    resetWriting();
+    const characters = [...activeChallenge.characters];
+    const markers = characters.map((_, index) => element('li', '', String(index + 1)));
+    writingProgress.append(...markers);
+    markers[0].setAttribute('aria-current', 'step');
+    stopWriting = createWriting(writingGrid, activeChallenge.characters, false, () => {
+      writtenAnswer = activeChallenge.characters;
+      handwrittenReply.textContent = writtenAnswer;
+      handwrittenReply.lang = 'zh-Hans';
+      sendWriting.disabled = false;
+      if (!writing.hidden) sendWriting.focus({ preventScroll: true });
+    }, () => {
+      writingFeedback('The handwriting grid didn’t load.');
+      retryWriting.hidden = false;
+    }, () => {
+      writingFeedback('Try that stroke again.');
+    }, (completed) => {
+      const marker = markers[completed - 1];
+      marker.textContent = characters[completed - 1];
+      marker.lang = 'zh-Hans';
+      marker.classList.add('complete');
+      marker.removeAttribute('aria-current');
+      markers[completed]?.setAttribute('aria-current', 'step');
+      writingFeedback('');
+    });
+  }
+
+  function openWriting() {
+    if (!expanded || !activeChallenge?.characters) return;
+    writing.hidden = false;
+    sheet.classList.add('is-writing');
+    scroll.hidden = true;
+    composer.hidden = true;
+    if (!stopWriting) startWriting();
+    if (!motion.matches) writing.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150 });
+    writingTitle.focus({ preventScroll: true });
+  }
+
   function submit(value) {
     if (!activeChallenge) return;
     const answer = value.trim();
@@ -291,7 +384,9 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     }
     const result = activeChallenge.validate ? activeChallenge.validate(answer) : true;
     if (result !== true) {
-      setFeedback(typeof result === 'string' ? result : 'Try that again.');
+      const message = typeof result === 'string' ? result : 'Try that again.';
+      if (writing.hidden) setFeedback(message);
+      else writingFeedback(message);
       return;
     }
     const accepted = activeChallenge;
@@ -303,13 +398,21 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
 
   function setChallenge(challenge, { notify: ring = true } = {}) {
     if (challenge && challenge.id === activeChallenge?.id) return;
+    backToChat();
+    resetWriting();
     activeChallenge = challenge;
     prompt.textContent = challenge?.prompt || 'Reply';
     input.value = '';
     input.placeholder = challenge?.placeholder || 'Type a reply';
     const options = challenge?.choices || [];
+    const useHandwriting = Boolean(challenge?.characters);
     replyRow.hidden = options.length > 0;
     choices.hidden = options.length === 0;
+    input.hidden = useHandwriting;
+    send.hidden = useHandwriting;
+    handwrittenReply.hidden = !useHandwriting;
+    handwrittenReply.textContent = challenge?.placeholder || 'Write a reply';
+    handwrittenReply.removeAttribute('lang');
     choices.replaceChildren(...options.map((choice) => {
       const answer = button('phone-choice', typeof choice === 'string' ? choice : choice.label);
       answer.addEventListener('click', () => submit(typeof choice === 'string' ? choice : choice.value));
@@ -346,7 +449,8 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   sheet.addEventListener('close', () => { if (!sheet.open) finishClose(); });
   sheet.addEventListener('cancel', (event) => {
     event.preventDefault();
-    close();
+    if (writing.hidden) close();
+    else backToChat();
   });
   sheet.addEventListener('click', (event) => {
     if (event.target !== sheet) return;
@@ -355,9 +459,13 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   });
   composer.addEventListener('submit', (event) => {
     event.preventDefault();
-    submit(input.value);
+    if (!activeChallenge?.characters) submit(input.value);
   });
   input.addEventListener('input', () => setFeedback(''));
+  handwrittenReply.addEventListener('click', openWriting);
+  writingBack.addEventListener('click', backToChat);
+  retryWriting.addEventListener('click', startWriting);
+  sendWriting.addEventListener('click', () => submit(writtenAnswer));
 
   return { open, close, setVisible, receive, setChallenge, setHint, setActivity, reset, get isOpen() { return expanded; } };
 }
