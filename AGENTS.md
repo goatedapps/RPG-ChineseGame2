@@ -62,7 +62,10 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Assets and delivery
 
-- Use ImageGen for scene and comic art where useful, and use game-feel and GSAP techniques where they improve feedback and motion.
+- Across all levels and lessons, use ImageGen as the default source for player-facing artwork, including the full 3D environment, buildings, scenery, props, vehicles, characters, textures, illustrated UI icons, and comics. Match the approved art direction throughout the lesson.
+- For 3D objects, generate consistent front, side, back, or other views as needed. Use the generated views as textures, model references, or sprite views according to how the player sees and interacts with the asset.
+- Use geometry for volume, lighting, collision, and interaction, and use CSS and SVG for layout, accessible controls, and simple interface indicators. Give visible decorative surfaces and recognisable objects generated artwork by default. Treat plain geometry and code-drawn artwork as temporary placeholders unless there is a specific technical reason to keep them.
+- Use game-feel and GSAP techniques where they improve feedback and motion.
 - Reuse scene assets, size WebP artwork for its on-screen use, and load the room, handwriting data, and audio when needed.
 - Use stereo MP3 sound effects, audible footsteps and interaction feedback, and background music for the title, prelude, and gameplay.
 - Provide separate controls for music and effects, and lower the music during speech.

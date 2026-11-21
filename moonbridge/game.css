@@ -432,15 +432,12 @@ dialog header,
   box-shadow: 0 3px 11px #080a19e0;
   color: #fff4df;
 }
-.radio-dock svg {
+.radio-dock img {
   display: block;
-  width: 26px;
-  height: 38px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px #090713b0);
 }
 #unread {
   position: absolute;

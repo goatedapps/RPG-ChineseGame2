@@ -91,15 +91,102 @@ const color = {
   rock: material(0x29344c),
   blueRock: material(0x3f4d68),
   tree: material(0x183d41),
-  leaf: material(0x586077),
   pink: material(0xa25868),
   lamp: material(0xffcc7e, 0.45, 0xffa648, 2),
   off: material(0x4c5667, 0.68),
   spark: material(0xffe087, 0.4, 0xffa117, 2.7),
-  silver: material(0xbbd9ef, 0.48, 0x1766b4, 0.9),
   path: material(0x2d7280, 0.61, 0x194c68, 0.6),
   paper: material(0xdfc795),
+  creamNose: material(0xd6bd8b, 0.5, 0xff9d4d, 0.17),
+  creamSide: material(0xd6bd8b, 0.5),
+  blueNose: material(0xabbcde, 0.49, 0x4599cf, 0.22),
+  blueSide: material(0xabbcde, 0.49),
+  radioFront: material(0xc3b197, 0.65),
+  radioBack: material(0xc3b197, 0.65),
+  radioSide: material(0xc3b197, 0.65),
+  waterfall: new T.MeshBasicMaterial({
+    color: 0x77a9d1,
+    transparent: true,
+    opacity: 0.31,
+    depthWrite: false,
+  }),
 };
+const surfaceArtwork = [
+  ['timber', 'walnut', 0xb29382],
+  ['oak', 'oak', 0xcfb792],
+  ['trim', 'brass', 0xe2c29d],
+  ['roof', 'tiles', 0xa6bacd],
+  ['edge', 'tiles', 0xb2c6c9],
+  ['red', 'banner', 0xd4b9a4],
+  ['brass', 'brass', 0xcdb590],
+  ['rail', 'brass', 0xa3aeb9],
+  ['cart', 'cream-enamel', 0xcbb48f],
+  ['azure', 'blue-enamel', 0x99b7dc],
+  ['seat', 'leather', 0xbca9aa],
+  ['stone', 'stone', 0xa7b4c7],
+  ['rock', 'slate', 0x657b9c],
+  ['blueRock', 'slate', 0x8399bd],
+  ['path', 'stone', 0x99b5c3],
+  ['tree', 'leaves', 0x8aa2a0],
+  ['pink', 'blossoms', 0xcaa09d],
+  ['paper', 'paper', 0xcfc19f],
+  ['waterfall', 'waterfall', 0x8cb7dc],
+  ['lamp', 'lantern-glass', 0xd8bc8a, true],
+  ['spark', 'lantern-glass', 0xf6ca84, true],
+  ['creamNose', 'cream-nose', 0xe0c9a5, true],
+  ['creamSide', 'cream-side', 0xcdb292],
+  ['blueNose', 'blue-nose', 0xccd8ed, true],
+  ['blueSide', 'blue-side', 0xbcc8e3],
+  ['radioFront', 'radio-front', 0xd5c5ad],
+  ['radioBack', 'radio-back', 0xd5c5ad],
+  ['radioSide', 'radio-side', 0xd5c5ad],
+];
+for (const face of [color.radioFront, color.radioBack, color.radioSide]) {
+  face.alphaTest = 0.47;
+}
+
+function loadSurfaceArtwork(renderer) {
+  const loader = new T.TextureLoader();
+  const textures = new Map();
+  for (const [key, file, tint, emissive] of surfaceArtwork) {
+    const target = color[key];
+    if (!textures.has(file)) {
+      const url = new URL('./art/materials/' + file + '.webp', import.meta.url);
+      textures.set(
+        file,
+        loader.loadAsync(url.href).then((texture) => {
+          texture.colorSpace = T.SRGBColorSpace;
+          texture.anisotropy = Math.min(
+            4,
+            renderer.capabilities.getMaxAnisotropy(),
+          );
+          return texture;
+        }),
+      );
+    }
+    textures
+      .get(file)
+      .then((texture) => {
+        target.color.setHex(tint);
+        target.map = texture;
+        if (emissive) {
+          target.emissiveMap = texture;
+          if (key === 'lamp' || key === 'spark')
+            target.emissiveIntensity = key === 'spark' ? 1 : 0.64;
+        }
+        target.needsUpdate = true;
+      })
+      .catch(() => {
+        // Keep the underlying material visible if an individual texture cannot load.
+      });
+  }
+}
+
+const faceGeo = new T.PlaneGeometry();
+function artworkFace(parent, mat, x, y, z, width, height, yaw = 0) {
+  return mesh(parent, faceGeo, mat, [x, y, z], [width, height, 1], [0, yaw, 0]);
+}
+
 function mesh(parent, geometry, mat, xyz, size, rotation = [0, 0, 0]) {
   const object = new T.Mesh(geometry, mat);
   object.position.set(...xyz);
@@ -278,12 +365,32 @@ function crate(parent, x, y, z) {
 }
 function device(parent, x, y, z) {
   const item = groupAt(parent, x, y, z);
-  box(item, color.brass, 0, 0.14, 0, 0.44, 0.34, 0.16);
-  box(item, color.dark, 0, 0.14, 0.086, 0.34, 0.27, 0.034);
-  box(item, color.rail, 0.13, 0.36, -0.02, 0.035, 0.4, 0.035);
-  for (let i = 0; i < 4; i++)
-    box(item, color.rail, -0.04, 0.09 + i * 0.043, 0.112, 0.17, 0.013, 0.014);
-  ball(item, color.spark, 0.12, 0.085, 0.115, 0.03, 0.03, 0.025);
+  mesh(item, roundedGeo, color.brass, [0, 0.198, 0], [0.3, 0.387, 0.14]);
+  artworkFace(item, color.radioFront, 0, 0.198, 0.071, 0.348, 0.402);
+  artworkFace(item, color.radioBack, 0, 0.198, -0.071, 0.348, 0.402, Math.PI);
+  artworkFace(
+    item,
+    color.radioSide,
+    0.151,
+    0.198,
+    0,
+    0.151,
+    0.402,
+    Math.PI / 2,
+  );
+  artworkFace(
+    item,
+    color.radioSide,
+    -0.151,
+    0.198,
+    0,
+    0.151,
+    0.402,
+    -Math.PI / 2,
+  );
+  mesh(item, wheelGeo, color.brass, [0.099, 0.409, 0], [0.033, 0.061, 0.033]);
+  mesh(item, wheelGeo, color.brass, [0.099, 0.508, 0], [0.011, 0.178, 0.011]);
+  ball(item, color.brass, 0.099, 0.6, 0, 0.024, 0.024, 0.024);
   return item;
 }
 function canister(parent, x, y, z) {
@@ -302,17 +409,20 @@ function cart(parent, blue = false) {
   mesh(object, roundedGeo, bodyMat, [0, 0.52, 0], [1.72, 0.46, 2.72]);
   box(object, color.brass, 0, 0.51, 1.32, 1.27, 0.075, 0.08);
   box(object, color.brass, 0, 0.67, -0.99, 1.43, 0.11, 0.31);
-  mesh(object, roundedGeo, bodyMat, [0, 0.79, -1.12], [1.54, 0.47, 0.6]);
-  box(
+  mesh(object, roundedGeo, bodyMat, [0, 0.83, -1.12], [1.39, 0.62, 0.6]);
+  artworkFace(
     object,
-    blue ? color.silver : color.lamp,
+    blue ? color.blueNose : color.creamNose,
     0,
-    0.88,
-    -1.395,
-    0.69,
-    0.37,
-    0.06,
+    0.83,
+    -1.426,
+    1.24,
+    0.54,
+    Math.PI,
   );
+  const sideArt = blue ? color.blueSide : color.creamSide;
+  artworkFace(object, sideArt, 0.863, 0.519, 0, 2.16, 0.371, Math.PI / 2);
+  artworkFace(object, sideArt, -0.863, 0.519, 0, 2.16, 0.371, -Math.PI / 2);
   mesh(object, roundedGeo, color.seat, [0, 0.8, 0.32], [1.12, 0.2, 0.62]);
   mesh(object, roundedGeo, color.seat, [0, 1.02, 0.64], [1.12, 0.59, 0.23]);
   box(object, color.brass, 0, 1.01, 0.78, 1.02, 0.055, 0.045);
@@ -489,16 +599,10 @@ function nightLandscape(scene, fixed) {
   for (let i = 0; i < 8; i++) {
     const x = (i % 2 ? 1 : -1) * (26 + i * 2.5);
     const z = -22 - i * 9.5;
-    const fall = new T.MeshBasicMaterial({
-      color: 0x77a9d1,
-      transparent: true,
-      opacity: 0.31,
-      depthWrite: false,
-    });
     for (let j = 0; j < 3; j++)
       box(
         fixed,
-        fall,
+        color.waterfall,
         x + j * 0.15,
         -16,
         z,
@@ -606,6 +710,7 @@ export function createWorld(canvas, notify, finished) {
     antialias: true,
     powerPreference: 'high-performance',
   });
+  loadSurfaceArtwork(renderer);
   const scene = new T.Scene();
   const camera = new T.PerspectiveCamera(68, 1, 0.065, 245);
   const fixed = new T.Group();
