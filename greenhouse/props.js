@@ -12,6 +12,7 @@ export function createKit(THREE, scene) {
   const batches = new Map();
   const transform = new THREE.Object3D();
   const images = new THREE.TextureLoader();
+  const sources = new Map();
 
   function material(color, options = {}) {
     return new THREE.MeshStandardMaterial({ color, roughness: .76, ...options });
@@ -73,12 +74,25 @@ export function createKit(THREE, scene) {
   }
 
   function imageTexture(file, ready) {
-    const url = new URL('./art/' + file, import.meta.url);
-    images.load(url.href, (map) => {
-      map.colorSpace = THREE.SRGBColorSpace;
-      map.anisotropy = 4;
-      ready(map);
-    }, undefined, () => {});
+    let source = sources.get(file);
+    if (!source) {
+      const url = new URL('./art/' + file, import.meta.url);
+      source = new Promise((resolve) => {
+        images.load(url.href, (map) => {
+          map.colorSpace = THREE.SRGBColorSpace;
+          map.anisotropy = 4;
+          resolve(map);
+        }, undefined, () => {
+          sources.delete(file);
+          resolve(null);
+        });
+      });
+      sources.set(file, source);
+    }
+    // Clones share decoded pixels but keep their own UV transforms and sampler settings.
+    void source.then((map) => {
+      if (map) ready(map.clone());
+    });
   }
 
   function imageMaterial(file, fallback, options) {
@@ -195,6 +209,7 @@ export function createKit(THREE, scene) {
 
   return {
     group, material, texture, imageTexture, imageMaterial, metricSurface, plate, flooring, finish,
+    ready: () => Promise.all(sources.values()),
     box: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, boxGeometry),
     tube: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, tubeGeometry),
     pot: (size, at, mat, parent = null, rotation) => shape(size, at, mat, parent, rotation, taperedGeometry),

@@ -110,7 +110,12 @@ export function playComic(container, onFinish, { onPage = () => {} } = {}) {
       image.hidden = true;
       fallback.hidden = false;
     }, { once: true });
-    image.src = new URL('./art/comic-storm-' + (page + 1) + '.webp', import.meta.url);
+    const path = './art/comic-storm-' + (page + 1);
+    const full = new URL(path + '.webp', import.meta.url);
+    const small = new URL(path + '-small.webp', import.meta.url);
+    image.sizes = 'min(calc(100vw - 1.2rem), calc((100dvh - 6rem) * 1.5))';
+    image.srcset = `${small} 768w, ${full} 1050w`;
+    image.src = full;
     const speech = balloon('comic-speech', data.bubble);
     drawing.append(image, fallback, speech);
     const effect = data.effect ? balloon('comic-sound', data.effect.bubble) : null;

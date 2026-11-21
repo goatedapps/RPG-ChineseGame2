@@ -67,7 +67,7 @@ export function createEngine({
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.18;
 
-  const { scene, targets, colliders, spawn, update } = worldFactory(THREE);
+  const { scene, targets, colliders, spawn, update, ready } = worldFactory(THREE);
   const camera = new THREE.PerspectiveCamera(65, 1, .065, 110);
   const raycaster = new THREE.Raycaster();
   raycaster.far = REACH;
@@ -334,10 +334,12 @@ export function createEngine({
       choose(scan());
     }
   }
-  renderer.setAnimationLoop(frame);
+  function show() {
+    renderer.setAnimationLoop(frame);
+  }
 
   return {
-    setActive, interact, setVector, look, reset, focus,
+    show, ready, setActive, interact, setVector, look, reset, focus,
     setGameState(next) {
       state = { ...next };
       nextRay = 0;

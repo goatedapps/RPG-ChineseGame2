@@ -587,5 +587,5 @@ export function createWorld(THREE) {
   }
 
   update(0, { reducedMotion: true });
-  return { scene, spawn, colliders, targets, update };
+  return { scene, spawn, colliders, targets, update, ready: kit.ready() };
 }

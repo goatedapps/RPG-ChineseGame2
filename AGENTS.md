@@ -6,7 +6,9 @@
 - Give each lesson its own HTML entry point and reuse shared gameplay and learning systems where practical.
 - A future menu will link the lessons and let players choose any supported level (P2, P3, P5, or P6), then progress through that level in order from Lesson 1.
 - Give each lesson a coherent storyline with one overarching mission and a series of related objectives.
+- Give each title screen a distinct illustrated identity that fits the story.
 - Start each storyline with a short, picture-led prelude that establishes the situation before play begins.
+- Give comic art expressive characters, clear action, and exaggerated staging where it suits the story.
 - Put dialogue inside comic panels and reveal story beats one at a time with GSAP when the player clicks or taps the scene.
 - Use the title, prelude, and first playable moments to establish what is at stake and why the mission needs attention.
 - Introduce walking, looking around, and interacting in a short hands-on tutorial.
@@ -20,7 +22,7 @@
 - Connect discoveries to comprehension questions and dictation before advancing to the next clue or story checkpoint.
 - Give players a reason to keep exploring through visible progress, discoveries, and satisfying feedback when their actions change the scene.
 - Use the `imagegen`, `game-feel`, and GSAP skills where they help the lesson.
-- Use optimized generated artwork for environments, props, and pages where it improves the scene.
+- Use generated artwork throughout the lab, including plants, desks, boards, shelving, and cupboards, and reuse matching assets across repeated objects.
 - Show an item close-up directly over the room, with only the item and the words a player needs.
 - Open books to the relevant page, use legible handwritten Chinese for personal notes, and let players click or tap outside the item to dismiss it.
 - Keep generic titles, outer cards, and redundant controls out of object close-ups.
@@ -40,12 +42,22 @@
 - Let the vocabulary notebook fill up as the player progresses, and give every word its meaning, Hanyu Pinyin, and a pronunciation control.
 - Use the browser's Speech Synthesis API for Mandarin dictation and Hanzi Writer for stroke-by-stroke practice.
 - Give players one large active handwriting box for both touch and mouse input, with progress shown separately for multi-character words.
+- Keep the active box at least 248 CSS pixels per side at typical desktop and tablet sizes, a 50% increase over the original 165-pixel maximum.
 - During dictation, highlight the next stroke after five unsuccessful attempts at that stroke.
 - Show the sentence while it is read aloud, with the target word blanked out.
 - Offer normal-speed replay as the only dictation playback option.
 - Use natural-sounding prerecorded Mandarin for story dialogue, such as walkie-talkie conversations, where practical.
 - Use stereo MP3s for sound effects.
-- Use background music and short interaction sounds to support the scene, with separate music and sound-effect controls and lower music during speech.
+- Use background music on the title screen, during the prelude, and in gameplay, with separate music and sound-effect controls.
+- Keep footsteps and button feedback audible in the mix, and lower the music during speech.
+
+## Asset delivery
+
+- Export illustration and texture WebPs at sizes and quality suited to their on-screen use, with smaller variants where the layout benefits.
+- Reuse decoded texture sources for repeated objects while preserving per-material mapping, and keep the live Chinese clue text and handwriting legible.
+- Load the cover and its immediate controls first, prepare the 3D room when the player chooses to enter, and fetch practice assets at the first exercise that needs them.
+- Fetch audio as the scene needs it, and preserve clean loops, stereo effects, and intelligible Mandarin.
+- Subset fonts and Hanzi stroke data to the lesson where practical, retain attribution, and verify assets on tablet and desktop views.
 
 ## Current reference implementation
 
@@ -53,8 +65,7 @@
 - The earlier Stormroot platformer remains available at `stormroot.html`.
 - P6 Lesson 1 covers all 24 entries in `content/p6/tingxie/1.yaml`.
 - The story and dictation order live in `greenhouse/story.js`, the notebook and bilingual practice data in `greenhouse/lexicon.js`, and the close-ups in `greenhouse/evidence.js`.
-- Keep generated game art as small WebP assets under `greenhouse/art/` and render clue wording as live text over the artwork.
-- Reuse generated lab textures under `greenhouse/art/lab/` across 3D room assets, and keep collision and interaction geometry aligned with the visible objects.
+- Keep generated art under `greenhouse/art/`, shared lab textures under `greenhouse/art/lab/`, and interaction geometry aligned with the visible objects.
 - If a recorded radio line changes, regenerate the matching MP3 using the transcript in `greenhouse/radio-lines.js`.
 - Keep Hanzi stroke data and its attribution together under `stage/vendor/`.
 - Preview over HTTP with `python -m http.server 8000` and keep asset and module URLs relative to work under the GitHub Pages repository path.

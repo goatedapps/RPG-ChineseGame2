@@ -1,5 +1,7 @@
 const dataUrl = new URL('../stage/vendor/lesson-characters.json', import.meta.url);
+const writerUrl = new URL('../stage/vendor/hanzi-writer.min.js', import.meta.url);
 let dataRequest;
+let writerRequest;
 
 function getStrokeData() {
   dataRequest ??= fetch(dataUrl).then((response) => {
@@ -10,6 +12,28 @@ function getStrokeData() {
     throw error;
   });
   return dataRequest;
+}
+
+function getWriter() {
+  if (window.HanziWriter) return Promise.resolve(window.HanziWriter);
+  writerRequest ??= new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = writerUrl.href;
+    function failed() {
+      script.remove();
+      reject(new Error('Handwriting library unavailable'));
+    }
+    script.onload = () => {
+      if (window.HanziWriter) resolve(window.HanziWriter);
+      else failed();
+    };
+    script.onerror = failed;
+    document.head.append(script);
+  }).catch((error) => {
+    writerRequest = null;
+    throw error;
+  });
+  return writerRequest;
 }
 
 export function createWriting(grid, word, guided, onComplete, onError, onMistake, onProgress) {
@@ -40,10 +64,9 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
   });
   resize.observe(grid);
 
-  getStrokeData().then((data) => {
+  Promise.all([getStrokeData(), getWriter()]).then(([data, Writer]) => {
     if (cancelled) return;
-    const Writer = window.HanziWriter;
-    if (!Writer || characters.some((character) => !data[character])) throw new Error('Missing handwriting asset');
+    if (characters.some((character) => !data[character])) throw new Error('Missing handwriting asset');
     function begin(index) {
       if (cancelled) return;
       activeIndex = index;

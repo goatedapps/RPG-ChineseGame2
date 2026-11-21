@@ -1,6 +1,6 @@
 # Science wing artwork
 
-`science-poster.webp` was made with the built-in image generation tool and compressed for use as an in-game texture.
+`science-poster.webp` was made with the built-in image generation tool and compressed to a 480 × 720 in-game texture.
 
 ## Prompt
 
@@ -14,7 +14,8 @@ No lettering, no words, no numbers, no logos, no silhouettes of people, no outsi
 
 ## Room surfaces
 
-The built-in image generation tool produced a four-part material sheet, split and compressed into `wall-plaster.webp`, `floor-terrazzo.webp`, `worktop-wood.webp`, and `cabinet-enamel.webp`.
+The 256 × 256 `floor-terrazzo.webp` tile came from a four-part material sheet produced with the built-in image generation tool.
+The other room surfaces use the newer textures under `lab/`.
 
 Square seamless video game material atlas, four equal full-bleed quadrants in a precise 2 by 2 grid.
 This is flat texture photography, a material swatch image, no lighting gradients, no mockup, no letters, no bevels, no shadows and no border or divider line.
@@ -40,8 +41,9 @@ No text, lettering, arrows, labels, signs, diagrams inset, border, or decorative
 
 ## Storm comic and title cover
 
-The built-in image generator produced `storm-cover.webp` and `comic-storm-1.webp` through `comic-storm-4.webp`.
-The cover is 1280 × 720 and the four comic panels are 1050 × 700 WebPs.
+The built-in image generator produced the title cover and four comic panels.
+The title uses `storm-cover.webp` at 1280 × 720 or the 744 × 720 crop `storm-cover-portrait.webp` on narrower screens.
+The comic uses 1050 × 700 panels and serves their 768 × 512 `-small` versions when the frame and pixel density permit.
 Chinese and opt-in English are typeset as live dialogue within the illustrated balloons.
 
 ### Shared comic direction
@@ -110,7 +112,7 @@ No heavy gradients; use original sharply cut comic color shapes and small print-
 
 ## Object covers
 
-`book-diary.webp`, `book-exercise.webp`, `book-test.webp`, and `book-rehearsal.webp` are 400 × 400 book and document textures.
+`book-diary.webp`, `book-exercise.webp`, and `book-rehearsal.webp` are 288 × 288 book textures, and `book-test.webp` is a 400 × 400 document texture.
 The built-in image generator provided the artwork, which was cropped and compressed to WebP.
 
 Produce one precisely aligned 2x2 material atlas, square, four equal full-bleed quadrants, clean joins at centre, no margin, no table, no shadows, no perspective.

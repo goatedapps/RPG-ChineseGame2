@@ -10,6 +10,12 @@
   background: #1b1e36;
   color: #faf3df;
 }
+#splash picture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+}
 .cover-art {
   position: absolute;
   inset: 0;
@@ -17,7 +23,6 @@
   height: 100%;
   object-fit: cover;
   object-position: 58% center;
-  z-index: -2;
 }
 #splash::before {
   content: '';

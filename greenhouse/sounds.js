@@ -21,8 +21,14 @@ const tracks = {
 
 const rainFile = 'rain-window';
 const musicLoopStart = .145;
-const soundFiles = new Set([rainFile, ...Object.values(clips).flatMap(({ files }) => files)]);
+const comicClips = ['page', 'storm'];
+const sceneClips = {
+  title: ['ui'],
+  comic: ['ui', 'radio', ...comicClips],
+  game: Object.keys(clips).filter((name) => !comicClips.includes(name)),
+};
 const maxEffects = 7;
+const maxCueDelay = 650;
 
 function fileURL(category, name) {
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
@@ -46,6 +52,8 @@ export function createGreenhouseAudio() {
   let focused = true;
   let stepIndex = 0;
   const buffers = new Map();
+  const pendingEffects = new Map();
+  const pendingCues = new Map();
   const pendingMusic = new Map();
   const musicBuffers = new Map();
   const voices = new Map();
@@ -145,31 +153,67 @@ export function createGreenhouseAudio() {
     }
   }
 
-  async function load(name) {
-    try {
-      const response = await fetch(fileURL('sfx', name));
-      if (!response.ok) return;
-      const buffer = await context.decodeAudioData(await response.arrayBuffer());
+  function fetchAudio(category, name) {
+    return fetch(fileURL(category, name)).then((response) => response.ok ? response.arrayBuffer() : null)
+      .catch(() => null);
+  }
+
+  function prepareEffect(name) {
+    if (buffers.has(name)) return Promise.resolve(buffers.get(name));
+    let entry = pendingEffects.get(name);
+    if (!entry) {
+      entry = { data: fetchAudio('sfx', name) };
+      pendingEffects.set(name, entry);
+    }
+    if (!context) return null;
+    entry.decoded ??= entry.data.then(async (data) => {
+      if (!data) return null;
+      const buffer = await context.decodeAudioData(data);
       buffers.set(name, buffer);
       if (name === rainFile) refreshMix();
-    } catch {
-      // Effects are optional when media fails to load or decode.
+      return buffer;
+    }).catch(() => null).finally(() => pendingEffects.delete(name));
+    return entry.decoded;
+  }
+
+  function prepareSceneEffects() {
+    if (!enabled) return;
+    for (const name of sceneClips[musicScene] ?? sceneClips.title) {
+      for (const file of clips[name].files) prepareEffect(file);
     }
+    if (ambience) prepareEffect(rainFile);
+  }
+
+  function prepareGameplay() {
+    if (!enabled) return;
+    for (const file of [rainFile, ...clips.step.files, ...clips.pickup.files]) prepareEffect(file);
+  }
+
+  function queueCue(name, file) {
+    const alreadyPending = pendingCues.has(name);
+    pendingCues.set(name, { scene: musicScene, time: performance.now() });
+    if (alreadyPending) return;
+    void Promise.all([prepareEffect(file), enabling]).then(([buffer]) => {
+      const request = pendingCues.get(name);
+      pendingCues.delete(name);
+      const current = name === 'ui' || request.scene === musicScene;
+      if (buffer && current && audible() && performance.now() - request.time <= maxCueDelay) cue(name);
+    });
   }
 
   function prepareMusic(name) {
     if (!name || musicBuffers.has(name)) return;
     let entry = pendingMusic.get(name);
     if (!entry) {
-      const data = fetch(fileURL('music', name)).then((response) => response.ok ? response.arrayBuffer() : null)
-        .catch(() => null);
-      entry = { data, decoding: false };
+      entry = { data: fetchAudio('music', name), decoding: false };
       pendingMusic.set(name, entry);
     }
     if (!context || entry.decoding) return;
     entry.decoding = true;
     void entry.data.then(async (data) => {
-      if (data) musicBuffers.set(name, await context.decodeAudioData(data));
+      if (!data || name !== musicScene) return;
+      const buffer = await context.decodeAudioData(data);
+      if (name === musicScene) musicBuffers.set(name, buffer);
     }).catch(() => {}).finally(() => {
       pendingMusic.delete(name);
       refreshMix();
@@ -210,7 +254,7 @@ export function createGreenhouseAudio() {
     window.addEventListener('pointerup', unlock);
     window.addEventListener('keydown', unlock);
     context.addEventListener('statechange', refreshMix);
-    for (const file of soundFiles) void load(file);
+    prepareSceneEffects();
     if (musicEnabled) prepareMusic(musicScene);
     return true;
   }
@@ -232,12 +276,16 @@ export function createGreenhouseAudio() {
   function cue(request) {
     const name = request === 'dew' ? 'pickup' : request;
     const clip = Object.hasOwn(clips, name) ? clips[name] : undefined;
-    if (!clip || !enabled || !audible()) return;
+    if (!clip || !enabled || !context || !focused || document.hidden) return;
     const now = context.currentTime;
     if (now - (lastCue.get(name) ?? -Infinity) < clip.cooldown) return;
     const nextFile = name === 'step' ? clip.files[stepIndex % clip.files.length] : clip.files[0];
     const buffer = buffers.get(nextFile) ?? buffers.get(clip.files[0]);
-    if (!buffer) return;
+    if (!buffer || !audible()) {
+      if (name === 'step') prepareEffect(nextFile);
+      else queueCue(name, nextFile);
+      return;
+    }
     if (voices.size >= maxEffects) {
       if (name === 'step') return;
       const footstep = [...voices].find(([, voice]) => voice.name === 'step');
@@ -264,8 +312,10 @@ export function createGreenhouseAudio() {
 
   return {
     start,
+    prepareGameplay,
     setEnabled(value) {
       enabled = Boolean(value);
+      if (enabled && (musicScene || context || ambience)) prepareSceneEffects();
       refreshMix();
     },
     setMusicEnabled(value) {
@@ -276,16 +326,16 @@ export function createGreenhouseAudio() {
     setMusic(name) {
       const next = Object.hasOwn(tracks, name) ? name : null;
       if (musicScene === next) return;
+      musicBuffers.delete(musicScene);
       musicScene = next;
-      if (musicEnabled) {
-        prepareMusic(next);
-        if (next === 'title') prepareMusic('comic');
-      }
+      if (musicEnabled) prepareMusic(next);
+      prepareSceneEffects();
       refreshMix();
     },
     setAmbience(active) {
       if (ambience === Boolean(active)) return;
       ambience = Boolean(active);
+      if (ambience && enabled) prepareEffect(rainFile);
       refreshMix();
     },
     setDucked(value) {

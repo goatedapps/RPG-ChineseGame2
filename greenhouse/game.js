@@ -1,5 +1,3 @@
-import { createEngine } from './engine.js';
-import { createWorld } from './world.js';
 import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js';
@@ -69,6 +67,7 @@ function load() {
 
 let state = load();
 let engine;
+let roomRequest;
 let started = false;
 let unavailable = false;
 let tutorialIndex = 0;
@@ -847,7 +846,29 @@ window.addEventListener('keydown', (event) => {
 });
 
 function begin() {
-  if (unavailable || !engine || started) return;
+  if (started) return;
+  if (unavailable) {
+    audio.setMusic('title');
+    return;
+  }
+  if (!engine) {
+    $('#start').disabled = true;
+    $('#replay-intro').disabled = true;
+    $('#start-status').textContent = '正在准备科学楼……';
+    void prepareRoom().then(() => {
+      if (!unavailable) {
+        $('#start').disabled = false;
+        $('#replay-intro').disabled = false;
+      }
+      if (engine) begin();
+      else {
+        $('#start-status').textContent = '科学楼未能载入。请刷新页面再试。';
+        audio.setMusic('title');
+      }
+    });
+    return;
+  }
+  $('#start-status').textContent = '';
   started = true;
   audio.setMusic('game');
   audio.setAmbience(true);
@@ -856,8 +877,9 @@ function begin() {
   $('#toolbar').hidden = false;
   $('#mission-ui').hidden = false;
   $('#play-controls').hidden = false;
+  engine.show();
   engine.setActive(true);
-  engine.focus(true);
+  engine.focus(state.phase === 'explore');
   objective(true, true);
   if (state.phase === 'done') showEnding();
 }
@@ -897,11 +919,13 @@ for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
 }
 
 function beginWithComic() {
-  if (unavailable || !engine || started || !$('#comic-overlay').hidden) return;
+  if (unavailable || started || !$('#comic-overlay').hidden) return;
   audio.setMusic('comic');
+  void prepareRoom();
   playComic($('#comic-overlay'), begin, {
     onPage(page) {
-      if (page === 2) audio.cue('storm');
+      if (page === 1) audio.prepareGameplay();
+      else if (page === 2) audio.cue('storm');
       else if (page === 4) audio.cue('radio');
       else if (page > 1) audio.cue('page');
     },
@@ -931,46 +955,50 @@ if (state.tutorialDone) {
   $('#replay-intro').hidden = false;
 }
 
-engine = createEngine({
-  canvas, worldFactory: createWorld, reducedMotion: motion,
-  onTarget: updateTarget,
-  onInteract: useObject,
-  onMove({ distance }) {
-    footstepDistance += distance;
-    if (footstepDistance >= .72) {
-      footstepDistance %= .72;
-      audio.cue('step');
-    }
-    if (!started || state.tutorialDone || tutorialIndex !== 0) return;
-    walked += distance;
-    if (walked > .85) {
-      tutorialIndex = 1;
-      audio.cue('dew');
-      objective();
-    }
-  },
-  onLook({ dx, dy }) {
-    if (!started || state.tutorialDone || tutorialIndex !== 1) return;
-    turned += Math.abs(dx) + Math.abs(dy);
-    if (turned > 92) {
-      tutorialIndex = 2;
-      audio.cue('dew');
-      objective();
-    }
-  },
-  onStatus({ type, message }) {
-    if (type === 'unsupported') {
-      unavailable = true;
-      $('#start').disabled = true;
-      $('#start-status').textContent = message;
-    } else if (type === 'contextlost' || type === 'contextrestored') {
-      response(message, type === 'contextlost' ? 'The 3D view paused while graphics recover.' : 'The 3D view has recovered.');
-    }
-  },
-});
-
-if (engine && !unavailable) {
-  $('#start-status').textContent = '';
-  engine.setActive(false);
-  worldState();
+function prepareRoom() {
+  roomRequest ??= Promise.all([import('./engine.js'), import('./world.js')]).then(async ([{ createEngine }, { createWorld }]) => {
+    const room = createEngine({
+      canvas, worldFactory: createWorld, reducedMotion: motion,
+      onTarget: updateTarget,
+      onInteract: useObject,
+      onMove({ distance }) {
+        footstepDistance += distance;
+        if (footstepDistance >= .72) {
+          footstepDistance %= .72;
+          audio.cue('step');
+        }
+        if (!started || state.tutorialDone || tutorialIndex !== 0) return;
+        walked += distance;
+        if (walked > .85) {
+          tutorialIndex = 1;
+          audio.cue('dew');
+          objective();
+        }
+      },
+      onLook({ dx, dy }) {
+        if (!started || state.tutorialDone || tutorialIndex !== 1) return;
+        turned += Math.abs(dx) + Math.abs(dy);
+        if (turned > 92) {
+          tutorialIndex = 2;
+          audio.cue('dew');
+          objective();
+        }
+      },
+      onStatus({ type, message }) {
+        if (type === 'unsupported') {
+          unavailable = true;
+          $('#start').disabled = true;
+          $('#start-status').textContent = message;
+        } else if (type === 'contextlost' || type === 'contextrestored') {
+          response(message, type === 'contextlost' ? 'The 3D view paused while graphics recover.' : 'The 3D view has recovered.');
+        }
+      },
+    });
+    await room.ready;
+    engine = room;
+    if (!unavailable) worldState();
+  }).catch(() => {
+    roomRequest = null;
+  });
+  return roomRequest;
 }
