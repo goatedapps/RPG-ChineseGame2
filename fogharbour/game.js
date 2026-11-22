@@ -242,7 +242,7 @@ function showCheck(task) {
   const status = element('p', 'feedback');
   status.setAttribute('role', 'status');
   sheet.append(element('p', 'body', check.prompt), status);
-  const choices = element('div', 'choices');
+  const choices = element('div', 'harbour-answers');
   const start = (state.index + state.question + 1) % check.choices.length;
   for (let n = 0; n < check.choices.length; n++) {
     const index = (n + start) % check.choices.length;
@@ -258,7 +258,7 @@ function showCheck(task) {
       save();
       play('correct');
       sheet.append(button('继续', () => showCheck(task)));
-    }, 'choice');
+    }, 'harbour-answer');
     choices.append(option);
   }
   const review = element('details', 'harbour-review');
@@ -359,11 +359,12 @@ async function showPractice(index = 0) {
   const item = data[index % data.length];
   const status = element('p', 'feedback');
   sheet.append(element('p', 'body', item.prompt), status);
-  item.choices.forEach((choice, n) => sheet.append(button(choice, () => {
+  const choices = element('div', 'harbour-answers');
+  item.choices.forEach((choice, n) => choices.append(button(choice, () => {
     status.textContent = n === item.answer ? '答对了。' : '再想一想。';
     play(n === item.answer ? 'correct' : 'wrong');
-  }, 'choice')));
-  sheet.append(button('下一题', () => showPractice(index + 1)), button('返回词语手册', showBook, 'text-button'));
+  }, 'harbour-answer')));
+  sheet.append(choices, button('下一题', () => showPractice(index + 1)), button('返回词语手册', showBook, 'text-button'));
 }
 
 function replay() {

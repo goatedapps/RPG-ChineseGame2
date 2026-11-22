@@ -21,9 +21,22 @@
   background: linear-gradient(#12293b47,#101e32cf), url('art/harbour.webp') center / cover;
 }
 #workbench:not(.artifact-inspection) { background: #122c38f5; }
-.harbour-panel > :is(p, .choices, .button-row, details, .writing-grid) { margin-block: .7rem; }
-.harbour-panel button + button { margin-inline-start: .2rem; }
-.harbour-panel .choices button + button { margin-inline-start: 0; }
+.harbour-panel > :is(p, .harbour-answers, .button-row, details, .writing-grid) { margin-block: .7rem; }
+.harbour-panel > button + button { margin-inline-start: .2rem; }
+.harbour-answers { display: grid; gap: .45rem; }
+.harbour-answer {
+  min-height: 44px;
+  padding: .6rem .8rem;
+  border: 1px solid #8ba9a8;
+  border-radius: .4rem;
+  background: #213f4a;
+  color: var(--cream);
+  text-align: start;
+  line-height: 1.5;
+}
+.harbour-answer:enabled:is(:hover, :focus-visible) { background: #315663; }
+.harbour-answer:disabled { opacity: 1; }
+.harbour-panel .feedback { color: var(--sun); }
 .harbour-panel .writing-grid { --writing-side: min(23rem, 54dvh); margin-inline: auto; }
 .harbour-panel .writing-progress { text-align: center; color: #ffd991; }
 .harbour-panel .body { line-height: 1.62; }
