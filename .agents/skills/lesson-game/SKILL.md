@@ -14,6 +14,7 @@ Start with [AGENTS.md](../../../AGENTS.md) for the current project rules. Use th
 - All vocab in the Tingxie word list must have a dictation practice in each story.
 - Outline the stakes in the prelude, the places the player will visit, what the helper says before each new task, and what the epilogue shows. Make each task give the player a reason to move, inspect, choose, or act.
 - Game will be in simplified Chinese throughout. However, the storyline in each lesson will be 'told' to the player entirely in English via an 'assistant'. This assistant can be a friend that guides you through the mission via a phone or walkie talkie (like P6 lesson 1 and P3 Lesson 1), a robot, a partner for a mission etc. The tutorial may begin with the player finding and picking up the helper’s device. Keep the helper available at the bottom right after pickup. After a task has been completed and before a new task is displayed in Chinese, the 'assistant' will have a new alert or notification that explains the next step.
+- Automatically read each new task instruction aloud in Mandarin when it appears on the HUD. For tasks with an English briefing, wait until the player has finished with it. Keep the Mandarin replay control available for the active task.
 
 ## 2. Reuse the reference lesson and shared components
 
@@ -35,7 +36,7 @@ Serve the repository over HTTP with `python -m http.server 8000`. Open the lesso
 
 1. Enter from the star map on a fresh visit, play through the prelude, and return with saved progress. Confirm the map points to the correct lesson.
 2. On desktop, check mouse capture, free look, interaction, and cursor release. On touch, check the joystick, drag-to-look, close-up gestures, and small-screen readability.
-3. Run through a helper briefing and hint, a clue, a comprehension check, dictation, and the vocabulary notebook. Verify language, whether the hint points to the right object, and start/stop behavior for dictation audio.
+3. Run through a helper briefing and hint, a clue, a comprehension check, dictation, and the vocabulary notebook. Verify that the new task is spoken in Mandarin after the briefing, the hint points to the right object, and dictation audio starts and stops as expected.
 4. Check music and effects with the browser's first-interaction restriction, confirm sound follows the settings, and verify any recorded helper lines open and stop at the expected moments.
 5. Check the epilogue, final test, interrupted-test resume, completion and world unlock, and replay confirmation. For a full review, compare the shipped activities with the word coverage from step 1.
 

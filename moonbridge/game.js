@@ -139,6 +139,7 @@ let view = 'home';
 let world;
 let radioBuzz;
 let lastRadioAlert;
+let lastTaskReadout;
 let currentTarget = null;
 let hintCount = 0;
 let toastTimer;
@@ -161,9 +162,24 @@ function play(name) {
 }
 function speaker(text, status) {
   voice.speak(text, 0.86, (state) => {
-    if (state === 'unavailable' && status)
+    if (state === 'unavailable' && status) {
       status.textContent = '这个设备暂时无法播放普通话。';
+      status.hidden = false;
+    }
   });
+}
+
+function readTask(replay = false) {
+  if (view !== 'hud' || dialog.open ||
+      (!driving && (briefingPending() || !objective()?.cue))) return;
+  const instruction = $('control-hint').textContent;
+  const taskKey = save.stage + ':' + $('objective').textContent + (driving ? '' : ':' + instruction);
+  if (!replay && (taskKey === lastTaskReadout || navigator.userActivation?.hasBeenActive === false)) return;
+  lastTaskReadout = taskKey;
+  const status = $('voice-status');
+  status.textContent = '';
+  status.hidden = true;
+  speaker(instruction, status);
 }
 function animate(element, y = 6) {
   if (!window.gsap || reducedMotion.matches) return;
@@ -219,7 +235,10 @@ setAudio();
 
 function setView(next) {
   view = next;
-  if (next !== 'hud') stopMeiClip();
+  if (next !== 'hud') {
+    stopMeiClip();
+    voice.stop();
+  }
   for (const id of ['home', 'comic', 'hud', 'assessment'])
     $(id).hidden = id !== next;
   canvas.hidden = next !== 'hud';
@@ -307,14 +326,15 @@ dialog.addEventListener('click', (event) => {
 dialog.addEventListener('close', () => {
   const onDismiss = dismissInspection;
   dismissInspection = undefined;
+  voice.stop();
   onDismiss?.();
   world?.releaseTrial();
   disposeWriting();
   disposeWriting = () => {};
-  voice.stop();
   if (view === 'hud') world?.resume();
   if (lastFocused?.isConnected && !lastFocused.closest('[hidden]'))
     lastFocused.focus();
+  readTask();
 });
 
 function pendingFieldwork() {
@@ -413,6 +433,7 @@ function update(notifyRadio = false) {
     $('drive').hidden = true;
   }
   paintAction();
+  readTask();
 }
 function go(stage) {
   save.stage = stage;
@@ -504,6 +525,7 @@ function startWorld() {
     return;
   }
   world.reset(save.stage >= 12);
+  lastTaskReadout = undefined;
   if (!save.introSeen) {
     save.introSeen = true;
     persist();
@@ -555,12 +577,14 @@ function enterLesson() {
   else showComic(opening, '序幕', startWorld);
 }
 $('retry-entry').onclick = startWorld;
-$('speak').onclick = () => {
-  const status = $('voice-status');
-  status.textContent = '';
-  status.hidden = false;
-  if (!briefingPending() && objective()?.cue) speaker($('control-hint').textContent, status);
-};
+$('speak').onclick = () => readTask(true);
+const inputEvents = ['pointerup', 'keydown', 'click'];
+function readOnFirstInput(input) {
+  if (!input.isTrusted || navigator.userActivation?.hasBeenActive === false) return;
+  for (const event of inputEvents) document.removeEventListener(event, readOnFirstInput);
+  if (!input.target.closest?.('#speak')) readTask();
+}
+for (const event of inputEvents) document.addEventListener(event, readOnFirstInput, { passive: true });
 
 function radioMessageKey(kind) {
   // The first radio exchange belongs to the lookout task.
@@ -1135,6 +1159,7 @@ function enterRace() {
   $('accelerator').textContent = '举手发车';
   $('accelerator').focus({ preventScroll: true });
   play('relay');
+  readTask();
 }
 
 function accelerateRace() {
