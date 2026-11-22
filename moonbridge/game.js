@@ -5,9 +5,10 @@ import {
   parts,
   tasks,
   objects,
-} from './story.js?v=physical-clues';
+} from './story.js?v=mei-voice';
 import { words, bank } from './curriculum.js';
-import { fieldwork } from './fieldwork.js?v=physical-clues';
+import { fieldwork } from './fieldwork.js?v=mei-voice';
+import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
@@ -40,6 +41,7 @@ const initial = {
   fieldProgress: null,
   seenRadioMessages: [],
   acknowledgedBriefings: [],
+  playedMeiClips: [],
   stage: 0,
   part: null,
   won: false,
@@ -88,6 +90,9 @@ function readSave() {
         : (Array.isArray(value.seenRadioMessages)
             ? value.seenRadioMessages.filter((key) => typeof key === 'string' && key.endsWith(':guide'))
             : []),
+      playedMeiClips: Array.isArray(value.playedMeiClips)
+        ? value.playedMeiClips.filter((id) => typeof id === 'string')
+        : [],
       discoveries: words
         .map(({ word }) => word)
         .filter(
@@ -114,7 +119,13 @@ function persist() {
     localStorage.setItem(saveKey, JSON.stringify(save));
   } catch {}
 }
-const voice = createVoice((status) => audio.setDucked(status === 'playing'));
+let mandarinPlaying = false;
+let meiPlayback;
+const voice = createVoice((status) => {
+  mandarinPlaying = status === 'playing';
+  if (mandarinPlaying) stopMeiClip();
+  updateSpeechMix();
+});
 let view = 'home';
 let world;
 let radioBuzz;
@@ -196,6 +207,7 @@ setAudio();
 
 function setView(next) {
   view = next;
+  if (next !== 'hud') stopMeiClip();
   for (const id of ['home', 'comic', 'hud', 'assessment'])
     $(id).hidden = id !== next;
   canvas.hidden = next !== 'hud';
@@ -532,7 +544,44 @@ function radioMessageKey(kind) {
   return save.stage + ':' + variant + ':' + kind;
 }
 
-function radioMessage(text, kind, onDisplayed) {
+function updateSpeechMix() {
+  audio.setDucked(mandarinPlaying || Boolean(meiPlayback?.playing));
+}
+
+function stopMeiClip() {
+  if (!meiPlayback) return;
+  const { clip } = meiPlayback;
+  meiPlayback = undefined;
+  clip.pause();
+  updateSpeechMix();
+}
+
+function playMeiClip(id) {
+  if (save.playedMeiClips.includes(id) || meiPlayback?.id === id) return;
+  stopMeiClip();
+  const clip = new Audio(new URL('./audio/mei/' + id + '.mp3', import.meta.url).href);
+  const playback = { id, clip, playing: false };
+  meiPlayback = playback;
+  clip.addEventListener('playing', () => {
+    if (meiPlayback !== playback) return;
+    playback.playing = true;
+    save.playedMeiClips.push(id);
+    persist();
+    updateSpeechMix();
+  }, { once: true });
+  const finish = () => {
+    if (meiPlayback === playback) {
+      meiPlayback = undefined;
+      updateSpeechMix();
+    }
+  };
+  clip.addEventListener('ended', finish, { once: true });
+  clip.addEventListener('error', finish, { once: true });
+  void clip.play().catch(finish);
+}
+
+function radioMessage({ id, text }, kind, onDisplayed) {
+  playMeiClip(id);
   const message = make('p', text, 'helper-message');
   message.lang = 'en';
   const key = radioMessageKey(kind);
@@ -613,15 +662,12 @@ function openRadio() {
     return;
   }
   const places = {
-    spark:
-      'The spark is on the right side of the same table where you found the radio.',
-    cart: 'Look for the brass bell on the cart in the middle of the station.',
-    lever: 'The red handle is on the left-hand workbench.',
-    handbook: 'The handbook is on the worktable in the west workshop, just beside the archive.',
-    shelf:
-      'The shelf at the back of the west workshop holds the two fittings, one brass and one blue.',
-    beacon:
-      'Look right from the track. The tall brass lamp has an empty socket.',
+    spark: mei.sparkHint,
+    cart: mei.cartHint,
+    lever: mei.leverHint,
+    handbook: mei.handbookHint,
+    shelf: mei.fittingsHint,
+    beacon: mei.beaconHint,
   };
   const hint = task.hint ?? places[task.item] ?? guide;
   const help = objectHotspot('Get a hint', 'radio-hint', () => {

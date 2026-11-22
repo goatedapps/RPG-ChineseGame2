@@ -1,5 +1,5 @@
 import { bank } from './curriculum.js';
-import { lookoutBriefing } from './story.js?v=physical-clues';
+import { mei } from './radio-messages.js';
 
 const question = (prompt, choices, correct, feedback) => ({ prompt, choices, correct, feedback });
 
@@ -8,8 +8,8 @@ export const fieldwork = {
     title: '东侧瞭望台',
     item: 'signal',
     cue: '过东侧木桥，到望远镜旁查看守灯人的记录。',
-    guide: lookoutBriefing,
-    hint: 'From the radio table, face the tracks. Take the footbridge on your right, beside the blue lantern, then look for the brass telescope.',
+    guide: mei.lookoutBriefing,
+    hint: mei.lookoutHint,
     paper: 'note-paper',
     heading: '给小梅',
     signature: '爸爸',
@@ -29,8 +29,8 @@ export const fieldwork = {
     title: '西侧修理坊 · 档案柜',
     item: 'archive',
     cue: '过西侧木桥，查看修理坊的档案柜。',
-    guide: 'I heard that bang. Did the spark jump out of its holder? Good thing you tried it here. If it falls on the bridge, it’s gone.\n\nTake the left footbridge to the workshop. Look in the archive for the mechanic’s note. It’ll tell you where to find the fix.',
-    hint: 'From the depot, face the tracks. Take the footbridge on your left by the red lantern. The archive panel is along the back rail of the workshop.',
+    guide: mei.archiveBriefing,
+    hint: mei.archiveHint,
     paper: 'archive-paper',
     heading: '修理坊留言',
     signature: '修车师傅',
@@ -65,8 +65,8 @@ export const fieldwork = {
     title: '桥口 · 发车牌',
     item: 'dispatch',
     cue: '沿铁轨走到桥口，查看发车牌。',
-    guide: 'It stayed in the holder this time! I can see the other driver waiting at the departure rail. Go see what the sign says before you get on your cart.\n\nYou two can still race. I’ll be here waiting for the spark, whoever gets here first.',
-    hint: 'Follow the tracks past the parked cream cart toward the mouth of the bridge. The route sign stands just beside the track.',
+    guide: mei.dispatchBriefing,
+    hint: mei.dispatchHint,
     paper: 'archive-paper',
     heading: '发车须知',
     clue: '车手们举手，表示准备好了。大家互相祝对方马到成功。\n\n先到终点的人得第一名，但把火种安全送过桥，才是这次的任务。',
@@ -83,8 +83,8 @@ export const fieldwork = {
     title: '对岸灯台 · 交接簿',
     item: 'arrival',
     cue: '走到高灯前面的桌边，填写交接簿。',
-    guide: 'I can see you! Pull up by the tall lamp. My father used to say these lights were built to guide the soldiers who guarded the pass.\n\nOpen the book on the table and record the delivery. Then bring the spark over. I’ll open the lamp so you can put it in.',
-    hint: 'Step off the tracks to the right. The handover book is on the low table in front of the tall lamp.',
+    guide: mei.arrivalBriefing,
+    hint: mei.arrivalHint,
     paper: 'ledger-paper',
     heading: '月桥交接簿',
     clue: '两辆灯车在桥上你追我赶，真是一场龙争虎斗！\n\n很久以前，军人点亮桥灯，保卫这条山路。现在请把火种交给守灯人。',
