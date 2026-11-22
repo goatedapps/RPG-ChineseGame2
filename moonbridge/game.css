@@ -530,25 +530,6 @@ dialog:has(.restart-confirmation) {
   margin-top: 8px;
   color: var(--jade);
 }
-.part {
-  display: grid;
-  grid-template-columns: 46px 1fr;
-  gap: 10px;
-  align-items: center;
-  margin-top: 8px;
-}
-.part i {
-  display: grid;
-  place-items: center;
-  width: 43px;
-  height: 43px;
-  border-radius: 9px;
-  border: 1px solid #64738d;
-  background: #15233d;
-  color: var(--gold);
-  font-style: normal;
-  font-size: 1.3rem;
-}
 .assessment {
   display: grid;
   place-items: center;
@@ -901,3 +882,106 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
 }
 
 .test-actions { display: grid; gap: .4rem; }
+
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  overflow: auto;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'])[open] {
+  display: grid;
+  place-items: center;
+}
+#dialog[data-appearance='fittings']::backdrop {
+  background: radial-gradient(ellipse at center, #0a1020bd, #050914e2);
+}
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) header {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) #dialog-body {
+  width: min(100%, 35rem);
+}
+.artifact-page, .fitting-shelf, .radio-face {
+  position: relative;
+}
+.artifact-page-number {
+  margin-top: .65rem;
+  text-align: center;
+  font-size: .78rem;
+  color: #725337;
+  font-variant-numeric: tabular-nums;
+}
+.object-hotspot,
+.object-hotspot:hover:enabled {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.object-hotspot:focus-visible {
+  outline-offset: -3px;
+}
+.page-left, .page-right {
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  cursor: pointer;
+}
+.page-left { left: 0; }
+.page-right { right: 0; }
+.fitting-shelf {
+  width: min(100%, 29rem, 68dvh);
+  margin: 0 auto;
+}
+.fitting-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.fitting-stabilizer, .fitting-runner {
+  top: 38%;
+  width: 44%;
+  height: 35%;
+}
+.fitting-stabilizer { left: 6%; }
+.fitting-runner { right: 5%; }
+.fitting-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+  margin-top: .55rem;
+  color: #ffe2a6;
+  font-size: .84rem;
+  text-align: center;
+}
+.radio-face {
+  justify-self: center;
+  width: max-content;
+  max-width: 100%;
+}
+.radio-face .radio-closeup-device {
+  width: auto;
+  max-width: 100%;
+}
+.radio-hint {
+  right: 10%;
+  bottom: 5%;
+  width: 38%;
+}

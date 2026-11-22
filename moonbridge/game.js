@@ -247,9 +247,13 @@ function showComic(content, title, onFinish) {
   });
 }
 
+let dismissInspection;
+
 function showPanel(appearance, title, language = 'zh-Hans') {
+  dismissInspection = undefined;
   dialog.dataset.appearance = appearance ?? 'panel';
   dialog.lang = language;
+  $('dialog-close').hidden = ['artifact', 'fittings', 'radio'].includes(appearance);
   $('dialog-close').setAttribute('aria-label', language === 'en' ? 'Close' : '关闭');
   disposeWriting();
   disposeWriting = () => {};
@@ -271,9 +275,12 @@ function closePanel() {
 }
 $('dialog-close').onclick = closePanel;
 dialog.addEventListener('click', (event) => {
-  if (event.target === dialog) closePanel();
+  if (event.target === dialog || event.target === body) closePanel();
 });
 dialog.addEventListener('close', () => {
+  const onDismiss = dismissInspection;
+  dismissInspection = undefined;
+  onDismiss?.();
   world?.releaseTrial();
   disposeWriting();
   disposeWriting = () => {};
@@ -329,7 +336,10 @@ function update(notifyRadio = false) {
   const task = objective();
   const waiting = briefingPending(task);
   $('objective').textContent = waiting ? '听听小梅怎么说' : (task?.title ?? '月桥重新亮了');
-  $('control-hint').textContent = waiting ? '打开对讲机，确认小梅的消息。' : (task?.cue ?? '');
+  const checking = Boolean(pendingFieldwork() && save.fieldProgress?.stage === save.stage);
+  $('control-hint').textContent = waiting ? '打开对讲机，确认小梅的消息。'
+    : checking ? '再次查看线索，继续理解检查与听写。'
+      : (task?.cue ?? '');
   const missionNumber =
     save.stage < 4
       ? 1
@@ -512,7 +522,7 @@ $('speak').onclick = () => {
   const status = $('voice-status');
   status.textContent = '';
   status.hidden = false;
-  if (!briefingPending() && objective()?.cue) speaker(objective().cue, status);
+  if (!briefingPending() && objective()?.cue) speaker($('control-hint').textContent, status);
 };
 
 function radioMessageKey(kind) {
@@ -527,12 +537,15 @@ function radioMessage(text, kind, onDisplayed) {
   message.lang = 'en';
   const key = radioMessageKey(kind);
   const seen = save.seenRadioMessages.includes(key);
-  if (!seen) {
-    save.seenRadioMessages.push(key);
-    persist();
+  function markRead() {
+    if (!seen) {
+      save.seenRadioMessages.push(key);
+      persist();
+    }
+    onDisplayed?.();
   }
   if (seen || reducedMotion.matches) {
-    onDisplayed?.();
+    markRead();
     return message;
   }
 
@@ -547,10 +560,10 @@ function radioMessage(text, kind, onDisplayed) {
   const start = performance.now();
   function type(now) {
     const count = Math.floor((now - start) / duration * characters.length);
-    if (count >= characters.length || reducedMotion.matches ||
-        !message.isConnected || !dialog.open) {
+    if (!message.isConnected || !dialog.open) return;
+    if (count >= characters.length || reducedMotion.matches) {
       message.textContent = text;
-      onDisplayed?.();
+      markRead();
       return;
     }
     typed.textContent = characters.slice(0, count).join('');
@@ -574,28 +587,29 @@ function openRadio() {
   const wave = make('span', '', 'radio-airwaves');
   wave.setAttribute('aria-hidden', 'true');
   wave.append(make('i'), make('i'), make('i'));
-  scene.append(device, transmission);
+  const radioFace = make('div', '', 'radio-face');
+  radioFace.append(device);
+  scene.append(radioFace, transmission);
   transmission.append(wave);
   body.append(scene);
   const pending = briefingPending(task);
-  const acknowledge = button('Got it', () => {
-    if (pending) {
-      const key = radioMessageKey('guide');
+  let ready = false;
+  const key = radioMessageKey('guide');
+  const message = radioMessage(guide, 'guide', () => {
+    ready = true;
+    syncRadio();
+  });
+  transmission.append(message);
+  if (pending) {
+    dismissInspection = () => {
+      if (!ready) return;
       if (!save.acknowledgedBriefings.includes(key)) save.acknowledgedBriefings.push(key);
       if (stage === 3) go(4);
       else {
         persist();
         update();
       }
-    }
-    closePanel();
-  }, pending ? 'gold' : undefined);
-  acknowledge.disabled = pending;
-  const message = radioMessage(guide, 'guide', () => { acknowledge.disabled = false; });
-  transmission.append(message);
-  syncRadio();
-  if (pending) {
-    transmission.append(group(acknowledge));
+    };
     return;
   }
   const places = {
@@ -610,95 +624,103 @@ function openRadio() {
       'Look right from the track. The tall brass lamp has an empty socket.',
   };
   const hint = task.hint ?? places[task.item] ?? guide;
-  const help = button('Get a hint', () => {
+  const help = objectHotspot('Get a hint', 'radio-hint', () => {
     hintCount++;
     if (hintCount === 1) {
       message.after(radioMessage(hint, 'hint'));
-      help.textContent = 'Show location';
+      help.setAttribute('aria-label', 'Show location');
+      help.title = 'Show location';
     } else {
       world.point(task.item);
       closePanel();
     }
   });
-  transmission.append(group(acknowledge, help));
+  radioFace.append(help);
   if (hintCount > 0) {
     message.after(radioMessage(hint, 'hint'));
-    help.textContent = 'Show location';
+    help.setAttribute('aria-label', 'Show location');
+    help.title = 'Show location';
   }
 }
 $('radio').onclick = openRadio;
 
+function objectHotspot(label, className, activate) {
+  const control = button('', activate, 'object-hotspot ' + className);
+  control.setAttribute('aria-label', label);
+  control.title = label;
+  return control;
+}
+
 function handbook() {
   showPanel('artifact', '司机手册');
   play('paper');
-  let page = 1;
+  let page = 0;
+  let readThird = false;
   const title = make('p', '', 'artifact-heading');
   const description = make('p', '', 'artifact-ink');
-  const previous = button('上一页', () => {
-    page--;
+  const pageNumber = make('p', '', 'artifact-page-number');
+  const sheet = artifactPage('ledger-paper', title, description, pageNumber);
+  sheet.setAttribute('aria-live', 'polite');
+  const previous = objectHotspot('上一页', 'page-left', () => turn(-1));
+  const next = objectHotspot('下一页', 'page-right', () => turn(1));
+  sheet.append(previous, next);
+  sheet.onkeydown = (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    turn(event.key === 'ArrowLeft' ? -1 : 1);
+  };
+  sheet.tabIndex = 0;
+
+  function turn(direction) {
+    const target = page + direction;
+    if (target < 0 || target > 2) return;
+    page = target;
     render();
     play('paper');
-  });
-  const next = button('下一页', () => {
-    page++;
-    render();
-    play('paper');
-  });
-  const see = button(
-    '读完了',
-    () => {
-      if (page === 3 && save.stage === 7) {
-        go(8);
-        closePanel();
-      }
-    },
-    'gold',
-  );
+  }
+
   function render() {
     title.textContent = [
-      '第一篇课文 · 好司机先练习',
-      '第二页 · 检查车铃与车灯',
-      '第三页 · 火种架和车扣',
-    ][page - 1];
+      '好司机先练习', '检查车铃与车灯', '火种架和车扣',
+    ][page];
     description.textContent = [
       '老师傅讲了一件事：希望将来当司机，就要先学会检查灯车。',
       '轻敲车铃，再看看灯是否亮了。',
       '稳轮夹适合颠簸的近路。快轮扣适合平坦的长路。先装好，再试跑。',
-    ][page - 1];
-    previous.disabled = page === 1;
-    next.disabled = page === 3;
-    see.disabled = page !== 3;
+    ][page];
+    pageNumber.textContent = (page + 1) + ' / 3';
+    previous.disabled = page === 0;
+    next.disabled = page === 2;
+    readThird ||= page === 2;
+    sheet.focus({ preventScroll: true });
   }
-  body.append(
-    artifactPage('ledger-paper', title, description),
-    group(
-      previous,
-      next,
-      button('重听页码', () =>
-        speaker('把手册翻到第三页，读一读。', description),
-      ),
-      see,
-    ),
-  );
+
+  body.append(sheet);
   render();
-  speaker('把手册翻到第三页，读一读。');
+  dismissInspection = () => {
+    if (readThird && save.stage === 7) go(8);
+  };
 }
+
 function choosePart() {
-  showPanel('equipment', '挑选车扣');
-  body.append(fieldImage('workshop'), make('p', '想走哪条路？看看两个车扣有什么不同。'));
+  showPanel('fittings', '挑选车扣');
+  const shelf = make('figure', '', 'fitting-shelf');
+  const image = fieldImage('workshop', 'fitting-image');
+  image.alt = '工作台上摆着两个车扣。';
+  const caption = make('figcaption', '', 'fitting-notes');
+  shelf.append(image);
   for (const [id, part] of Object.entries(parts)) {
-    const item = make('div', '', 'part');
-    item.append(make('i', part.icon), make('p', part.line));
-    body.append(
-      item,
-      button('拿取' + part.name, () => {
-        save.part = id;
-        play('pickup');
-        go(9);
-        closePanel();
-      }),
-    );
+    const label = part.name + '。' + part.line;
+    shelf.append(objectHotspot(label, 'fitting-' + id, () => {
+      save.part = id;
+      play('pickup');
+      go(9);
+      closePanel();
+    }));
+    caption.append(make('span', id === 'stabilizer' ? '稳轮夹 · 颠簸近路' : '快轮扣 · 平坦长路'));
   }
+  shelf.append(caption);
+  body.append(shelf);
 }
 function runTrial(success, power, onResult) {
   if (testing) return;
@@ -820,19 +842,12 @@ function openFieldwork() {
   play('paper');
   addWords(field.words);
   persist();
-  const pronunciation = make('p', '', 'note');
-  body.append(
-    fieldArtifact(field),
-    group(
-      pronounce('朗读线索', field.clue, pronunciation),
-      button('检查理解', () => {
-        save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
-        persist();
-        fieldCheck(field);
-      }, 'gold'),
-    ),
-    pronunciation,
-  );
+  body.append(fieldArtifact(field));
+  dismissInspection = () => {
+    save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
+    persist();
+    update();
+  };
 }
 
 function fieldCheck(field) {

@@ -26,7 +26,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Show and acknowledge each new story briefing before revealing its related task on the HUD. Write the helper’s messages as a conversation that reacts to what just happened and explains why the next action matters. Let exploration reveal clues, and wait for the player to finish the current action before introducing the next one.
 - When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
 - Show close-ups as full images of the actual objects with ImageGen artwork. Put readable clues and relevant controls on or near the object itself. Use live text over generated paper for handwritten notes and pages. Keep the close-up free of generic dialog cards.
-- Let players tap or click outside a close-up to dismiss it, and show any image a question refers to.
+- Keep object close-ups free of visible interface buttons whenever practical. Tap or click outside the object to return to the world, tap the left or right side of a book to turn pages, and tap an item directly to pick it up. Support Escape and arrow keys as keyboard alternatives. Use the device’s own controls for radio actions. Show any image a question refers to.
 
 ## Curriculum and language
 
