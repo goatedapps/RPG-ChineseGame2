@@ -1,5 +1,6 @@
 import { createHintPortal } from '../shared/hint-portal.js';
-import { art, labels, arrival } from './story.js';
+import { art, labels, arrival } from './story.js?v=harbour-sign';
+import { signFace } from './signs.js';
 
 export function buildHarbour(THREE, resume = 0, hasPhone = false) {
   const scene = new THREE.Scene();
@@ -99,7 +100,8 @@ export function buildHarbour(THREE, resume = 0, hasPhone = false) {
   function item(id, image, x, y, z, w, h) {
     const object = new THREE.Group();
     const material = new THREE.MeshStandardMaterial({
-      map: texture(image), transparent: true, alphaTest: .28, side: THREE.DoubleSide, roughness: .92,
+      map: typeof image === 'string' ? texture(image) : image,
+      transparent: true, alphaTest: .28, side: THREE.DoubleSide, roughness: .92,
       emissive: '#4a4339', emissiveIntensity: .2,
     });
     const visual = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
@@ -111,8 +113,24 @@ export function buildHarbour(THREE, resume = 0, hasPhone = false) {
     return object;
   }
   const phone = item('phone', art('phone'), -.61, 1.07, 1.25, .47, .64);
-  item('markers', art('sign'), .66, 1.44, -1.8, 1.38, 2.2);
-  item('stairs', art('sign'), 0, 1.48, -8.3, 1.43, 2.18);
+  for (const [id, x, z] of [['markers', 1.64, -1.8], ['stairs', .92, -8.3]]) {
+    const face = new THREE.Texture();
+    face.colorSpace = THREE.SRGBColorSpace;
+    face.anisotropy = 4;
+    const sign = item(id, face, x, 1.38, z, 2.36, 2.62);
+    // Keep the post on the deck and show the lettering only from the approach.
+    const material = sign.children[0].material;
+    material.side = THREE.FrontSide;
+    const back = new THREE.Mesh(sign.children[0].geometry, material.clone());
+    back.material.side = THREE.BackSide;
+    back.material.map = texture(art('sign'));
+    back.userData.nonOccluding = true;
+    sign.add(back);
+    loads.push(signFace(id).then((canvas) => { face.image = canvas; face.needsUpdate = true; }).catch(() => {
+      material.map = texture(art('sign'));
+      material.needsUpdate = true;
+    }));
+  }
   const coat = item('coat', art('coat'), -.85, 1.43, -15.7, .95, 1.48);
   item('escort', art('grandma'), -.7, 1.43, -20.2, 1.03, 1.79);
   const child = new THREE.Mesh(new THREE.PlaneGeometry(.71, 1.28), new THREE.MeshStandardMaterial({

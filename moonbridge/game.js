@@ -16,7 +16,7 @@ import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=final-skip';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
 import { showSkippedFinal } from '../shared/skipped-final.js';
 
 import { playLessonComic } from '../shared/comic.js';

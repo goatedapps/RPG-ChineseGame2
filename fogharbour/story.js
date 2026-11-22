@@ -21,14 +21,13 @@ const check = (prompt, choices, answer, feedback) => ({ prompt, choices, answer,
 export const chapters = [
   {
     id: 'markers', title: '雾里的电话', cue: '查看桌边的码头路牌，找出通往下层浮台的方向。',
-    guide: 'It’s Lan. Grandma was helping a little boy when the landing drifted away. I can see her red umbrella below the market. The sign beside our dinner table shows the lower route. Check it before you head out.',
-    hint: 'Face the cloud harbour from the table. The tall teal sign just ahead points to both landings.',
-    paper: '下层浮台 · 值班记录',
-    clue: '远处灰蒙蒙的，上下两个码头在地图上几乎重叠，难怪你会疑惑。用智能手机拨打阿岚的号码，确认奶奶在哪一层。我们家和小男孩的家庭都在等他们回来。',
+    guide: 'It’s Lan. Grandma was helping a little boy when their landing drifted away. I just spotted her red umbrella on the lower landing. Look for the hanging sign on the right as you leave our dinner table. It’ll point you to the right landing.',
+    hint: 'Head out from the dinner table towards the harbour. Look for the dark blue hanging sign on your right.',
+    clue: '雾港灰蒙蒙的，我正疑惑该往哪儿走，便用智能手机拨打阿岚的号码。她说，奶奶和小男孩在下层浮台。小男孩的家庭也在等他回去。',
     words: ['家庭', '拨打', '智能手机', '灰蒙蒙', '疑惑'],
     checks: [
-      check('远处灰蒙蒙的，为什么不能只看手机地图就出发？', ['两个码头的位置几乎重叠。', '智能手机只能拍照。', '家人已经回来了。'], 0, '先拨打阿岚的号码，把疑惑弄清楚。'),
-      check('哪一句中的“家庭”指的是家人组成的生活单位？', ['两个家庭一起准备团圆饭。', '渡船开过两座浮台。', '我拨打了两次电话。'], 0, '奶奶和我是一家人，小男孩也有自己的家庭。'),
+      check('按照路牌，要去奶奶所在的下层浮台，该怎么走？', ['沿着栈道往前走。', '掉头回上层码头。', '留在团圆桌旁。'], 0, '路牌指向前方。沿着栈道走，就能找到通往下层浮台的浮梯。'),
+      check('雾港灰蒙蒙的，我对路线有疑惑时，是怎么弄清楚的？', ['用智能手机拨打阿岚的号码。', '在上层码头等雾散去。', '跟着小男孩的家庭回家。'], 0, '我拨打阿岚的号码，得知奶奶和小男孩在下层浮台。'),
     ],
   },
   {

@@ -9,7 +9,7 @@ import { createGreenhouseAudio } from './sounds.js?v=audio-recovery';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
 import { showSkippedFinal } from '../shared/skipped-final.js';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';

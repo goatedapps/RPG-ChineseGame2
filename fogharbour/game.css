@@ -20,7 +20,7 @@
 .lesson-entry {
   background: linear-gradient(#12293b47,#101e32cf), url('art/harbour.webp') center / cover;
 }
-#workbench:not(.artifact-inspection) { background: #122c38f5; }
+#workbench:not(.artifact-inspection, :has(.developer-menu)) { background: #122c38f5; }
 .harbour-panel > :is(p, .harbour-answers, .button-row, details, .writing-grid) { margin-block: .7rem; }
 .harbour-panel > button + button { margin-inline-start: .2rem; }
 .harbour-answers { display: grid; gap: .45rem; }
@@ -42,6 +42,27 @@
 .harbour-panel .body { line-height: 1.62; }
 .harbour-review { padding: .48rem; color: #f4dbb4; background: #27424c; border-radius: .45rem; }
 .harbour-review summary { cursor: pointer; }
+#workbench.artifact-inspection:has(.harbour-sign)::backdrop {
+  background: #031416a8;
+  backdrop-filter: blur(7px);
+}
+.harbour-sign {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 26rem, 70dvh);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cream);
+}
+.harbour-sign canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 .7rem 1rem #0008);
+}
+.harbour-sign-caption { padding: .35rem .55rem; border-radius: .4rem; background: #0e2635e8; }
+.harbour-sign-fallback { padding: 1.2rem; background: #213f4a; }
 .harbour-note {
   padding: clamp(1.45rem, 6vw, 3.4rem);
   width: min(41rem, 100%);

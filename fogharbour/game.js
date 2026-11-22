@@ -8,14 +8,15 @@ import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.j
 import { bindJoystick } from '../shared/joystick.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
 import { showSkippedFinal } from '../shared/skipped-final.js';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
 import { element, control } from '../shared/minigame.js';
-import { art, chapters, ending, labels, opening, arrival } from './story.js';
-import { buildHarbour } from './world.js';
+import { art, chapters, ending, labels, opening, arrival } from './story.js?v=harbour-sign';
+import { buildHarbour } from './world.js?v=harbour-sign';
+import { signFace, signLines } from './signs.js';
 import { crossSteps, dockFerry, guidePassengers } from './minigames.js';
 
 const $ = (id) => document.getElementById(id);
@@ -205,6 +206,24 @@ function advance() {
     refresh();
   }
 }
+function showHarbourSign(task, continueToCheck) {
+  const sign = control('读完路牌，继续', 'harbour-sign');
+  const caption = element('span', 'harbour-sign-caption', '轻触路牌继续');
+  caption.id = 'panel-title';
+  const fallback = element('span', 'harbour-sign-fallback', signLines[task.id].join('　'));
+  fallback.id = 'harbour-sign-directions';
+  sign.setAttribute('aria-describedby', fallback.id);
+  sign.append(fallback, caption);
+  sign.onclick = continueToCheck;
+  showPanel(sign, sign, true);
+  signFace(task.id).then((canvas) => {
+    canvas.setAttribute('aria-hidden', 'true');
+    sign.prepend(canvas);
+    fallback.hidden = true;
+  }).catch(() => {});
+  play('paper');
+}
+
 function study(task) {
   if (state.step === 'writing') {
     showDictation(task);
@@ -214,17 +233,22 @@ function study(task) {
     showCheck(task);
     return;
   }
+  const continueToCheck = () => {
+    state.step = 'check';
+    save();
+    showCheck(task);
+  };
+  if (task.id === 'markers') {
+    showHarbourSign(task, continueToCheck);
+    return;
+  }
   const sheet = element('article', 'harbour-note');
   const heading = element('h2', '', task.paper);
   heading.id = 'panel-title';
   const text = element('p', '', task.clue);
   const page = control('读完这页，完成记录', 'harbour-note-tap');
   page.append(element('span', '', '轻触这页，完成记录'));
-  page.onclick = () => {
-    state.step = 'check';
-    save();
-    showCheck(task);
-  };
+  page.onclick = continueToCheck;
   sheet.append(heading, text, page);
   showPanel(sheet, page, true);
   play('paper');
@@ -263,7 +287,9 @@ function showCheck(task) {
     choices.append(option);
   }
   const review = element('details', 'harbour-review');
-  review.append(element('summary', '', '回看记录'), element('p', '', task.clue));
+  review.append(element('summary', '', task.id === 'markers' ? '回看路牌和通话线索' : '回看记录'));
+  if (task.id === 'markers') review.append(element('p', '', signLines[task.id].join('　')));
+  review.append(element('p', '', task.clue));
   sheet.append(choices, review);
 }
 function showWriting(entry, title, done, back = undefined) {
@@ -484,6 +510,7 @@ $('settings').onclick = () => {
 };
 const dev = createDeveloperMode({
   panel, openPanel, canSkip: () => Boolean(active),
+  onClose: () => desk.close(),
   getSkipLabel: () => '跳过当前任务',
   onSkip() {
     if (!state.called) {
