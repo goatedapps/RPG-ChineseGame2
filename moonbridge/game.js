@@ -14,7 +14,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=direct-entry';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=entry-audio';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 

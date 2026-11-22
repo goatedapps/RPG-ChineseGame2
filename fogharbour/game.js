@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=fogharbour';
 import { createPhone } from '../greenhouse/phone.js?v=fogharbour';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=story-minigames';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js';
 import { createWriting } from '../greenhouse/writing.js';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=fogharbour';

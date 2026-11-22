@@ -36,6 +36,7 @@ const sceneClips = {
 };
 const maxEffects = 7;
 const maxCueDelay = 650;
+const resumeTimeout = 750;
 
 function fileURL(category, name) {
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
@@ -56,7 +57,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   let musicEnabled = true;
   let ambience = false;
   let ducked = false;
-  let focused = true;
+  let hasRun = false;
   let stepIndex = 0;
   const buffers = new Map();
   const pendingEffects = new Map();
@@ -67,7 +68,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   const lastCue = new Map();
 
   function audible() {
-    return focused && !document.hidden && context?.state === 'running';
+    return !document.hidden && context?.state === 'running';
   }
 
   function ramp(param, amount, time = .035) {
@@ -231,11 +232,22 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function unlock() {
-    if ((!enabled && !musicEnabled) || !context || context.state === 'running' || enabling) return;
-    enabling = context.resume().catch(() => {}).finally(() => {
+    if ((!enabled && !(musicEnabled && musicScene)) || document.hidden || !context ||
+        context.state === 'running' || context.state === 'closed' || enabling) return;
+    // An interrupted context can leave resume() pending. Allow a later input to retry.
+    let timer;
+    const timeout = new Promise((resolve) => { timer = setTimeout(resolve, resumeTimeout); });
+    enabling = Promise.race([context.resume().catch(() => {}), timeout]).finally(() => {
+      clearTimeout(timer);
       enabling = undefined;
       refreshMix();
     });
+  }
+
+  function restoreAudio() {
+    if (context.state === 'running') hasRun = true;
+    else if (hasRun) unlock();
+    refreshMix();
   }
 
   function initialize() {
@@ -252,16 +264,11 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     effects.connect(master);
     room.connect(master);
     music.connect(master);
-    document.addEventListener('visibilitychange', refreshMix);
-    window.addEventListener('blur', () => {
-      focused = false;
-      refreshMix();
-    });
-    window.addEventListener('focus', () => {
-      focused = true;
-      refreshMix();
-    });
-    context.addEventListener('statechange', refreshMix);
+    hasRun = context.state === 'running';
+    document.addEventListener('visibilitychange', restoreAudio);
+    window.addEventListener('pageshow', restoreAudio);
+    window.addEventListener('focus', restoreAudio);
+    context.addEventListener('statechange', restoreAudio);
     prepareSceneEffects();
     if (musicEnabled) prepareMusic(musicScene);
     return true;
@@ -299,7 +306,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   function cue(request) {
     const name = request === 'dew' ? 'pickup' : request;
     const clip = Object.hasOwn(clips, name) ? clips[name] : undefined;
-    if (!clip || !enabled || !context || !focused || document.hidden) return;
+    if (!clip || !enabled || !context || document.hidden) return;
     const now = context.currentTime;
     if (now - (lastCue.get(name) ?? -Infinity) < clip.cooldown) return;
     const nextFile = name === 'step' ? clip.files[stepIndex % clip.files.length] : clip.files[0];
@@ -353,8 +360,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
       musicScene = next;
       if (musicEnabled) prepareMusic(next);
       prepareSceneEffects();
-      // Build and preload the graph on entry. A browser that suspends it will
-      // only be asked to resume from one of the input handlers.
+      // Preload on entry. Wait for input to unlock the graph for the first time.
       if (next) start(false);
       refreshMix();
     },

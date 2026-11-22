@@ -5,7 +5,7 @@ import { missions, objects, tutorial } from './story.js?v=story-minigames';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=radio-briefings';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=story-minigames';
+import { createGreenhouseAudio } from './sounds.js?v=audio-recovery';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
