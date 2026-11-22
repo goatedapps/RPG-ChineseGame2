@@ -1,0 +1,352 @@
+.minigame {
+  width: min(100%, 44rem);
+  margin: auto;
+  color: #fff0cf;
+  text-shadow: 0 2px 8px #050c15;
+}
+#dialog[data-appearance='artifact'] #dialog-body:has(.minigame) {
+  width: min(100%, 44rem);
+}
+#workbench .minigame { width: min(calc(100% - 26px), 44rem); }
+dialog .minigame-title {
+  margin: 0 0 .55rem;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: #ffdb99;
+}
+.minigame-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  max-height: 61dvh;
+  overflow: clip;
+  border: 1px solid #d1a36e8a;
+  border-radius: .85rem;
+  background: #0c242b;
+  isolation: isolate;
+  box-shadow: 0 12px 36px #020b14aa;
+}
+.minigame-status {
+  min-height: 2.9em;
+  margin: .45rem 0 0;
+  font-size: clamp(.85rem, 3.4vw, 1rem);
+}
+.minigame [role='slider'],
+.minigame button {
+  touch-action: none;
+  user-select: none;
+}
+.minigame button,
+.minigame button:hover:enabled {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+}
+.minigame button:disabled { opacity: 1; }
+.minigame button:focus-visible,
+.minigame [role='slider']:focus-visible {
+  outline: 2px solid #ffe39e;
+  outline-offset: -3px;
+}
+.minigame [role='slider'] { cursor: grab; }
+.minigame [role='slider']:active { cursor: grabbing; }
+.minigame img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.minigame [data-dragging] { z-index: 5; cursor: grabbing; }
+.minigame[data-complete] .minigame-stage { pointer-events: none; }
+
+.moon-lens {
+  position: relative;
+  width: min(84%, 26rem);
+  height: 91%;
+  overflow: hidden;
+  border: clamp(5px, 2vw, 13px) solid #876349;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #edcb8c, 0 0 0 15px #0b111f, inset 0 0 35px #090a17;
+}
+.moon-panorama {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 400%;
+  transform: translateX(var(--pan, 0%));
+  background: #151733 url('../moonbridge/art/minigame-bridge.webp') center / 100% 100% no-repeat;
+}
+.moon-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 28px #000b;
+  pointer-events: none;
+}
+.moon-reticle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  inset-block: 14%;
+  width: 1px;
+  background: #fff2d080;
+  pointer-events: none;
+}
+.moon-reticle::before,
+.moon-reticle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.moon-reticle::before { width: 3rem; height: 1px; background: inherit; }
+.moon-reticle::after { width: 2rem; aspect-ratio: 1; border: 1px solid #fff2d090; border-radius: 50%; }
+.in-focus .moon-reticle { background: #ffe29b; }
+.in-focus .moon-reticle::after { border-color: #ffd16c; box-shadow: 0 0 13px #ffba54; }
+.moon-target {
+  position: absolute;
+  display: none;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: .72rem;
+  white-space: nowrap;
+  color: #fff0be;
+}
+.moon-target::before { content: ''; display: block; width: .8rem; aspect-ratio: 1; margin: 0 auto .32rem; border: 2px solid #ffdc97; border-radius: 50%; box-shadow: 0 0 11px #ffcb65; }
+.moon-target.active, .moon-target.found { display: block; }
+.moon-target.found { opacity: .72; }
+.moon-target.found::before { background: #ffe2a0; }
+
+.workshop-puzzle {
+  align-content: center;
+  gap: clamp(.65rem, 2.5vw, 1.3rem);
+  padding: .5rem;
+  background: linear-gradient(#18122255, #24102579), url('../moonbridge/art/workshop.webp') center / cover;
+}
+.word-slips { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; width: 100%; }
+.word-slip {
+  padding: .45rem;
+  min-height: clamp(90px, 19vw, 150px);
+  background: #e5c38f url('../moonbridge/art/note-paper.webp') center / 100% 100%;
+  color: #412418;
+  text-shadow: none;
+  text-align: center;
+}
+.word-line, .word-tiles { display: flex; gap: .25rem; align-items: center; justify-content: center; }
+.word-line { font-size: clamp(1.05rem, 4vw, 1.8rem); font-weight: 750; }
+.word-gap { color: #4e2b17 !important; box-shadow: inset 0 -2px #8a553e9e; }
+.word-note { font-size: clamp(.65rem, 2.6vw, .92rem); margin: .2rem 0 0; }
+.minigame .word-tile,
+.minigame .word-tile:hover:enabled {
+  width: clamp(44px, 11vw, 76px);
+  aspect-ratio: 1;
+  background: #572c1e url('../moonbridge/art/materials/oak.webp') center / cover;
+  color: #ffe0a2;
+  border: 2px outset #ac7555;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 8px #1c100aab;
+  cursor: grab;
+}
+.word-tiles { gap: 1.15rem; }
+.minigame .word-tile[aria-pressed='true'] { border-color: #ffe19c; }
+.minigame .word-tile:disabled { opacity: .35; }
+
+.bridge-lighting { background: #121833 url('../moonbridge/art/minigame-bridge.webp') center / 100% 100%; }
+.bridge-collar {
+  align-self: end;
+  width: clamp(64px, 22%, 140px);
+  margin: 0 0 3%;
+  border-radius: 50%;
+  background: #373346;
+}
+.bridge-collar img { transform: rotate(var(--turn, 0deg)); }
+.bridge-lamp, .moon-beam, .exhibit-beam, .exhibit-glow { position: absolute; pointer-events: none; }
+.bridge-lamp {
+  width: 1.2%;
+  aspect-ratio: 1;
+  border: 1px solid #ffcf87;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 .7rem #f9ad6a;
+}
+.bridge-lamp.near { left: 26%; top: 32%; }
+.bridge-lamp.far { left: 74%; top: 43%; }
+.bridge-lamp.lit { background: #fff1a8; box-shadow: 0 0 1.4rem .45rem #ffc9699c; }
+.bridge-lamp.span-light { top: 49%; width: .6%; opacity: 0; transition: opacity .22s ease-out; }
+.bridge-lamp.span-light.lit { opacity: 1; }
+.moon-beam {
+  left: 26%;
+  top: 27%;
+  width: 49%;
+  height: 10%;
+  opacity: .6;
+  background: linear-gradient(90deg, #ffd68dc2, #ffe2a939);
+  clip-path: polygon(0 48%, 100% 0, 100% 100%);
+  transform: rotate(var(--beam, 0deg));
+  transform-origin: left center;
+}
+.moon-beam.aligned { opacity: .95; }
+
+.seal-window {
+  background: #154249 url('../greenhouse/art/minigame-window.webp') center / 100% 100%;
+  touch-action: none;
+}
+.window-sill { position: absolute; top: 67%; width: 100%; height: 13%; }
+.minigame .window-leak {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+}
+.window-leak::before {
+  content: '';
+  width: 1.14rem;
+  height: .2rem;
+  border-radius: 50%;
+  background: #95e6ff;
+  box-shadow: 0 0 .6rem #b9f3ff;
+}
+.window-leak i {
+  position: absolute;
+  top: 53%;
+  width: .37rem;
+  height: .74rem;
+  border-radius: 68% 45% 78% 33%;
+  background: #93dcff;
+  animation: window-drip 1.25s ease-in infinite;
+}
+.window-leak.sealed::before {
+  width: 2rem;
+  height: .36rem;
+  border-radius: .18rem;
+  background: #253736;
+  box-shadow: 0 0 .4rem #ffe19a77;
+}
+.window-leak.sealed i { display: none; }
+@keyframes window-drip {
+  from { opacity: .95; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(3.4rem); }
+}
+.minigame .window-strip {
+  position: absolute;
+  width: clamp(44px, 15%, 95px);
+  aspect-ratio: 1.6;
+  top: 76%;
+  left: 10%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+}
+
+.plant-rescue {
+  background: linear-gradient(#203c3994,#1729259c), url('../greenhouse/art/minigame-window.webp') center / cover;
+}
+.minigame .rescue-plant, .minigame .rescue-hands, .minigame .rescue-base {
+  position: absolute;
+  cursor: grab;
+}
+.rescue-plant { width: 28%; height: 61%; bottom: 23%; }
+.rescue-plant.sturdy { left: 14%; }
+.rescue-plant.fragile { right: 14%; }
+.rescue-plant img { transform-origin: center bottom; }
+.rescue-plant.fragile img { animation: wind-bend 1.65s ease-in-out alternate infinite; }
+@keyframes wind-bend { from { transform: rotate(-5deg); } to { transform: rotate(9deg); } }
+.rescue-base {
+  right: 18%;
+  bottom: 18%;
+  width: 20%;
+  height: 12%;
+  border: 1px dashed #ffe29d !important;
+  border-radius: 50%;
+  background: #facc761c !important;
+}
+.rescue-hands { width: 25%; height: 25%; left: 39%; bottom: 2%; }
+.seedling-safe .rescue-hands { left: auto; right: 14%; bottom: 9%; transition: bottom .24s ease-out; }
+.seedling-safe .fragile { bottom: 27%; transition: bottom .24s ease-out; }
+.seedling-safe .fragile img { animation: none; }
+
+.root-monitor {
+  grid-template-rows: 1fr auto auto;
+  gap: .25rem;
+  padding: .25rem .7rem .65rem;
+  background: linear-gradient(155deg,#183b36,#0b201e);
+}
+.minigame .root-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 1px inset #69a488 !important;
+  background: radial-gradient(#375145, #071a15) !important;
+  box-shadow: inset 0 0 1.2rem #0009;
+}
+.root-frame img { padding: .15rem; max-height: 32dvh; }
+.root-day { color: #ffd786; font-size: .85rem; }
+.root-timeline {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  color: #fbeac8;
+  font-size: clamp(.61rem, 2.6vw, .9rem);
+  border-radius: .3rem;
+  padding: 0 .22rem;
+  border: 1px solid #77988e;
+  background: linear-gradient(90deg,#486152aa,#253a41aa);
+}
+.root-playhead {
+  position: absolute;
+  inset-block: 0;
+  width: .17rem;
+  background: #ffd287;
+  box-shadow: 0 0 .55rem #ffc86a;
+  pointer-events: none;
+}
+
+.exhibit-puzzle {
+  background: linear-gradient(#172f32a6,#0a1c16cc), url('../greenhouse/art/minigame-window.webp') center / cover;
+}
+.exhibit-plan { position: absolute; top: 4%; left: 4%; width: 25% !important; height: 43% !important; }
+.minigame .exhibit-piece {
+  position: absolute;
+  width: 24%;
+  height: 45%;
+}
+.exhibit-piece.pot { bottom: 6%; left: 6%; cursor: grab; }
+.has-pot .exhibit-piece.pot {
+  left: 40%;
+  translate: none !important;
+  transition: left .25s cubic-bezier(.2,.85,.2,1);
+}
+.exhibit-piece.label { bottom: 8%; right: 12%; height: 24%; }
+.exhibit-piece.label img { transform: rotate(var(--label-turn, 90deg)); transition: transform .22s ease-out; }
+.exhibit-label-ink {
+  position: absolute;
+  inset: 28% 0 auto;
+  opacity: 0;
+  color: #322619;
+  font-size: clamp(.6rem, 2.4vw, 1rem);
+  text-shadow: none;
+}
+.has-label .exhibit-label-ink { opacity: 1; transition: opacity .22s ease-out; }
+.exhibit-piece.lamp { right: 5%; top: 4%; height: 40%; }
+.exhibit-piece.lamp[aria-disabled='true'] { pointer-events: none; }
+.exhibit-piece.lamp img { transform: rotate(var(--lamp-turn, 0deg)); }
+.minigame .exhibit-pot-spot { position: absolute; bottom: 6%; left: 41%; width: 22%; height: 19%; border: 1px dashed #ffdf97; border-radius: 50%; background: #ffe19c17; }
+.exhibit-beam {
+  right: 17%;
+  top: 32%;
+  width: 36%;
+  height: 42%;
+  background: linear-gradient(90deg,#ffd68827,#ffe5a56b);
+  clip-path: polygon(100% 18%, 0 37%, 0 92%, 100% 34%);
+  transform-origin: right 23%;
+  transform: rotate(var(--light-turn, 0deg));
+}
+.exhibit-glow { left: 44%; top: 41%; width: 15%; aspect-ratio: 1; border-radius: 50%; }
+.light-aligned .exhibit-glow { box-shadow: 0 0 2rem 1rem #ffc87188; background: #ffc8711c; }
+.exhibit-ready .exhibit-beam { background: linear-gradient(90deg,#ffe3a955,#ffe5a5bd); }
+@media (prefers-reduced-motion: reduce) {
+  .window-leak i, .rescue-plant.fragile img { animation: none; }
+  .minigame * { transition-duration: 0s !important; }
+}

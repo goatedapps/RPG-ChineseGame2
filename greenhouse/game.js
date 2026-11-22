@@ -1,11 +1,11 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { missions, objects, tutorial } from './story.js?v=briefing-flow';
+import { missions, objects, tutorial } from './story.js?v=story-minigames';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=radio-briefings';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=entry-audio';
+import { createGreenhouseAudio } from './sounds.js?v=story-minigames';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=briefing-flow';
@@ -15,6 +15,7 @@ import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=briefing-flow';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
+import { prepareExhibit, readRootFootage, sealWindow, supportSeedling } from './minigames.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
@@ -503,6 +504,18 @@ function useObject(target) {
     if (target.id === nextObject()) takePhone();
     return;
   }
+  if (target.id === nextObject()) {
+    const current = missions[state.mission]?.actions[state.action];
+    const game = {
+      westWindow: sealWindow,
+      weakPlant: supportSeedling,
+      exhibitStand: current?.action === 'place' ? prepareExhibit : undefined,
+    }[target.id];
+    if (game) {
+      playCloseup(game, () => completeObject(target, true));
+      return;
+    }
+  }
   if (evidence[target.id]) {
     inspectEvidence(target, target.id === nextObject() ? () => completeObject(target, true) : null);
     return;
@@ -636,7 +649,22 @@ function row(...buttons) {
   return controls;
 }
 
+function playCloseup(build, next) {
+  const game = build(audio.cue, (stillOpen) => {
+    if (stillOpen) {
+      afterClose = next;
+      desk.close();
+    } else next();
+  });
+  afterClose = null;
+  presentPanel(game.root, game.focusTarget, true);
+}
+
 function showEvidence(id, next) {
+  if (id === 'rootCam' && next) {
+    playCloseup(readRootFootage, next);
+    return;
+  }
   const item = evidence[id];
   const sheet = node('article', '', 'artifact-sheet artifact-' + item.kind);
   sheet.tabIndex = -1;

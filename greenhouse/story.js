@@ -74,7 +74,7 @@ export const missions = [
         '密封条刚好能盖住漏水的缝。',
         'The strip fits over the leaking gap.'),
       step('westWindow', 'use',
-        '用密封条堵住西窗的缝。',
+        '沿着西窗的窗台拖动密封条，堵住漏水的缝。',
         'Press the weatherstrip over the leaking gap in the west window.',
         '西窗不漏了！',
         'The west window has stopped leaking!'),

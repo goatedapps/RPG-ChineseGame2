@@ -1,0 +1,236 @@
+import { control, dragPiece, element, makeMinigame, pointIn, prop, scrub } from '../shared/minigame.js';
+
+const art = (name) => new URL('./art/' + name + '.webp', import.meta.url).href;
+const at = (event, node, margin = .1) => {
+  const { x, y } = pointIn(event, node);
+  return x >= -margin && x <= 1 + margin && y >= -margin && y <= 1 + margin;
+};
+
+export function sealWindow(play, onFinish) {
+  const game = makeMinigame('雨中补缝', '抓住密封条，沿窗台拖过每一处漏水的缝。', play, onFinish);
+  const { stage } = game;
+  stage.classList.add('seal-window');
+  const sill = element('div', 'window-sill');
+  const strip = control('拖动密封条', 'window-strip');
+  strip.append(prop(art('minigame-strip')));
+  const leaks = [24, 50, 76].map((x, i) => {
+    const leak = control('密封第' + (i + 1) + '处漏缝', 'window-leak');
+    leak.style.left = x + '%';
+    leak.append(element('i'));
+    leak.onclick = () => patch(leak);
+    sill.append(leak);
+    return { x, leak };
+  });
+  function drip() {
+    const open = leaks.filter(({ leak }) => !leak.disabled).length;
+    if (!open) return;
+    play('drip');
+    game.after(1500 - open * 300, drip);
+  }
+  game.after(450, drip);
+  function patch(leak) {
+    if (leak.disabled) return;
+    leak.disabled = true;
+    leak.classList.add('sealed');
+    const count = leaks.filter(({ leak: item }) => item.disabled).length;
+    if (count === leaks.length) game.finish('窗缝封好了，窗台不再滴水。', sill);
+    else {
+      game.feedback(leak, 'seal');
+      game.status.textContent = '已补好 ' + count + ' / ' + leaks.length + ' 处漏缝。';
+    }
+  }
+  let pointer;
+  const apply = (event) => {
+    const { x, y } = pointIn(event, stage);
+    strip.style.left = Math.max(5, Math.min(95, 100 * x)) + '%';
+    strip.style.top = Math.max(53, Math.min(88, 100 * y)) + '%';
+    if (y < .57 || y > .82) {
+      pointer.previous = undefined;
+      return;
+    }
+    const span = pointer.previous ?? x;
+    for (const leak of leaks) {
+      if (leak.x * .01 >= Math.min(span, x) - .055 &&
+          leak.x * .01 <= Math.max(span, x) + .055) patch(leak.leak);
+    }
+    pointer.previous = x;
+  };
+  stage.onpointerdown = (event) => {
+    if (event.button !== 0 || pointer || !event.target.closest('.window-strip, .window-sill')) return;
+    if (event.target.closest('.window-leak')) return;
+    pointer = { id: event.pointerId };
+    stage.setPointerCapture(event.pointerId);
+    apply(event);
+  };
+  stage.onpointermove = (event) => {
+    if (event.pointerId === pointer?.id) apply(event);
+  };
+  stage.onlostpointercapture = () => { pointer = undefined; };
+  strip.onclick = () => leaks.find(({ leak }) => !leak.disabled)?.leak.focus();
+  stage.append(sill, strip);
+  return { ...game, focusTarget: strip };
+}
+
+export function supportSeedling(play, onFinish) {
+  const game = makeMinigame('幼苗救援', '看看风吹过时，哪一株幼苗更柔弱？', play, onFinish);
+  const { stage } = game;
+  stage.classList.add('plant-rescue');
+  const sturdy = control('选择左边的幼苗', 'rescue-plant sturdy');
+  const fragile = control('选择右边的幼苗', 'rescue-plant fragile');
+  sturdy.append(prop(art('minigame-pot')));
+  fragile.append(prop(art('minigame-fragile')));
+  const hands = control('选择双手', 'rescue-hands');
+  hands.append(prop(art('minigame-hands')));
+  hands.hidden = true;
+  const base = control('从盆底托住幼苗', 'rescue-base');
+  base.hidden = true;
+  let selected = false;
+  sturdy.onclick = () => {
+    game.feedback(sturdy, 'wrong');
+    game.status.textContent = '这一株的茎还很直。看看哪一株被风吹弯了。';
+  };
+  fragile.onclick = () => {
+    fragile.disabled = true;
+    sturdy.disabled = true;
+    base.hidden = false;
+    hands.hidden = false;
+    game.feedback(fragile, 'pickup');
+    game.status.textContent = '它的茎很柔弱。把双手拖到盆底，从下面托住它。';
+    hands.focus();
+  };
+  function lift() {
+    if (hands.disabled) return;
+    base.hidden = true;
+    hands.disabled = true;
+    stage.classList.add('seedling-safe');
+    game.finish('你从盆底托住了柔弱的幼苗。', fragile);
+  }
+  function pickUpHands() {
+    selected = true;
+    hands.setAttribute('aria-pressed', 'true');
+    base.focus();
+  }
+  base.onclick = () => {
+    if (selected) lift();
+    else hands.focus();
+  };
+  dragPiece(hands, (event) => { if (at(event, base, .32)) lift(); }, pickUpHands);
+  stage.append(sturdy, fragile, base, hands);
+  return { ...game, focusTarget: sturdy };
+}
+
+export function readRootFootage(play, onFinish) {
+  const game = makeMinigame('幼苗救援 · 根系观察', '拖动录像进度，找出幼苗开始在土里扎根的那一天。', play, onFinish);
+  const { stage } = game;
+  stage.classList.add('root-monitor');
+  const screen = control('记录这一帧的生长情况', 'root-frame');
+  const frame = prop(art('minigame-root-0'));
+  screen.append(frame);
+  const timeline = element('div', 'root-timeline');
+  const head = element('i', 'root-playhead');
+  const day = element('span', 'root-day');
+  const days = ['第一天', '第三天', '第五天', '第七天'];
+  let index = 0;
+  timeline.append(head);
+  for (const label of days) timeline.append(element('span', '', label));
+  scrub(timeline, '查看生长录像', 0, (value) => {
+    const previous = index;
+    index = Math.round(value * 3 / 100);
+    head.style.left = value + '%';
+    day.textContent = days[index];
+    frame.src = art('minigame-root-' + index);
+    timeline.setAttribute('aria-valuetext', days[index]);
+    if (index !== previous) game.feedback(day, 'ui');
+  });
+  screen.onclick = () => {
+    if (index === 2) {
+      screen.disabled = true;
+      game.finish('第五天，细根伸进土里，幼苗开始扎根了。', screen);
+    } else {
+      game.feedback(screen, 'wrong');
+      game.status.textContent = index < 2
+        ? '根还没有伸展开。再往后看看。'
+        : '根已经很多了。往前找找第一次扎根的画面。';
+    }
+  };
+  stage.append(screen, day, timeline);
+  game.status.textContent += ' 找到后轻触屏幕记录。';
+  return { ...game, focusTarget: timeline };
+}
+
+export function prepareExhibit(play, onFinish) {
+  const game = makeMinigame('科学展开幕', '按布置图摆放：花盆放中央，标签朝前，展灯照着叶子。', play, onFinish);
+  const { stage } = game;
+  stage.classList.add('exhibit-puzzle');
+  const layout = prop(art('page-exhibit'), 'exhibit-plan');
+  const pot = control('移动花盆', 'exhibit-piece pot');
+  const label = control('转动展品标签', 'exhibit-piece label');
+  const lamp = element('div', 'exhibit-piece lamp');
+  pot.append(prop(art('minigame-pot')));
+  label.append(prop(art('minigame-label')), element('span', 'exhibit-label-ink', '豆苗'));
+  lamp.append(prop(art('minigame-lamp')));
+  const spot = control('把花盆放在展台中央', 'exhibit-pot-spot');
+  const light = element('i', 'exhibit-beam');
+  const glow = element('i', 'exhibit-glow');
+  let step = 0;
+  let selected = false;
+  let turns = 0;
+  let timer;
+  function placePot() {
+    if (step !== 0) return;
+    step++;
+    stage.classList.add('has-pot');
+    pot.disabled = true;
+    spot.hidden = true;
+    label.disabled = false;
+    game.feedback(pot, 'seal', true);
+    game.status.textContent = '花盆放好了。转一转标签，让正面朝向参观者。';
+    label.focus();
+  }
+  function pickUpPot() {
+    selected = true;
+    pot.setAttribute('aria-pressed', 'true');
+    spot.focus();
+  }
+  spot.onclick = () => {
+    if (selected) placePot();
+    else pot.focus();
+  };
+  dragPiece(pot, (event) => { if (at(event, spot, .2)) placePot(); }, pickUpPot);
+  label.disabled = true;
+  label.onclick = () => {
+    if (step !== 1) return;
+    turns++;
+    label.style.setProperty('--label-turn', (90 - 45 * turns) + 'deg');
+    game.feedback(label, 'seal');
+    if (turns < 2) return;
+    step++;
+    stage.classList.add('has-label');
+    label.disabled = true;
+    lamp.tabIndex = 0;
+    lamp.removeAttribute('aria-disabled');
+    game.status.textContent = '标签朝前了。拖动灯罩，把光照在叶子上。';
+    lamp.focus();
+  };
+  scrub(lamp, '转动展灯', 18, (value) => {
+    if (step > 2) return;
+    lamp.style.setProperty('--lamp-turn', (value - 65) * .8 + 'deg');
+    light.style.setProperty('--light-turn', (value - 65) * 1.15 + 'deg');
+    const aligned = step === 2 && Math.abs(value - 65) <= 6;
+    stage.classList.toggle('light-aligned', aligned);
+    if (!aligned) {
+      clearTimeout(timer);
+      timer = undefined;
+      return;
+    }
+    timer ??= game.after(430, () => {
+      step++;
+      stage.classList.add('exhibit-ready');
+      game.finish('展台准备好了，科学展可以开幕了！', glow);
+    });
+  }, true);
+  lamp.tabIndex = -1;
+  lamp.setAttribute('aria-disabled', 'true');
+  stage.append(layout, light, glow, spot, pot, label, lamp);
+  return { ...game, focusTarget: pot };
+}

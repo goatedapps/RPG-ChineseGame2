@@ -85,7 +85,7 @@ export const tasks = [
   },
   {
     title: '把火种交给小梅',
-    cue: '走到对岸车站的高灯旁，把火种放进去。',
+    cue: '走到对岸的高灯旁，放入火种，再转动铜环点亮月桥。',
     item: 'beacon',
     guide: mei.beaconBriefing,
   },

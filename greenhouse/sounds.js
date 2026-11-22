@@ -9,6 +9,7 @@ const clips = {
   jolt: { files: ['moonbridge-trial-jolt'], volume: .68, cooldown: .2 },
   impact: { files: ['moonbridge-trial-impact'], volume: .88, cooldown: .2 },
   seal: { files: ['seal-press'], volume: .50, cooldown: .22 },
+  drip: { files: ['window-drip'], volume: .23, cooldown: .3 },
   correct: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
   relay: { files: ['continue'], volume: .35, cooldown: .38 },

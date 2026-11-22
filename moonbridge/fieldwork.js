@@ -12,7 +12,7 @@ export const fieldwork = {
   4: {
     title: '东侧瞭望台',
     item: 'signal',
-    cue: '过东侧木桥，到望远镜旁查看守灯人的记录。',
+    cue: '过东侧木桥，用望远镜寻找灯塔，再查看旁边的记录。',
     guide: mei.lookoutBriefing,
     hint: mei.lookoutHint,
     paper: 'note-paper',
@@ -33,7 +33,7 @@ export const fieldwork = {
   7: {
     title: '西侧修理坊 · 档案柜',
     item: 'archive',
-    cue: '过西侧木桥，查看修理坊的档案柜。',
+    cue: '过西侧木桥，在档案柜前配好纸条上的量词，再读留言。',
     guide: mei.archiveBriefing,
     hint: mei.archiveHint,
     paper: 'archive-paper',

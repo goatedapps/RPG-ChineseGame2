@@ -1,13 +1,14 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
+import { findBridgeLamps, lightMoonbridge, matchWorkshopWords } from './minigames.js';
 import { createWorld } from './world.js?v=cockpit-race';
 import {
   opening,
   parts,
   tasks,
   objects,
-} from './story.js?v=cockpit-race';
+} from './story.js?v=story-minigames';
 import { words, bank } from './curriculum.js';
-import { fieldwork, workshopWriting } from './fieldwork.js?v=cockpit-race';
+import { fieldwork, workshopWriting } from './fieldwork.js?v=story-minigames';
 import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
@@ -39,6 +40,7 @@ const initial = {
   version: 2,
   introSeen: false,
   workshop: { handbook: 0, shelf: 0 },
+  minigames: [],
   fieldDone: [],
   fieldProgress: null,
   seenRadioMessages: [],
@@ -69,6 +71,7 @@ function readSave() {
     return {
       ...structuredClone(initial),
       introSeen: value.introSeen === true || value.stage > 0,
+      minigames: [4, 7].filter((stage) => value.minigames?.includes?.(stage)),
       workshop: {
         handbook: limitProgress(value.workshop?.handbook ?? oldArchive - 3, 2),
         shelf: limitProgress(value.workshop?.shelf ?? oldArchive - 5, 2),
@@ -1023,11 +1026,28 @@ function fieldArtifact(field) {
   return artifactPage(field.paper, heading, ...lines);
 }
 
+function playCloseup(build, complete) {
+  const game = build(play, complete);
+  showPanel('artifact', game.heading.textContent);
+  body.append(game.root);
+  game.focusTarget.focus({ preventScroll: true });
+}
+
 function openFieldwork() {
   const field = pendingFieldwork();
   if (!field) return;
   if (save.fieldProgress?.stage === save.stage) {
     fieldCheck(field);
+    return;
+  }
+  const minigame = { 4: findBridgeLamps, 7: matchWorkshopWords }[save.stage];
+  if (minigame && !save.minigames.includes(save.stage)) {
+    const stage = save.stage;
+    playCloseup(minigame, (stillOpen) => {
+      save.minigames.push(stage);
+      persist();
+      if (stillOpen) openFieldwork();
+    });
     return;
   }
   showPanel('artifact', field.title);
@@ -1239,7 +1259,10 @@ function action() {
       enterRace();
       break;
     case 12:
-      endStory();
+      playCloseup(lightMoonbridge, () => {
+        closePanel();
+        endStory();
+      });
       break;
   }
 }
