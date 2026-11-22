@@ -916,7 +916,7 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
 #dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) #dialog-body {
   width: min(100%, 35rem);
 }
-.artifact-page, .fitting-shelf, .radio-face {
+.artifact-page, .fitting-shelf {
   position: relative;
 }
 .artifact-page-number {
@@ -971,17 +971,47 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
   font-size: .84rem;
   text-align: center;
 }
-.radio-face {
+.radio-hint,
+.radio-hint:hover:enabled {
   justify-self: center;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffd58c;
+  text-shadow: 0 1px 7px #090617;
+}
+.radio-hint:disabled {
+  opacity: 1;
+}
+.radio-face-art {
+  display: block;
+  position: relative;
   width: max-content;
   max-width: 100%;
+  margin: 0 auto;
 }
-.radio-face .radio-closeup-device {
+.radio-face-art .radio-closeup-device {
   width: auto;
   max-width: 100%;
 }
-.radio-hint {
-  right: 10%;
-  bottom: 5%;
-  width: 38%;
+.radio-hint:enabled .radio-face-art::after {
+  position: absolute;
+  top: 87%;
+  left: 70%;
+  width: 25%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffe1a3;
+  border-radius: 50%;
+  box-shadow: 0 0 .55rem #ff9f4f;
+  content: '';
+}
+.radio-hint-label {
+  display: block;
+  margin-top: .3rem;
+  font-size: .85rem;
+}
+.radio-hint:disabled .radio-hint-label {
+  visibility: hidden;
 }

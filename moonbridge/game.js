@@ -541,8 +541,8 @@ $('speak').onclick = () => {
 };
 
 function radioMessageKey(kind) {
-  // Keep the initial briefing available once the lookout task begins.
-  if (save.stage === 3 && kind === 'guide') return '4:field:guide';
+  // The first radio exchange belongs to the lookout task.
+  if (save.stage === 3) return '4:field:' + kind;
   const variant = pendingFieldwork()?.cue ? 'field' : 'task';
   return save.stage + ':' + variant + ':' + kind;
 }
@@ -634,36 +634,11 @@ function openRadio() {
   showPanel('radio', 'Mei’s Walkie-Talkie', 'en');
   const scene = make('div', '', 'radio-closeup');
   const device = fieldImage('radio-closeup', 'radio-closeup-device');
-  device.alt = 'Mei’s walkie-talkie';
+  device.alt = '';
   const transmission = make('div', '', 'radio-transmission');
   const wave = make('span', '', 'radio-airwaves');
   wave.setAttribute('aria-hidden', 'true');
   wave.append(make('i'), make('i'), make('i'));
-  const radioFace = make('div', '', 'radio-face');
-  radioFace.append(device);
-  scene.append(radioFace, transmission);
-  transmission.append(wave);
-  body.append(scene);
-  const pending = briefingPending(task);
-  let ready = false;
-  const key = radioMessageKey('guide');
-  const message = radioMessage(guide, 'guide', () => {
-    ready = true;
-    syncRadio();
-  });
-  transmission.append(message);
-  if (pending) {
-    dismissInspection = () => {
-      if (!ready) return;
-      if (!save.acknowledgedBriefings.includes(key)) save.acknowledgedBriefings.push(key);
-      if (stage === 3) go(4);
-      else {
-        persist();
-        update();
-      }
-    };
-    return;
-  }
   const places = {
     spark: mei.sparkHint,
     cart: mei.cartHint,
@@ -672,24 +647,54 @@ function openRadio() {
     shelf: mei.fittingsHint,
     beacon: mei.beaconHint,
   };
-  const hint = task.hint ?? places[task.item] ?? guide;
-  const help = objectHotspot('Get a hint', 'radio-hint', () => {
-    hintCount++;
-    if (hintCount === 1) {
-      message.after(radioMessage(hint, 'hint'));
-      help.setAttribute('aria-label', 'Show location');
-      help.title = 'Show location';
+  const hintTask = stage === 3 ? fieldwork[4] : task;
+  const hint = hintTask.hint ?? places[hintTask.item] ?? guide;
+  const pending = briefingPending(task);
+  const key = radioMessageKey('guide');
+  let showLocation = false;
+  const art = make('span', '', 'radio-face-art');
+  art.append(device);
+  const prompt = make('span', 'Get a hint', 'radio-hint-label');
+  const help = button('', () => {
+    if (hintCount === 0) {
+      hintCount = 1;
+      showHint();
     } else {
-      world.point(task.item);
+      showLocation = true;
       closePanel();
     }
+  }, 'radio-hint');
+  help.disabled = true;
+  help.append(art, prompt);
+  scene.append(help, transmission);
+  transmission.append(wave);
+  body.append(scene);
+
+  const message = radioMessage(guide, 'guide', () => {
+    help.disabled = false;
+    syncRadio();
   });
-  radioFace.append(help);
-  if (hintCount > 0) {
+  transmission.append(message);
+  function showHint() {
     message.after(radioMessage(hint, 'hint'));
-    help.setAttribute('aria-label', 'Show location');
-    help.title = 'Show location';
+    prompt.textContent = 'Show location';
   }
+  if (hintCount > 0) showHint();
+
+  dismissInspection = () => {
+    if (pending && !help.disabled) {
+      if (!save.acknowledgedBriefings.includes(key)) save.acknowledgedBriefings.push(key);
+      if (stage === 3) {
+        const usedHint = hintCount;
+        go(4);
+        hintCount = usedHint;
+      } else {
+        persist();
+        update();
+      }
+    }
+    if (showLocation) world.point(hintTask.item);
+  };
 }
 $('radio').onclick = openRadio;
 
