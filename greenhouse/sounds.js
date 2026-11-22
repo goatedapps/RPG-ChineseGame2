@@ -103,8 +103,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function stopVoice(source, voice) {
-    if (voice.stopping) return;
-    voice.stopping = true;
+    voices.delete(source);
     ramp(voice.gain.gain, 0, .012);
     source.stop(context.currentTime + .055);
   }
@@ -316,12 +315,15 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
       else queueCue(name, nextFile);
       return;
     }
+    // A browser interruption can strand ended sources without an ended event.
+    for (const voice of voices.values()) {
+      if (voice.endTime <= now) voice.release();
+    }
     if (voices.size >= maxEffects) {
       if (name === 'step') return;
       const footstep = [...voices].find(([, voice]) => voice.name === 'step');
       if (!footstep) return;
       stopVoice(...footstep);
-      voices.delete(footstep[0]);
     }
     const source = context.createBufferSource();
     const gain = context.createGain();
@@ -329,12 +331,14 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     gain.gain.value = clip.volume;
     source.connect(gain);
     gain.connect(effects);
-    source.onended = () => {
+    function release() {
+      source.onended = null;
       source.disconnect();
       gain.disconnect();
       voices.delete(source);
-    };
-    voices.set(source, { gain, name });
+    }
+    source.onended = release;
+    voices.set(source, { gain, name, release, endTime: now + buffer.duration + .05 });
     lastCue.set(name, now);
     if (name === 'step') stepIndex += 1;
     source.start();

@@ -4,9 +4,11 @@ export function createVoice(onChange) {
   const synth = window.speechSynthesis;
   let revision = 0;
   let activeListener;
+  let watchdog;
 
   function stop() {
     revision += 1;
+    clearTimeout(watchdog);
     synth?.cancel();
     const previous = activeListener;
     activeListener = undefined;
@@ -17,10 +19,15 @@ export function createVoice(onChange) {
   function speak(text, rate = .87, onState = () => {}) {
     stop();
     const id = revision;
+    let terminal = false;
     activeListener = onState;
     const report = (status) => {
-      if (id !== revision) return;
-      if (status !== 'playing') activeListener = undefined;
+      if (id !== revision || terminal) return;
+      if (status !== 'playing') {
+        terminal = true;
+        clearTimeout(watchdog);
+        activeListener = undefined;
+      }
       onChange(status);
       onState(status);
     };
@@ -40,9 +47,21 @@ export function createVoice(onChange) {
       line.lang = preferred?.lang ?? 'zh-CN';
       if (preferred) line.voice = preferred;
       line.rate = rate;
+      let started = false;
+      line.onstart = () => { started = true; };
       line.onend = () => report('idle');
       line.onerror = (event) => report(['canceled', 'interrupted'].includes(event.error) ? 'idle' : 'unavailable');
+      const deadline = performance.now() + 8000 + ([...text].length * 550 / rate);
+      function checkPlayback() {
+        if (id !== revision) return;
+        if (!synth.speaking && !synth.pending) {
+          report(started ? 'idle' : 'unavailable');
+        } else if (performance.now() >= deadline) stop();
+        else watchdog = setTimeout(checkPlayback, 1200);
+      }
       report('playing');
+      // System speech can end without notifying the page, leaving the game mix ducked.
+      watchdog = setTimeout(checkPlayback, 4000);
       synth.speak(line);
     } catch {
       report('unavailable');

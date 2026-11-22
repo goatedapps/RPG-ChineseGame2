@@ -18,7 +18,7 @@ export function speakerButton(click, label) {
 }
 
 
-export function dictationButton(voice, text, onState) {
+export function dictationButton(voice, text, onState, { autoplay = false } = {}) {
   const button = speakerButton(null, '播放听写');
   const icon = button.querySelector('path');
   const speaker = icon.getAttribute('d');
@@ -35,5 +35,6 @@ export function dictationButton(voice, text, onState) {
     if (playing) voice.stop();
     else voice.speak(text, .85, render);
   };
+  if (autoplay) voice.speak(text, .85, render);
   return button;
 }

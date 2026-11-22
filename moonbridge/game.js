@@ -14,8 +14,8 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=final-skip';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
 import { showSkippedFinal } from '../shared/skipped-final.js';
 

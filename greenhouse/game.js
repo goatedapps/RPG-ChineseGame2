@@ -3,9 +3,9 @@ import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-bri
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js?v=story-minigames';
 import { lexicon, practiceBank } from './lexicon.js';
-import { createVoice } from './voice.js?v=radio-briefings';
+import { createVoice } from './voice.js?v=speech-recovery';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=audio-recovery';
+import { createGreenhouseAudio } from './sounds.js?v=effect-recovery';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';

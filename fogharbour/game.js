@@ -1,12 +1,12 @@
 import { createEngine } from '../greenhouse/engine.js?v=fogharbour';
 import { createPhone } from '../greenhouse/phone.js?v=fogharbour';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
-import { createVoice } from '../greenhouse/voice.js';
-import { createWriting } from '../greenhouse/writing.js';
-import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=final-skip';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
+import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
+import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=dictation-outline';
 import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.js';
 import { bindJoystick } from '../shared/joystick.js';
-import { dictationButton, speakerButton } from '../shared/speaker.js';
+import { dictationButton, speakerButton } from '../shared/speaker.js?v=dictation-outline';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
 import { showSkippedFinal } from '../shared/skipped-final.js';
@@ -302,12 +302,22 @@ function showWriting(entry, title, done, back = undefined) {
   const line = entry.sentences[0];
   const blank = line.replaceAll(entry.word, '＿'.repeat([...entry.word].length));
   const controls = element('div', 'button-row');
-  controls.append(dictationButton(voice, line + ' 要写的是：' + entry.word + '。'), button('看字', () => {
-    status.textContent = entry.word;
-  }, 'text-button'));
+  const playbackStatus = element('p', 'feedback', '暂时无法播放华语。可以轻触播放按钮重试。');
+  playbackStatus.setAttribute('role', 'status');
+  playbackStatus.hidden = true;
+  const reveal = button('看字', () => {
+    writingCleanup.revealOutline();
+    reveal.disabled = true;
+  }, 'text-button');
+  const playback = dictationButton(voice, line + ' 要写的是：' + entry.word + '。', (status) => {
+    playbackStatus.hidden = status !== 'unavailable';
+  }, { autoplay: true });
+  controls.append(playback, reveal);
   if (back) controls.append(button('返回词语手册', back, 'text-button'));
-  sheet.append(element('p', 'sentence', blank), controls, grid, progress, status);
+  sheet.append(element('p', 'sentence', blank), controls, playbackStatus, grid, progress, status);
   writingCleanup = createWriting(grid, entry.word, false, () => {
+    voice.stop();
+    reveal.disabled = true;
     status.textContent = '写好了！';
     play('correct');
     done(sheet);
@@ -432,6 +442,7 @@ function showTest(mode, skip = skipDictation) {
   testCleanup = createLessonTestView(host, {
     bank, mode, state: state[slot] ? restoreLessonTest(bank, state[slot]) : createLessonTest(bank),
     speak: voice.speak, stopSpeech: voice.stop, cue: play, strokeDataUrl, awardArt: art('ending'), lessonLabel: '第二课',
+    autoDictation: mode === 'practice',
     showReplayOnPass: mode === 'final',
     onProgress(progress) { state[slot] = progress; save(); },
     onPass() {

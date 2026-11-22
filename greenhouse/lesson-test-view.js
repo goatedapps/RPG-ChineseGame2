@@ -1,4 +1,4 @@
-import { dictationButton } from '../shared/speaker.js?v=radio-briefings';
+import { dictationButton } from '../shared/speaker.js?v=dictation-outline';
 import { currentLessonQuestion, revealLessonWord, completeLessonQuestion } from './lesson-test.js';
 import { createWriting } from './writing.js';
 
@@ -19,12 +19,13 @@ function button(className, text, action) {
 }
 
 export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay,
-  strokeDataUrl, awardArt = poster, lessonLabel = '第一课', showReplayOnPass = false, onDeveloper }) {
+  strokeDataUrl, awardArt = poster, lessonLabel = '第一课', showReplayOnPass = false, onDeveloper, autoDictation = false }) {
   const title = mode === 'practice' ? '词语练习' : '课末测试';
   let state = initialState;
   let stopWriting = () => {};
   let motion;
   let destroyed = false;
+  let lastDictated;
   host.setAttribute('aria-labelledby', 'lesson-test-title');
 
   function save(nextState) {
@@ -102,8 +103,10 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const layout = node('div', 'lesson-test-layout');
     const prompt = node('div', 'lesson-test-prompt');
     const promptTools = node('div', 'lesson-test-tools');
-    const spokenGap = question.revealed ? question.word : '，空格，';
-    const read = dictationButton({ speak, stop: stopSpeech }, question.before + spokenGap + question.after);
+    const spokenGap = question.revealed || autoDictation ? question.word : '，空格，';
+    const autoplay = autoDictation && lastDictated !== state.queue[0];
+    if (autoplay) lastDictated = state.queue[0];
+    const read = dictationButton({ speak, stop: stopSpeech }, question.before + spokenGap + question.after, undefined, { autoplay });
     read.classList.add('lesson-test-icon', 'lesson-test-speaker');
     if (question.review) promptTools.append(node('p', 'lesson-test-review', '再试一次'));
     promptTools.append(read);

@@ -54,6 +54,7 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
   let activeIndex = 0;
   let renderedSize = 0;
   let cancelled = false;
+  let outline = guided;
   const drawingSize = () => Math.max(58, grid.clientWidth - 2);
   const dimensions = (size) => ({ width: size, height: size, padding: Math.round(size * .075) });
   const setViewBox = (square, size) => square.querySelector('svg')?.setAttribute('viewBox', `0 0 ${size} ${size}`);
@@ -80,7 +81,7 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
       renderedSize = drawingSize();
       const writer = Writer.create(square, characters[index], {
         ...dimensions(renderedSize), leniency: 1.3,
-        showCharacter: false, showOutline: guided,
+        showCharacter: false, showOutline: outline,
         strokeColor: '#1b4135', outlineColor: '#8da991', drawingColor: '#294f3e',
         highlightColor: '#759a52',
         charDataLoader: (char, ready) => ready(data[char]),
@@ -106,9 +107,15 @@ export function createWriting(grid, word, guided, onComplete, onError, onMistake
     begin(0);
   }).catch(() => { if (!cancelled) onError(); });
 
-  return () => {
+  const cleanup = () => {
     cancelled = true;
     resize.disconnect();
     writers.forEach((writer) => writer.cancelQuiz());
   };
+  cleanup.revealOutline = () => {
+    if (cancelled) return;
+    outline = true;
+    writers[activeIndex]?.showOutline({ duration: 0 });
+  };
+  return cleanup;
 }
