@@ -262,6 +262,7 @@ function showComic(content, title, onFinish) {
 let dismissInspection;
 
 function showPanel(appearance, title, language = 'zh-Hans') {
+  if (appearance !== 'radio') stopMeiClip();
   dismissInspection = undefined;
   dialog.dataset.appearance = appearance ?? 'panel';
   dialog.lang = language;
@@ -282,10 +283,12 @@ function showPanel(appearance, title, language = 'zh-Hans') {
 }
 function closePanel() {
   if (!dialog.open) return;
+  stopMeiClip();
   dialog.close();
   if (view === 'hud') world?.resume();
 }
 $('dialog-close').onclick = closePanel;
+dialog.addEventListener('cancel', stopMeiClip);
 dialog.addEventListener('click', (event) => {
   if (event.target === dialog || event.target === body) closePanel();
 });
