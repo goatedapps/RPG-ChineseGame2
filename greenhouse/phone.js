@@ -14,7 +14,7 @@ function button(cls, text, label) {
   return node;
 }
 
-export function createPhone(host, { onToggle, onNotify } = {}) {
+export function createPhone(host, { onToggle, onNotify, contactName = '阿宁', contactInitial = '宁' } = {}) {
   host.classList.add('field-phone');
   host.lang = 'zh-Hans';
 
@@ -50,9 +50,9 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   const clock = element('span', 'phone-clock');
   statusBar.append(clock, element('span', 'phone-camera'), element('span', 'phone-battery'));
   const contact = element('div', 'phone-contact-line');
-  const avatar = element('span', 'phone-avatar', '宁');
+  const avatar = element('span', 'phone-avatar', contactInitial);
   avatar.setAttribute('aria-hidden', 'true');
-  const heading = element('h2', 'phone-contact', '阿宁');
+  const heading = element('h2', 'phone-contact', contactName);
   heading.id = 'phone-contact';
   heading.tabIndex = -1;
   contact.append(avatar, heading);
@@ -154,7 +154,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   function appendMessage(text, outgoing = false) {
     if (!text) return;
     const item = element('div', 'phone-bubble ' + (outgoing ? 'outgoing' : 'incoming'));
-    const meta = element('span', 'phone-visually-hidden', outgoing ? '你' : '阿宁');
+    const meta = element('span', 'phone-visually-hidden', outgoing ? '你' : contactName);
     const message = element('p', 'phone-message-text', text);
     message.lang = outgoing ? 'zh-Hans' : 'en';
     item.append(meta, message, element('time', 'phone-message-time', time()));
@@ -169,14 +169,14 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     badge.hidden = total === 0;
     dock.setAttribute('aria-label', total ? `打开手机，${total} 条未读消息` : '打开手机');
     alert.hidden = expanded || total === 0;
-    alertTitle.textContent = hintUnread ? '有新提示' : '阿宁';
+    alertTitle.textContent = hintUnread ? '有新提示' : contactName;
     alertSummary.textContent = hintUnread ? '轻触查看。' : unread === 1 ? '新消息' : `${unread} 条新消息`;
     alert.dataset.kind = hintUnread ? 'hint' : 'message';
   }
 
   function notify(kind) {
     if (expanded || host.hidden) return;
-    status.textContent = kind === 'hint' ? '有新提示，请打开手机查看。' : '阿宁发来了新消息。';
+    status.textContent = kind === 'hint' ? '有新提示，请打开手机查看。' : contactName + '发来了新消息。';
     onNotify?.(kind);
     const now = performance.now();
     if (now - lastBuzz < 400) return;

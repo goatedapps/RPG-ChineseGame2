@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08171c">
+  <meta name="description" content="穿过云海寻找奶奶，练习六年级第二课的华文词语。">
+  <title>雾港归航 · 六年级华文</title>
+  <link rel="stylesheet" href="greenhouse/game.css">
+  <link rel="stylesheet" href="shared/comic.css">
+  <link rel="stylesheet" href="shared/minigame.css?v=story-minigames">
+  <link rel="stylesheet" href="greenhouse/phone.css?v=briefing-flow">
+  <link rel="stylesheet" href="greenhouse/lesson-test.css">
+  <link rel="stylesheet" href="greenhouse/developer-mode.css">
+  <link rel="stylesheet" href="shared/game-menus.css">
+  <link rel="stylesheet" href="shared/lesson-entry.css">
+  <link rel="stylesheet" href="shared/joystick.css">
+  <link rel="stylesheet" href="shared/vocabulary.css">
+  <link rel="stylesheet" href="fogharbour/game.css">
+  <script defer src="greenhouse/vendor/gsap.min.js"></script>
+  <script type="module" src="fogharbour/game.js"></script>
+</head>
+<body>
+<main id="app">
+  <canvas id="scene" tabindex="-1" aria-label="雾港的三维场景"></canvas>
+  <div class="vellum" aria-hidden="true"></div>
+
+  <header class="hud">
+    <div class="identity">
+      <span class="emblem-plant" aria-hidden="true">✦</span>
+      <div><strong>雾港归航</strong><span>六年级华文 · 第二课</span></div>
+    </div>
+    <div id="toolbar" class="toolbar" hidden>
+      <button id="book" type="button" class="hud-button"><span aria-hidden="true">▤</span><span>词语手册</span><strong id="word-count">0 / 24</strong></button>
+      <button id="settings" type="button" class="icon-button hud-utility" aria-label="设置" aria-haspopup="dialog" title="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h6m4 0h6M4 12h11m4 0h1M4 18h2m4 0h10M10 3v6m5 0v6m-9 0v6"/></svg></button>
+      <button id="developer-mode" type="button" class="icon-button hud-utility" aria-label="开发者模式" aria-haspopup="dialog" title="开发者模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7-5 5 5 5m10-10 5 5-5 5m-3-13-4 16"/></svg></button>
+    </div>
+  </header>
+
+  <section id="splash" class="lesson-entry" aria-label="载入课程">
+    <p id="start-status" role="status">正在载入课程……</p>
+    <button id="retry-entry" type="button" hidden>重试</button>
+    <a href="./?level=p6">返回星图</a>
+  </section>
+  <section id="mission-ui" class="mission" aria-label="当前任务" hidden>
+    <div class="mission-line">
+      <div class="radio-wave" id="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div><p id="mission-number" class="label"></p><h2 id="mission-name"></h2></div>
+      <button id="replay-cue" type="button" class="icon-button" aria-label="重听任务" title="重听任务"><svg class="speaker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z M16 9a4 4 0 0 1 0 6 M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+    </div>
+    <div class="cue-window"><p id="cue-text" class="cue-text" aria-live="polite"></p></div>
+    <p id="voice-status" class="voice-status" role="status" hidden></p>
+  </section>
+
+  <div id="reticle" class="reticle" aria-hidden="true" hidden></div>
+  <footer id="play-controls" class="play-controls" hidden>
+    <div id="joystick" class="joystick" aria-label="拖动摇杆行走"><span></span></div>
+    <div class="desktop-control"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 移动 <span>·</span> <kbd>F</kbd> 手机 <span>·</span> <kbd>Esc</kbd> 释放鼠标</div>
+    <div class="scene-action">
+      <button id="interact" type="button" class="primary action" hidden><kbd>E</kbd><span></span></button>
+    </div>
+    <p id="held" class="held" hidden></p>
+    <p class="touch-instruction">拖动画面转向</p>
+  </footer>
+
+  <div id="phone" hidden></div>
+  <section id="comic-overlay" hidden></section>
+  <section id="lesson-test" class="lesson-test" hidden></section>
+  <dialog id="workbench" class="game-panel" aria-labelledby="panel-title"><div id="panel"></div></dialog>
+  <noscript>请启用 JavaScript，才能探索雾港。</noscript>
+</main>
+</body>
+</html>

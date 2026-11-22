@@ -107,16 +107,16 @@ export function createEngine({
     camera.updateMatrixWorld();
   }
 
-  function reset() {
+  function reset(nextSpawn = spawn) {
     keys.clear();
     velocity.set(0, 0);
     touchDirection.set(0, 0);
     pointer.clearDrag();
-    yaw = spawn.yaw ?? 0;
-    pitch = spawn.pitch ?? -.022;
+    yaw = nextSpawn.yaw ?? 0;
+    pitch = nextSpawn.pitch ?? -.022;
     stride = 0;
     bob = 0;
-    camera.position.set(spawn.x, EYE_HEIGHT, spawn.z);
+    camera.position.set(nextSpawn.x, EYE_HEIGHT, nextSpawn.z);
     applyView();
     choose(null);
     nextRay = 0;

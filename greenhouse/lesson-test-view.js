@@ -18,7 +18,8 @@ function button(className, text, action) {
   return control;
 }
 
-export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay }) {
+export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay,
+  strokeDataUrl, awardArt = poster, lessonLabel = '第一课', showReplayOnPass = false }) {
   const title = mode === 'practice' ? '词语练习' : '课末测试';
   let state = initialState;
   let stopWriting = () => {};
@@ -42,19 +43,20 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
   function celebrate() {
     const sheet = node('article', 'lesson-test-sheet lesson-test-award');
     const art = node('img', 'lesson-test-award-art');
-    art.src = poster.href;
+    art.src = String(awardArt);
     art.alt = '';
     art.width = 480;
     art.height = 720;
     const copy = node('div', 'lesson-test-award-copy');
     const seal = node('span', 'lesson-test-seal', '✓');
     seal.setAttribute('aria-hidden', 'true');
-    const heading = node('h2', '', mode === 'practice' ? '词语练习完成！' : '第一课完成！');
+    const heading = node('h2', '', mode === 'practice' ? '词语练习完成！' : lessonLabel + '完成！');
     heading.id = 'lesson-test-title';
     heading.tabIndex = -1;
     const message = node('p', '', '所有词语，你都能独立写出来了。');
     const home = button('lesson-test-next', '返回星图', onExit);
     copy.append(seal, heading, message, home);
+    if (showReplayOnPass && onReplay) copy.append(button('lesson-test-pause', '重玩任务', onReplay));
     sheet.append(art, copy);
     host.replaceChildren(sheet);
     onPass();
@@ -175,7 +177,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     }, (completed) => {
       status.textContent = '';
       updateCharacters(completed);
-    }, { hintsAfterMisses: question.revealed ? 2 : false });
+    }, { strokeDataUrl, hintsAfterMisses: question.revealed ? 2 : false });
   }
 
   render(true);

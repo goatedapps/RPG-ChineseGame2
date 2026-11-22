@@ -1,0 +1,151 @@
+:root {
+  --cream: #fff0d0;
+  --sun: #ffcc83;
+  --line: #b596638c;
+}
+#app { background: #14283c url('art/harbour.webp') center / cover; }
+.vellum { opacity: .36; }
+.identity, .mission {
+  background-color: #12293be8;
+  border-color: #ba995e88;
+}
+.emblem-plant { color: #ffce83; }
+@media (max-width: 450px) {
+  .identity { gap: .4rem; }
+  .identity div span { white-space: nowrap; }
+  .identity .emblem-plant { display: none; }
+  .hud { gap: .5rem; }
+  .toolbar { gap: .35rem; }
+}
+.lesson-entry {
+  background: linear-gradient(#12293b47,#101e32cf), url('art/harbour.webp') center / cover;
+}
+#workbench:not(.artifact-inspection) { background: #122c38f5; }
+.harbour-panel > :is(p, .choices, .button-row, details, .writing-grid) { margin-block: .7rem; }
+.harbour-panel button + button { margin-inline-start: .2rem; }
+.harbour-panel .choices button + button { margin-inline-start: 0; }
+.harbour-panel .writing-grid { margin-inline: auto; }
+.harbour-panel .writing-progress { text-align: center; color: #ffd991; }
+.harbour-panel .body { line-height: 1.62; }
+.harbour-review { padding: .48rem; color: #f4dbb4; background: #27424c; border-radius: .45rem; }
+.harbour-review summary { cursor: pointer; }
+.harbour-note {
+  padding: clamp(1.45rem, 6vw, 3.4rem);
+  width: min(41rem, 100%);
+  background: #eac98e url('../moonbridge/art/ledger-paper.webp') center / 100% 100%;
+  color: #35251e;
+  line-height: 1.72;
+  box-shadow: 0 12px 32px #0009;
+}
+.harbour-note p { margin: 0 0 .8rem; }
+.harbour-note .harbour-note-tap {
+  background: none;
+  color: #654925;
+  border: 0;
+  min-height: 44px;
+  padding: .3rem 0;
+  text-decoration: underline;
+  font-size: .88rem;
+}
+.floating-steps { background: #152e49 url('art/stairs.webp') center / cover; }
+.stair-ledge {
+  position: absolute;
+  right: -8%;
+  bottom: 12%;
+  width: 43%;
+  height: 16%;
+  transform: rotate(-12deg);
+  background: #946039 url('../moonbridge/art/materials/oak.webp') center / cover;
+  box-shadow: 0 .55rem 0 #452f22;
+  border-top: .24rem solid #bb8c59;
+  pointer-events: none;
+}
+.braced .stair-ledge { transform: rotate(0); transition: transform .35s ease-out; }
+.step-socket {
+  position: absolute;
+  z-index: 1;
+  width: 16%;
+  height: 16%;
+  translate: -50% -50%;
+  border-radius: 50%;
+}
+.step-socket.active { box-shadow: 0 0 0 2px #ffcd78, inset 0 0 1rem #ffcf6755; }
+.step-socket.aligned { box-shadow: 0 0 0 2px #fff0aa, 0 0 1.1rem #ffce78; }
+.minigame .floating-step,
+.minigame .floating-step:hover:enabled {
+  width: 100%;
+  height: 100%;
+  translate: 0 var(--float, 0px);
+  border: 1px solid #d3a773;
+  border-radius: 50%;
+  background: #468077 url('../moonbridge/art/materials/oak.webp') center / cover;
+  box-shadow: 0 .33rem 0 #5a3c29, inset 0 .14rem 0 #d9a66e;
+}
+.step-socket.landed .floating-step { background: #645441; }
+.step-socket:not(.active,.landed) .floating-step { opacity: .52; }
+.minigame .brace-prop,
+.minigame .brace-prop:hover:enabled {
+  position: absolute;
+  left: 16%;
+  bottom: 9%;
+  width: clamp(42px, 11%, 62px);
+  height: 27%;
+  z-index: 2;
+  color: #ffe7ba;
+  background: #956343 url('../moonbridge/art/materials/oak.webp') center / cover;
+  border: 2px solid #d3aa75;
+  border-radius: .32rem;
+  cursor: grab;
+}
+.braced .brace-prop { left: 79%; bottom: 4%; transition: left .3s ease-out; }
+
+.shelter-game { background: #1b3033 url('art/shelter.webp') center / cover; }
+.shelter-game .shelter-grandma,
+.shelter-game .shelter-child {
+  position: absolute;
+  height: 74%;
+  width: 37%;
+  bottom: 8%;
+  filter: drop-shadow(0 4px 9px #101623d9);
+}
+.shelter-grandma { left: 9%; }
+.shelter-child { right: 9%; }
+.minigame .shelter-coat {
+  position: absolute;
+  bottom: 2%;
+  left: 41%;
+  width: 19%;
+  height: 30%;
+  z-index: 2;
+  cursor: grab;
+}
+.coat-given .shelter-coat { left: 16%; bottom: 12%; width: 22%; height: 42%; pointer-events: none; transition: left .25s ease-out; }
+.minigame :is(.shelter-hand,.shelter-arm,.shelter-shoulder) {
+  position: absolute;
+  z-index: 3;
+  border: 1px dashed #ffda82;
+  background: #172734d0;
+  border-radius: 50%;
+  font-size: .78rem;
+}
+.shelter-shoulder { left: 32%; top: 42%; }
+.shelter-arm { left: 34%; top: 54%; }
+.shelter-hand { right: 18%; top: 61%; }
+.minigame .assisted { background: #567652; border-style: solid; }
+
+.winch-game { background: #274050 url('art/berth.webp') center / cover; }
+.berth-timing {
+  position: absolute;
+  inset: 16% 10% auto;
+  height: 2.8rem;
+  background: #122a3ccd;
+  border: 1px solid #e1b27b;
+  border-radius: .6rem;
+}
+.berth-zone { position: absolute; inset: 0 32%; background: #f1bc663e; border-inline: 2px solid #ffda93; }
+.ferry-marker { position: absolute; top: 50%; left: var(--swing,50%); translate: -50% -50%; width: 25px; height: 14px; background: #f4d095; border-radius: 1px 1px 50% 50%; box-shadow: 0 .16rem 0 #7f4b2d; }
+.berth-timing.aligned .ferry-marker { background: #fff2b8; box-shadow: 0 0 .7rem #ffd386; }
+.minigame .ferry-winch { position: absolute; left: 36%; bottom: 15%; width: 28%; height: 48%; cursor: grab; }
+.ferry-winch img { rotate: var(--crank,0deg); transition: rotate .26s ease-out; filter: drop-shadow(0 .45rem .36rem #080e16dd); }
+.ferry-progress { position: absolute; bottom: 6%; left: 30%; width: 40%; accent-color: #eab974; }
+.docked .berth-zone { background: #ffe1948c; }

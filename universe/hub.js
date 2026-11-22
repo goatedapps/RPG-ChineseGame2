@@ -1,6 +1,6 @@
 import { bindJoystick } from '../shared/joystick.js';
 import { lessonCompleted } from '../shared/lesson-progress.js';
-import { getWorlds, levels } from './catalog.js';
+import { getWorlds, levels } from './catalog.js?v=fogharbour';
 
 const $ = (id) => document.getElementById(id);
 const gradeKeys = Object.keys(levels);

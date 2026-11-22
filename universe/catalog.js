@@ -21,6 +21,12 @@ const playable = {
       art: '../greenhouse/art/storm-cover.webp',
       transition: '穿过雨云，抵达温室。',
     },
+    2: {
+      title: '雾港归航',
+      href: 'p6-lesson2.html',
+      art: '../fogharbour/art/harbour.webp',
+      transition: '越过云海，抵达雾港。',
+    },
   },
 };
 
