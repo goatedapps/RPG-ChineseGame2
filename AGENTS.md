@@ -19,6 +19,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 - Build a compact, animated first-person 3D space where the player can walk, look around, examine objects, and pick up or use items.
 - Prioritize tablet touch controls and desktop keyboard and mouse controls. Reuse the greenhouse [joystick input](shared/joystick.js) and [joystick appearance](shared/joystick.css) across 3D lessons. Adapt its movement vector to the lesson rather than reimplementing the control.
+- Use the P6 Lesson 1 desktop mouse controls for first-person exploration in every lesson. Reuse the [shared scene pointer](shared/scene-pointer.js). Click the 3D scene to capture the mouse, move the mouse freely to look, and left-click while captured or press E to interact with the object under the reticle. Esc, gameplay overlays, and new story-helper messages release the cursor. Click the scene to recapture it. Support WASD and arrow keys for movement and keep drag-to-look for touch devices and browsers that block pointer lock.
 - Use the [mobile game HUD reference](references/mobile-game-hud.jpg) across lessons. Put the title and tools at the top, the current task and Mandarin replay button directly below, the touch joystick at lower left, and the story helper at lower right. Show the current item and interaction near the lower centre. Follow the language rules below for all new UI.
 - Make the vocabulary useful for finding objects, taking actions, and interpreting clues. Spread story beats and fieldwork across distinct walkable locations with visible landmarks.
 - Weave comprehension checks and handwriting into the mission, such as responding to a character or unlocking a computer.
@@ -27,6 +28,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - When the player gets stuck, offer a contextual hint first. On request, show the shared [golden hint ring](shared/hint-portal.js) at the exact target. The greenhouse ring renderer is the standard for all lessons.
 - Show close-ups as full images of the actual objects with ImageGen artwork. Put readable clues and relevant controls on or near the object itself. Use live text over generated paper for handwritten notes and pages. Keep the close-up free of generic dialog cards.
 - Keep object close-ups free of visible interface buttons whenever practical. Tap or click outside the object to return to the world, tap the left or right side of a book to turn pages, and tap an item directly to pick it up. Support Escape and arrow keys as keyboard alternatives. Use the device’s own controls for radio actions. Show any image a question refers to.
+- Use the physical controls for machines in close-up. Turn a dial to adjust a setting and operate the pictured lever to start a trial. Present trial results as an inspectable object such as a record on paper. Let players tap the record to continue or tap outside to return to the scene. Leave close buttons off these views.
 
 ## Curriculum and language
 

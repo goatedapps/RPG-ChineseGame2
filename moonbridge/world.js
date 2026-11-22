@@ -1,4 +1,5 @@
 import { createHintPortal } from '../shared/hint-portal.js';
+import { bindScenePointer, MOUSE_LOOK_RATE } from '../shared/scene-pointer.js';
 import * as T from '../greenhouse/vendor/three.module.min.js';
 import { advanceRace, FORK, MERGE } from './race.js';
 
@@ -809,7 +810,7 @@ function scenePoint(progress, style) {
   return route.end.getPoint((progress - MERGE) / (1 - MERGE));
 }
 
-export function createWorld(canvas, notify, finished) {
+export function createWorld(canvas, notify, finished, onInteract) {
   const renderer = new T.WebGLRenderer({
     canvas,
     antialias: true,
@@ -1033,7 +1034,6 @@ export function createWorld(canvas, notify, finished) {
   const stick = new T.Vector2();
   const desired = V(0, 0, 0);
   const aim = V(0, 0, 0);
-  let drag;
   const keys = new Map([
     ['ArrowUp', 'up'],
     ['KeyW', 'up'],
@@ -1064,28 +1064,24 @@ export function createWorld(canvas, notify, finished) {
   }
   window.addEventListener('keydown', (event) => key(event, true));
   window.addEventListener('keyup', (event) => key(event, false));
-  window.addEventListener('blur', () => {
+  function clearMovement() {
     input.clear();
     stick.set(0, 0);
-  });
-  canvas.addEventListener('pointerdown', (event) => {
-    if (!active || mode !== 'walk' || drag) return;
-    drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
-    canvas.setPointerCapture(event.pointerId);
-  });
-  canvas.addEventListener('pointermove', (event) => {
-    if (drag?.id !== event.pointerId || !active) return;
-    yaw -= (event.clientX - drag.x) * 0.006;
-    pitch = between(pitch - (event.clientY - drag.y) * 0.005, -0.98, 0.98);
-    drag.x = event.clientX;
-    drag.y = event.clientY;
-    if (mode === 'walk') notify({ mode, look: true });
-  });
-  function stopDrag(event) {
-    if (drag?.id === event.pointerId) drag = null;
   }
-  canvas.addEventListener('pointerup', stopDrag);
-  canvas.addEventListener('pointercancel', stopDrag);
+  const pointer = bindScenePointer(canvas, {
+    canLook: () => active && mode === 'walk',
+    onLook(dx, dy, touch) {
+      if ((!dx && !dy) || !Number.isFinite(dx) || !Number.isFinite(dy)) return;
+      const turn = touch ? dx * .006 : between(dx, -240, 240) * MOUSE_LOOK_RATE;
+      const tilt = touch ? dy * .005 : between(dy, -240, 240) * MOUSE_LOOK_RATE;
+      yaw -= turn;
+      pitch = between(pitch - tilt, -.98, .98);
+      camera.rotation.set(pitch, yaw, 0, 'YXZ');
+      notify({ mode, look: true });
+    },
+    onInteract,
+    onRelease: clearMovement,
+  });
 
   function canReachRadio() {
     if (!radio.visible) return false;
@@ -1310,12 +1306,11 @@ export function createWorld(canvas, notify, finished) {
 
   function pause() {
     active = false;
-    drag = null;
+    pointer.release();
     cancelAnimationFrame(raf);
     if (finishId) cancelAnimationFrame(finishId);
     finishId = undefined;
-    input.clear();
-    stick.set(0, 0);
+    clearMovement();
     last = 0;
   }
   function resume() {
@@ -1341,6 +1336,8 @@ export function createWorld(canvas, notify, finished) {
     pause,
     resume,
     reset,
+    focus: pointer.focus,
+    releasePointer: pointer.release,
     currentTarget,
     setTargets(ids) {
       targets = ids;
@@ -1378,15 +1375,15 @@ export function createWorld(canvas, notify, finished) {
         cargo: playerCart.cargo.visible };
       mode = 'trial';
       cue.visible = false;
-      input.clear();
-      stick.set(0, 0);
-      drag = null;
+      clearMovement();
+      pointer.release();
     },
     releaseTrial() {
       if (trial?.done) stopTrial();
     },
     startRace(part) {
       mode = 'race';
+      pointer.release();
       race = {
         part,
         route: part === 'runner' ? 'smooth' : 'rough',

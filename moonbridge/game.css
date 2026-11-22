@@ -93,6 +93,9 @@ canvas {
   display: block;
   touch-action: none;
 }
+#world:focus {
+  outline: none;
+}
 .screen {
   overflow: auto;
 }
@@ -670,36 +673,12 @@ dialog:has(.restart-confirmation) {
   height: 100%;
   touch-action: none;
 }
-#test-power {
-  display: block;
-  width: 100%;
-  height: 33px;
-  accent-color: var(--gold);
-  margin: 7px 0;
-}
 #hud.trial-playing,
 body:has(#dialog[data-appearance='trial-result'][open]) #hud {
   visibility: hidden;
 }
-#dialog[data-appearance='trial-result'] {
-  position: fixed;
-  inset: auto 0 max(1rem, env(safe-area-inset-bottom));
-  width: min(32rem, calc(100% - 1.5rem));
-  margin: 0 auto;
-  padding: .5rem;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
 #dialog[data-appearance='trial-result']::backdrop {
   background: linear-gradient(0deg, #070d1bee 0, #070d1b86 26%, transparent 58%);
-}
-#dialog[data-appearance='trial-result'] .dialog-copy {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-shadow: 0 2px 6px #000;
 }
 
 .vocab .icon-button,
@@ -883,7 +862,7 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
 
 .test-actions { display: grid; gap: .4rem; }
 
-#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) {
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'], [data-appearance^='trial-']) {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -899,21 +878,21 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
   background: transparent;
   box-shadow: none;
 }
-#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'])[open] {
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'], [data-appearance^='trial-'])[open] {
   display: grid;
   place-items: center;
 }
 #dialog[data-appearance='fittings']::backdrop {
   background: radial-gradient(ellipse at center, #0a1020bd, #050914e2);
 }
-#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) header {
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'], [data-appearance^='trial-']) header {
   position: absolute;
   width: 1px;
   height: 1px;
   overflow: hidden;
   clip-path: inset(50%);
 }
-#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio']) #dialog-body {
+#dialog:is([data-appearance='artifact'], [data-appearance='fittings'], [data-appearance='radio'], [data-appearance^='trial-']) #dialog-body {
   width: min(100%, 35rem);
 }
 .artifact-page, .fitting-shelf {
@@ -1014,4 +993,84 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
 }
 .radio-hint:disabled .radio-hint-label {
   visibility: hidden;
+}
+.trial-station {
+  width: min(100%, 28rem);
+  margin: auto;
+  color: #ffdfa2;
+  text-shadow: 0 2px 5px #050913;
+}
+.trial-station-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(.7rem, 4vw, 2rem);
+}
+.trial-speed-control,
+.trial-lever {
+  text-align: center;
+}
+.trial-dial {
+  aspect-ratio: 1;
+  width: min(100%, 11rem, 30dvh);
+  margin: .2rem auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.trial-dial:active { cursor: grabbing; }
+.trial-dial-knob {
+  display: block;
+  width: 100%;
+  transform: rotate(var(--knob-angle));
+  filter: drop-shadow(0 .45rem .4rem #040812bc);
+  pointer-events: none;
+}
+.trial-scale {
+  display: flex;
+  justify-content: space-between;
+  width: min(100%, 10rem);
+  margin: auto;
+  color: #ffdfad;
+  font-size: .78rem;
+}
+.trial-scale span:not(:nth-child(2)) { margin-top: .6rem; }
+.trial-speed {
+  display: block;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.trial-lever,
+.trial-lever:hover:enabled {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-shadow: inherit;
+  touch-action: none;
+}
+.trial-lever-art {
+  display: block;
+  width: min(100%, 10rem, 24dvh);
+  margin: 0 auto .25rem;
+  filter: drop-shadow(0 .45rem .4rem #040812bc);
+  pointer-events: none;
+}
+.trial-lever:active .trial-lever-art {
+  transform: rotate(-6deg);
+  transform-origin: 50% 90%;
+}
+.trial-station-note {
+  margin: .8rem 0 0;
+  text-align: center;
+  color: var(--paper);
+}
+.trial-note-instruction {
+  margin: .6rem 0 0;
+  color: #725337;
+  font-size: .85rem;
+}
+.trial-note-hotspot {
+  inset: 0;
+  width: 100%;
 }

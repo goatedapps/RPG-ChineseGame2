@@ -1,11 +1,11 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js?v=lever-trial';
+import { createWorld } from './world.js?v=desktop-pointer';
 import {
   opening,
   parts,
   tasks,
   objects,
-} from './story.js?v=mei-voice';
+} from './story.js?v=desktop-pointer';
 import { words, bank } from './curriculum.js';
 import { fieldwork } from './fieldwork.js?v=mei-voice';
 import { mei } from './radio-messages.js';
@@ -138,6 +138,8 @@ let disposeTest = () => {};
 let lastFocused;
 let driving = false;
 let testing = false;
+let practicePassed = false;
+let practiceSpeed = 68;
 let currentTestView = null;
 let devSkipDictation = false;
 let moveStart;
@@ -266,7 +268,7 @@ function showPanel(appearance, title, language = 'zh-Hans') {
   dismissInspection = undefined;
   dialog.dataset.appearance = appearance ?? 'panel';
   dialog.lang = language;
-  $('dialog-close').hidden = ['artifact', 'fittings', 'radio'].includes(appearance);
+  $('dialog-close').hidden = ['artifact', 'fittings', 'radio', 'trial-controls', 'trial-result'].includes(appearance);
   $('dialog-close').setAttribute('aria-label', language === 'en' ? 'Close' : '关闭');
   disposeWriting();
   disposeWriting = () => {};
@@ -335,6 +337,7 @@ function syncRadio(notify = false) {
   if (!unread || !notify || key === lastRadioAlert) return;
   lastRadioAlert = key;
   play('radio');
+  world?.releasePointer();
   if (reducedMotion.matches) return;
   radioBuzz?.cancel();
   radioBuzz = radio.animate([
@@ -483,17 +486,20 @@ function endRace(first) {
 function startWorld() {
   closePanel();
   try {
-    world ??= createWorld(canvas, worldEvent, endRace);
+    world ??= createWorld(canvas, worldEvent, endRace, action);
   } catch {
     showEntryError();
     return;
   }
   world.reset(save.stage >= 12);
   driving = false;
+  practicePassed = false;
+  practiceSpeed = 68;
   moveStart = null;
   footstepDistance = 0;
   setView('hud');
   update(true);
+  world.focus(!briefingPending());
   audio.prepareGameplay();
 }
 function restartMission() {
@@ -794,62 +800,128 @@ function runTrial(success, power, onResult) {
 }
 
 function firstRun() {
-  runTrial(false, 68, () => {
-    showPanel('trial-result', '第一次试跑');
-    body.append(
-      make('p', '灯车一颠，火种就弹出了架子，砰的一声落在木板上。', 'dialog-copy'),
-      group(button('查看司机手册', () => {
-        go(7);
-        closePanel();
-      }, 'gold')),
-    );
-  });
+  runTrial(false, 68, () => showTrialNote(
+    '第一次试跑',
+    '灯车一颠，火种就弹出了架子，砰的一声落在木板上。',
+    '轻触记录或放下记录，继续任务。',
+    closePanel,
+    () => go(7),
+  ));
 }
 
-function practiceRun(power = 68) {
+function showTrialNote(title, result, instruction, onTap, onDismiss) {
+  showPanel('trial-result', title);
+  const sheet = artifactPage('repair-paper',
+    make('h2', title, 'artifact-heading'),
+    make('p', result, 'artifact-ink'),
+    make('p', instruction, 'trial-note-instruction'),
+  );
+  sheet.append(objectHotspot(instruction, 'trial-note-hotspot', onTap));
+  body.append(sheet);
+  dismissInspection = onDismiss;
+}
+
+function speedDial() {
+  const dial = make('div', '', 'trial-dial');
+  dial.tabIndex = 0;
+  dial.setAttribute('role', 'slider');
+  dial.setAttribute('aria-label', '试跑速度');
+  dial.setAttribute('aria-valuemin', '0');
+  dial.setAttribute('aria-valuemax', '100');
+  dial.append(fieldImage('trial-speed-knob', 'trial-dial-knob'));
+  const readout = make('output', '', 'trial-speed');
+  readout.setAttribute('aria-hidden', 'true');
+  const limits = make('div', '', 'trial-scale');
+  limits.setAttribute('aria-hidden', 'true');
+  for (const value of ['0', '50', '100']) limits.append(make('span', value));
+  const control = make('div', '', 'trial-speed-control');
+  control.append(limits, dial, readout);
+  const sweep = 270;
+  let drag;
+
+  function setSpeed(value) {
+    practiceSpeed = Math.round(Math.min(100, Math.max(0, value)));
+    readout.textContent = '速度 ' + practiceSpeed;
+    dial.setAttribute('aria-valuenow', practiceSpeed);
+    dial.style.setProperty('--knob-angle', (practiceSpeed / 100 - .5) * sweep + 'deg');
+  }
+  function pointerAngle(event) {
+    const box = dial.getBoundingClientRect();
+    return Math.atan2(event.clientX - box.left - box.width / 2,
+      box.top + box.height / 2 - event.clientY) * 180 / Math.PI;
+  }
+  dial.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0 || drag) return;
+    const angle = pointerAngle(event);
+    drag = { id: event.pointerId, angle, speed: practiceSpeed };
+    dial.focus({ preventScroll: true });
+    dial.setPointerCapture(event.pointerId);
+  });
+  dial.addEventListener('pointermove', (event) => {
+    if (drag?.id !== event.pointerId) return;
+    const angle = pointerAngle(event);
+    const turn = ((angle - drag.angle + 540) % 360) - 180;
+    drag.angle = angle;
+    drag.speed = Math.min(100, Math.max(0, drag.speed + turn * 100 / sweep));
+    setSpeed(drag.speed);
+  });
+  dial.addEventListener('pointerup', (event) => {
+    if (drag?.id === event.pointerId) drag = undefined;
+  });
+  dial.addEventListener('lostpointercapture', () => { drag = undefined; });
+  dial.addEventListener('keydown', (event) => {
+    const changes = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1, PageDown: -10, PageUp: 10, Home: -100, End: 100 };
+    if (!Object.hasOwn(changes, event.key)) return;
+    event.preventDefault();
+    setSpeed(practiceSpeed + changes[event.key]);
+  });
+  setSpeed(practiceSpeed);
+  return control;
+}
+
+function practiceRun() {
   if (testing) return;
-  if (save.fieldProgress?.stage === 10) {
+  if (practicePassed || save.fieldProgress?.stage === 10) {
     openFieldwork();
     return;
   }
-  showPanel('equipment', '试跑台');
+  showPanel('trial-controls', '试跑台');
   const part = parts[save.part];
   const note = make(
     'p',
-    part.name + '已装好。把速度调好，再拉下试跑杆。',
-    'dialog-copy',
+    part.name + '已装好。转动旋钮调速，再操作红色试跑杆。',
+    'trial-station-note',
   );
-  const range = document.createElement('input');
-  range.type = 'range';
-  range.min = 0;
-  range.max = 100;
-  range.value = power;
-  range.id = 'test-power';
-  range.setAttribute('aria-label', '试跑速度');
-  const value = make('output', '速度 ' + power);
-  range.oninput = () => { value.textContent = '速度 ' + range.value; };
   const launch = button('拉下试跑杆', () => {
-    const selected = Number(range.value);
-    const ok = testPart(save, selected / 100);
-    runTrial(ok, selected, () => {
-      showPanel('trial-result', '试跑结果');
-      body.append(
-        make('p', ok
-          ? '灯车颠了一下，火种还是稳稳地留在架子上！'
-          : '灯车一颠，火种就掉了出来。把速度调到中间，再试一次。', 'dialog-copy'),
-        group(ok
-          ? button('查看试跑记录', () => {
-              world.releaseTrial();
-              openFieldwork();
-            }, 'gold')
-          : button('再试一次', () => {
-              world.releaseTrial();
-              practiceRun(selected);
-            }, 'gold')),
-      );
+    if (testing) return;
+    const ok = testPart(save, practiceSpeed / 100);
+    runTrial(ok, practiceSpeed, () => {
+      practicePassed = ok;
+      showTrialNote('试跑结果', ok
+        ? '灯车颠了一下，火种还是稳稳地留在架子上！'
+        : '灯车一颠，火种就掉了出来。把速度调到中间，再试一次。',
+      ok ? '轻触这页，翻看试跑记录。' : '轻触这页，回到试跑台。', () => {
+        world.releaseTrial();
+        practiceRun();
+      });
     });
-  }, 'gold');
-  body.append(note, value, range, group(launch));
+  }, 'trial-lever');
+  launch.prepend(fieldImage('test-lever-v2', 'trial-lever-art'));
+  let pull;
+  launch.onpointerdown = (event) => {
+    if (event.button !== 0 || pull) return;
+    pull = { id: event.pointerId, y: event.clientY };
+    launch.setPointerCapture(event.pointerId);
+  };
+  launch.onpointerup = (event) => {
+    if (pull?.id === event.pointerId && event.clientY - pull.y >= 14) launch.click();
+  };
+  launch.onlostpointercapture = () => { pull = undefined; };
+  const controls = make('div', '', 'trial-station-controls');
+  controls.append(speedDial(), launch);
+  const station = make('section', '', 'trial-station');
+  station.append(controls, note);
+  body.append(station);
 }
 
 function pronounce(label, text, status) {

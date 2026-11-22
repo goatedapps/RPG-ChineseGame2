@@ -1269,7 +1269,7 @@ else if (state.phonePicked) begin();
 else beginWithComic();
 
 function prepareRoom() {
-  roomRequest ??= Promise.all([import('./engine.js'), import('./world.js')]).then(async ([{ createEngine }, { createWorld }]) => {
+  roomRequest ??= Promise.all([import('./engine.js?v=desktop-pointer'), import('./world.js')]).then(async ([{ createEngine }, { createWorld }]) => {
     const room = createEngine({
       canvas, worldFactory: createWorld, reducedMotion: motion,
       onTarget: updateTarget,

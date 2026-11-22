@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
+import { bindScenePointer, MOUSE_LOOK_RATE } from '../shared/scene-pointer.js';
 
-const LOOK_RATE = .0031;
 const MAX_PITCH = Math.PI * .43;
 const MOVE_SPEED = 3;
 const BODY_RADIUS = .29;
@@ -86,13 +86,21 @@ export function createEngine({
   let rendering = true;
   let selected = null;
   let state = { used: new Set(), completed: 0 };
-  let drag = null;
   let yaw = spawn.yaw ?? 0;
   let pitch = spawn.pitch ?? -.022;
   let nextRay = 0;
   let previous = 0;
   let stride = 0;
   let bob = 0;
+  const pointer = bindScenePointer(canvas, {
+    canLook: () => active && rendering,
+    onLook(dx, dy, touch) {
+      const gain = touch ? 1.35 : 1;
+      look(dx * gain, dy * gain);
+    },
+    onInteract: interact,
+    onRelease: releaseInput,
+  });
 
   function applyView() {
     camera.rotation.set(pitch, yaw, 0, 'YXZ');
@@ -103,7 +111,7 @@ export function createEngine({
     keys.clear();
     velocity.set(0, 0);
     touchDirection.set(0, 0);
-    drag = null;
+    pointer.clearDrag();
     yaw = spawn.yaw ?? 0;
     pitch = spawn.pitch ?? -.022;
     stride = 0;
@@ -170,7 +178,6 @@ export function createEngine({
   function releaseInput() {
     keys.clear();
     touchDirection.set(0, 0);
-    drag = null;
   }
 
   function setActive(nextActive) {
@@ -181,7 +188,7 @@ export function createEngine({
     velocity.set(0, 0);
     if (!next) {
       choose(null);
-      if (document.pointerLockElement === canvas) document.exitPointerLock?.();
+      pointer.release();
     } else {
       nextRay = 0;
     }
@@ -189,8 +196,8 @@ export function createEngine({
 
   function look(dx, dy) {
     if (!active || !rendering || !Number.isFinite(dx) || !Number.isFinite(dy) || (!dx && !dy)) return;
-    yaw -= THREE.MathUtils.clamp(dx, -240, 240) * LOOK_RATE;
-    pitch = THREE.MathUtils.clamp(pitch - THREE.MathUtils.clamp(dy, -240, 240) * LOOK_RATE, -MAX_PITCH, MAX_PITCH);
+    yaw -= THREE.MathUtils.clamp(dx, -240, 240) * MOUSE_LOOK_RATE;
+    pitch = THREE.MathUtils.clamp(pitch - THREE.MathUtils.clamp(dy, -240, 240) * MOUSE_LOOK_RATE, -MAX_PITCH, MAX_PITCH);
     applyView();
     onLook({ dx, dy });
   }
@@ -198,20 +205,6 @@ export function createEngine({
   function setVector(x, y) {
     if (!active || !rendering || !Number.isFinite(x) || !Number.isFinite(y)) return;
     touchDirection.set(x, y).clampLength(0, 1);
-  }
-
-  function requestLock() {
-    if (!active || !rendering || !canvas.requestPointerLock || document.pointerLockElement === canvas) return;
-    try {
-      canvas.requestPointerLock()?.catch(() => {});
-    } catch {
-      // Browsers can deny pointer lock while still accepting drag controls.
-    }
-  }
-
-  function focus(lock = true) {
-    canvas.focus({ preventScroll: true });
-    if (lock && window.matchMedia('(pointer: fine)').matches) requestLock();
   }
 
   window.addEventListener('keydown', (event) => {
@@ -225,51 +218,13 @@ export function createEngine({
     }
   });
   window.addEventListener('keyup', (event) => keys.delete(event.code));
-  window.addEventListener('blur', releaseInput);
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) releaseInput();
-  });
-  document.addEventListener('pointerlockchange', () => {
-    if (document.pointerLockElement === canvas) drag = null;
-    else releaseInput();
-  });
-  document.addEventListener('mousemove', (event) => {
-    if (document.pointerLockElement === canvas) look(event.movementX, event.movementY);
-  });
-
-  canvas.addEventListener('pointerdown', (event) => {
-    if (!active || !rendering || drag || event.button !== 0) return;
-    event.preventDefault();
-    if (document.pointerLockElement === canvas) {
-      interact();
-      return;
-    }
-    focus(false);
-    drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
-    canvas.setPointerCapture?.(event.pointerId);
-    if (event.pointerType === 'mouse') requestLock();
-  });
-  canvas.addEventListener('pointermove', (event) => {
-    if (!drag || drag.id !== event.pointerId || document.pointerLockElement === canvas) return;
-    const gain = event.pointerType === 'touch' ? 1.35 : 1;
-    look((event.clientX - drag.x) * gain, (event.clientY - drag.y) * gain);
-    if (drag) {
-      drag.x = event.clientX;
-      drag.y = event.clientY;
-    }
-  });
-  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-    canvas.addEventListener(name, (event) => {
-      if (drag?.id === event.pointerId) drag = null;
-    });
-  }
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();
     rendering = false;
     releaseInput();
     velocity.set(0, 0);
     choose(null);
-    if (document.pointerLockElement === canvas) document.exitPointerLock?.();
+    pointer.release();
     onStatus({ type: 'contextlost', message: '三维场景已暂停，等待图形恢复。' });
   });
   canvas.addEventListener('webglcontextrestored', () => {
@@ -363,7 +318,7 @@ export function createEngine({
   }
 
   return {
-    show, hide, ready, setActive, interact, setVector, look, reset, focus, projectTarget,
+    show, hide, ready, setActive, interact, setVector, look, reset, focus: pointer.focus, projectTarget,
     setGameState(next) {
       state = { ...next };
       nextRay = 0;

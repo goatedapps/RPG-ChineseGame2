@@ -27,7 +27,7 @@ export const parts = {
 
 export const tasks = [
   { title: '走到工作台前', cue: '按方向键或拖动摇杆，向前走几步。' },
-  { title: '看看四周', cue: '拖动画面，看看车站和月桥。' },
+  { title: '看看四周', cue: '点击画面后移动鼠标，或用手指拖动画面，看看四周。' },
   { title: '拿起对讲机', cue: '走近右边的工作台，拿起对讲机。', item: 'radio' },
   {
     title: '听听小梅怎么说',
