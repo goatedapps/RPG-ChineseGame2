@@ -5,7 +5,7 @@ import { missions, objects, tutorial } from './story.js';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=radio-briefings';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=radio-briefings';
+import { createGreenhouseAudio } from './sounds.js?v=entry-audio';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
@@ -1257,11 +1257,9 @@ function beginWithComic() {
 
 audio.setEnabled(effectsEnabled);
 audio.setMusicEnabled(musicEnabled);
-document.addEventListener('pointerup', startAudio, { once: true });
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const button = event.target.closest('button');
-  startAudio();
   if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
 }, true);
 

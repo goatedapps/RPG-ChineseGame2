@@ -12,7 +12,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
 import { mountWriting, mountTest } from './assess.js?v=direct-entry';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=lever-trial';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=entry-audio';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 
@@ -1174,13 +1174,10 @@ document.querySelectorAll('[data-settings]').forEach((control) => {
   control.onclick = settings;
 });
 
-document.addEventListener('pointerup', () => audio.start(), { once: true });
-document.addEventListener('click', () => audio.start(), true);
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const control = event.target.closest('button');
   if (!control || control.matches('.comic-hit,#action,.options button')) return;
-  audio.start();
   play('ui');
 });
 

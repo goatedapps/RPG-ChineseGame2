@@ -260,15 +260,13 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
       focused = true;
       refreshMix();
     });
-    window.addEventListener('pointerup', unlock);
-    window.addEventListener('keydown', unlock);
     context.addEventListener('statechange', refreshMix);
     prepareSceneEffects();
     if (musicEnabled) prepareMusic(musicScene);
     return true;
   }
 
-  function start() {
+  function start(interactive = true) {
     if (!enabled && !(musicEnabled && musicScene)) return false;
     if (!context) {
       try {
@@ -277,10 +275,25 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
         return false;
       }
     }
-    unlock();
+    if (interactive) unlock();
     refreshMix();
     return true;
   }
+
+  function startFromInput(event) {
+    if (event.isTrusted) start();
+  }
+
+  // Lesson entry follows a page navigation. Catch the first interaction with the
+  // new page, including joystick movement and keys handled by the comic or world.
+  const inputOptions = { capture: true, passive: true };
+  window.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse') startFromInput(event);
+  }, inputOptions);
+  window.addEventListener('pointerup', startFromInput, inputOptions);
+  window.addEventListener('touchend', startFromInput, inputOptions);
+  window.addEventListener('keydown', startFromInput, inputOptions);
+  window.addEventListener('click', startFromInput, inputOptions);
 
   function cue(request) {
     const name = request === 'dew' ? 'pickup' : request;
@@ -339,6 +352,9 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
       musicScene = next;
       if (musicEnabled) prepareMusic(next);
       prepareSceneEffects();
+      // Build and preload the graph on entry. A browser that suspends it will
+      // only be asked to resume from one of the input handlers.
+      if (next) start(false);
       refreshMix();
     },
     setAmbience(active) {
