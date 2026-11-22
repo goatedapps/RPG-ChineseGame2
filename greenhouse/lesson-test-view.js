@@ -19,7 +19,7 @@ function button(className, text, action) {
 }
 
 export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay,
-  strokeDataUrl, awardArt = poster, lessonLabel = '第一课', showReplayOnPass = false }) {
+  strokeDataUrl, awardArt = poster, lessonLabel = '第一课', showReplayOnPass = false, onDeveloper }) {
   const title = mode === 'practice' ? '词语练习' : '课末测试';
   let state = initialState;
   let stopWriting = () => {};
@@ -96,6 +96,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const saveAndLeave = button('lesson-test-pause', '保存并返回星图', onExit);
     header.append(heading, counter, saveAndLeave);
     if (onReplay) header.append(button('lesson-test-pause', '重玩任务', onReplay));
+    if (onDeveloper) header.append(button('lesson-test-pause', '开发者模式', onDeveloper));
     header.append(bar);
 
     const layout = node('div', 'lesson-test-layout');

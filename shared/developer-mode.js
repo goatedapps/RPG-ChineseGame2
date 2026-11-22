@@ -76,7 +76,7 @@ export function createDeveloperMode({
     checkbox.id = 'developer-skip-dictation';
     checkbox.type = 'checkbox';
     checkbox.checked = skipDictation;
-    row.append(makeElement('span', '自动跳过听写'), checkbox);
+    row.append(makeElement('span', '自动跳过听写（含课末测试）'), checkbox);
     checkbox.addEventListener('change', () => {
       if (!unlocked) return;
       skipDictation = checkbox.checked;

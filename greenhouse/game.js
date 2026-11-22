@@ -9,7 +9,8 @@ import { createGreenhouseAudio } from './sounds.js?v=audio-recovery';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
-import { createDeveloperMode } from '../shared/developer-mode.js';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { showSkippedFinal } from '../shared/skipped-final.js';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
@@ -133,7 +134,12 @@ const developerMode = createDeveloperMode({
   getSkipLabel: () => state.tutorialDone ? '跳过当前任务' : '跳过操作练习',
   onSkip: skipCurrentTask,
   onSkipDictation(enabled) {
-    if (enabled && state.phase === 'dictation') {
+    if (enabled && activeTest?.mode === 'final') {
+      desk.close();
+      activeTest.destroy?.();
+      activeTest = null;
+      void openLessonTest('final');
+    } else if (enabled && state.phase === 'dictation') {
       moveToHandover(missions[state.mission]);
       save();
       syncPhoneActivity();
@@ -949,10 +955,10 @@ function returnMap() {
   location.assign('./?level=p6');
 }
 
-async function openLessonTest(mode) {
+async function openLessonTest(mode, skip = developerMode.skipDictation) {
   const final = mode === 'final';
   if (activeTest || (final ? !state.endingSeen || state.finalPassed : !state.lessonComplete)) return;
-  const run = {};
+  const run = { mode };
   activeTest = run;
   const slot = final ? 'finalTest' : 'practiceTest';
   if (final && !state.finalStarted) {
@@ -962,6 +968,13 @@ async function openLessonTest(mode) {
   suspendRoom();
   $('#splash').hidden = true;
   testScreen.hidden = false;
+  if (final && skip) {
+    showSkippedFinal(testScreen, {
+      cardClass: 'lesson-test-sheet', headingId: 'lesson-test-title', onExit: returnMap,
+      onResume() { activeTest = null; void openLessonTest(mode, false); },
+    });
+    return;
+  }
   const loading = node('div', '', 'lesson-test-loading');
   const status = node('p', '正在准备测验……');
   status.setAttribute('role', 'status');
@@ -972,7 +985,7 @@ async function openLessonTest(mode) {
 
   try {
     const [bank, { createLessonTestView }] = await Promise.all([
-      loadLessonTest(), import('./lesson-test-view.js?v=briefing-flow'),
+      loadLessonTest(), import('./lesson-test-view.js?v=final-skip'),
     ]);
     if (activeTest !== run) return;
     state[slot] = restoreLessonTest(bank, state[slot]);
@@ -994,13 +1007,14 @@ async function openLessonTest(mode) {
       },
       onExit: returnMap,
       onReplay: final ? confirmReplay : undefined,
+      onDeveloper: final ? developerMode.open : undefined,
     });
   } catch {
     if (activeTest !== run) return;
     status.textContent = '测验未能载入。请再试一次。';
     const retry = makeButton('重试', 'primary', () => {
       activeTest = null;
-      void openLessonTest(mode);
+      void openLessonTest(mode, skip);
     });
     home.before(retry);
     testScreen.replaceChildren(loading);

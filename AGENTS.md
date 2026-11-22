@@ -60,9 +60,9 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 - Put Settings and Developer mode in the top-right game toolbar. Reuse the greenhouse [settings menu](shared/settings.js), [Developer mode panel](shared/developer-mode.js), and [menu styling](shared/game-menus.css). Use the shared labeled switches for music and effects, and the separate return-home action during gameplay. Connect these controls to the lesson’s existing preferences and save flow.
 - Require the password `greenhouse` and keep Developer mode locked by default on every page load.
 - Reuse the Developer mode panel and connect its controls to each lesson's progression.
-- Let developers skip the current task and turn on automatic skipping of mission dictation.
+- Let developers skip the current task and turn on automatic skipping of mission dictation and the final dictation test. Make Developer mode available from an in-progress final test.
 - Advance the scene and story together when skipping, and award handwriting credit only for work the player completes.
-- Keep final and practice tests on their regular assessment flow.
+- Preserve unfinished assessment progress when a developer skips the final test. Leave practice tests and normal completion credit on the regular assessment flow.
 
 ## Assets and delivery
 

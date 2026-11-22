@@ -13,10 +13,11 @@ import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js?v=cockpit-race';
-import { mountWriting, mountTest } from './assess.js?v=direct-entry';
+import { mountWriting, mountTest } from './assess.js?v=final-skip';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
-import { createDeveloperMode } from '../shared/developer-mode.js';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { showSkippedFinal } from '../shared/skipped-final.js';
 
 import { playLessonComic } from '../shared/comic.js';
 import { bindJoystick } from '../shared/joystick.js';
@@ -1343,11 +1344,19 @@ function showBank(index = 0) {
     group(button('下一题', () => showBank((index + 1) % bank.length), 'gold')),
   );
 }
-function openTest(mode) {
+function openTest(mode, skip = devSkipDictation) {
   disposeTest();
+  disposeTest = () => {};
   closePanel();
   setView('assessment');
   currentTestView = mode;
+  if (mode === 'final' && skip) {
+    showSkippedFinal($('assessment-body'), {
+      cardClass: 'assessment-card', headingId: 'assessment-title', onExit: returnMap,
+      onResume: () => openTest(mode, false),
+    });
+    return;
+  }
   const key = mode === 'final' ? 'final' : 'practice';
   disposeTest = mountTest($('assessment-body'), {
     mode,
@@ -1369,6 +1378,7 @@ function openTest(mode) {
     },
     onExit: returnMap,
     onReplay: mode === 'final' ? confirmRestart : undefined,
+    onDeveloper: mode === 'final' ? developer.open : undefined,
   });
 }
 function settings() {
@@ -1438,6 +1448,7 @@ const developer = createDeveloperMode({
   },
   onSkipDictation: (value) => {
     devSkipDictation = value;
+    if (value && currentTestView === 'final') openTest('final');
   },
 });
 $('developer').onclick = () => {

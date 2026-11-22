@@ -54,7 +54,7 @@ export function mountWriting(host, word, options) {
 
 export function mountTest(
   host,
-  { mode, saved, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay },
+  { mode, saved, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay, onDeveloper },
 ) {
   let state = saved
     ? restoreLessonTest(sentences, saved)
@@ -97,6 +97,13 @@ export function mountTest(
       replay.textContent = '重玩任务';
       replay.onclick = onReplay;
       leave.after(replay);
+    }
+    if (onDeveloper) {
+      const developer = document.createElement('button');
+      developer.type = 'button';
+      developer.textContent = '开发者模式';
+      developer.onclick = onDeveloper;
+      host.querySelector('.test-actions').append(developer);
     }
     const reveal = host.querySelector('.reveal');
     reveal.disabled = item.revealed;

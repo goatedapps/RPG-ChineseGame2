@@ -3,12 +3,13 @@ import { createPhone } from '../greenhouse/phone.js?v=fogharbour';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js';
 import { createWriting } from '../greenhouse/writing.js';
-import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=fogharbour';
+import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=final-skip';
 import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.js';
 import { bindJoystick } from '../shared/joystick.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { createDeveloperMode } from '../shared/developer-mode.js';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=final-skip';
+import { showSkippedFinal } from '../shared/skipped-final.js';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
@@ -387,12 +388,20 @@ function confirmReplay() {
   sheet.append(element('p', 'body', '这次的任务和课末测试进度将清除。你将从序幕重新开始。'),
     button('保留进度', () => desk.close(), 'text-button'), button('确认重玩', replay));
 }
-function showTest(mode) {
+function showTest(mode, skip = skipDictation) {
   wrapUp();
   audio.setMusic(null);
   const host = $('lesson-test');
   host.hidden = false;
   testCleanup?.();
+  testCleanup = undefined;
+  if (mode === 'final' && skip) {
+    showSkippedFinal(host, {
+      cardClass: 'lesson-test-sheet', headingId: 'lesson-test-title', onExit: map,
+      onResume: () => showTest(mode, false),
+    });
+    return;
+  }
   const slot = mode === 'final' ? 'final' : 'practice';
   testCleanup = createLessonTestView(host, {
     bank, mode, state: state[slot] ? restoreLessonTest(bank, state[slot]) : createLessonTest(bank),
@@ -407,6 +416,7 @@ function showTest(mode) {
       save();
     },
     onExit: map, onReplay: confirmReplay,
+    onDeveloper: mode === 'final' ? dev.open : undefined,
   });
 }
 
@@ -484,7 +494,10 @@ const dev = createDeveloperMode({
       advance();
     }
   },
-  onSkipDictation(value) { skipDictation = value; },
+  onSkipDictation(value) {
+    skipDictation = value;
+    if (value && state.phase === 'final' && !$('lesson-test').hidden) showTest('final');
+  },
 });
 $('developer-mode').onclick = dev.open;
 $('book').onclick = showBook;
