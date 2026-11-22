@@ -6,7 +6,7 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 
 ## Lesson structure
 
-- The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Drag the star map to look around and move relative to the camera. Label each planet with its lesson number below it. Show a compact lesson name on the planet itself when the player approaches a world they can enter. Enter available worlds by double-clicking or double-tapping the planet. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
+- The [universe landing page](index.html) lets students choose P2, P3, P5, or P6 and explore one world per lesson with the shared joystick. Drag the star map to look around and move relative to the camera. Label each planet with its lesson number below it. Show a compact lesson name on the planet itself when the player approaches a world they can enter. Enter available worlds by double-clicking or double-tapping the planet. Enter the prelude on a first visit and resume the saved world or unfinished assessment on later visits. Add playable lessons to the [world catalog](universe/catalog.js) and provide a return link to their level’s star map.
 - Use [shared progress](shared/lesson-progress.js) to mark a lesson complete only after passing its final test. Unlock worlds in order within each level and keep completed lessons replayable. Display unpublished lessons as under construction once their prerequisites are met.
 - Give each lesson its own HTML entry point and reuse shared gameplay and learning systems where practical.
 - Use the [P6 Lesson 1 greenhouse](greenhouse/LESSON.md) as the baseline for gameplay, teaching, and polish. See the [P6 gameplay screenshots](references/p6-lesson1/README.md) for the task HUD, story helper, clues, comprehension, dictation, notebook, and final test.
@@ -48,8 +48,8 @@ Keep it to 200 lines or fewer and link to separate references for lesson-specifi
 - Start the final test when the player dismisses the closing story beat.
 - Build final and practice tests from the lesson's sentence bank, with one Chinese fill-in-the-blank Hanzi Writer question for every vocabulary entry.
 - Offer **看字** (Show word) as explicit help and retry each revealed word at the end in a different sentence until the player writes it unaided.
-- Keep unaided test attempts free of automatic stroke hints, and save test progress so the player can resume. When the title screen offers both quiz resume and replay, ask for confirmation before replay discards an unfinished run and starts from the prelude.
-- Celebrate a passed final test and return the player to the home screen, where they can take a practice test, replay the mission, and open the completed notebook.
+- Keep unaided test attempts free of automatic stroke hints, and save test progress so the player can resume. Ask for confirmation before replay discards an unfinished run and starts from the prelude.
+- Celebrate a passed final test and let the player return to the star map. Keep replay and practice available from the lesson settings and the notebook on the HUD.
 - Preserve lesson completion and practice access when the player replays the mission.
 
 ## Developer mode

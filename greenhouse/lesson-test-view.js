@@ -19,7 +19,7 @@ function button(className, text, action) {
   return control;
 }
 
-export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit }) {
+export function createLessonTestView(host, { bank, state: initialState, mode, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay }) {
   const title = mode === 'practice' ? '词语练习' : '课末测试';
   let state = initialState;
   let stopWriting = () => {};
@@ -55,7 +55,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     heading.id = 'lesson-test-title';
     heading.tabIndex = -1;
     const message = node('p', '', '所有词语，你都能独立写出来了。');
-    const home = button('lesson-test-next', '返回首页', onExit);
+    const home = button('lesson-test-next', '返回星图', onExit);
     copy.append(seal, heading, message, home);
     sheet.append(art, copy);
     host.replaceChildren(sheet);
@@ -93,8 +93,10 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     bar.setAttribute('aria-label', '已掌握的词语');
     bar.max = question.total;
     bar.value = question.mastered;
-    const saveAndLeave = button('lesson-test-pause', '保存并返回首页', onExit);
-    header.append(heading, counter, saveAndLeave, bar);
+    const saveAndLeave = button('lesson-test-pause', '保存并返回星图', onExit);
+    header.append(heading, counter, saveAndLeave);
+    if (onReplay) header.append(button('lesson-test-pause', '重玩任务', onReplay));
+    header.append(bar);
 
     const layout = node('div', 'lesson-test-layout');
     const prompt = node('div', 'lesson-test-prompt');

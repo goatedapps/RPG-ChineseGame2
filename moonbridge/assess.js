@@ -54,7 +54,7 @@ export function mountWriting(host, word, options) {
 
 export function mountTest(
   host,
-  { mode, saved, speak, stopSpeech, cue, onProgress, onPass, onExit },
+  { mode, saved, speak, stopSpeech, cue, onProgress, onPass, onExit, onReplay },
 ) {
   let state = saved
     ? restoreLessonTest(sentences, saved)
@@ -67,7 +67,7 @@ export function mountTest(
     if (!item) {
       onPass();
       host.innerHTML =
-        '<div class="assessment-card"><p class="tag">月桥亮起来了</p><h2 id="assessment-title" tabindex="-1">全部写对了！</h2><p class="note">你完成了三年级华文第一课。</p><div class="buttons"><button class="gold">回到首页</button></div></div>';
+        '<div class="assessment-card"><p class="tag">月桥亮起来了</p><h2 id="assessment-title" tabindex="-1">全部写对了！</h2><p class="note">你完成了三年级华文第一课。</p><div class="buttons"><button class="gold">返回星图</button></div></div>';
       host.querySelector('button').onclick = onExit;
       host.querySelector('h2').focus();
       return;
@@ -75,7 +75,7 @@ export function mountTest(
     host.innerHTML =
       '<div class="assessment-card"><header class="test-top"><div><p class="tag">月桥竞速</p><h2 id="assessment-title" tabindex="-1">' +
       (mode === 'final' ? '课末测试' : '词语练习') +
-      '</h2></div><button class="leave">保存并回到首页</button></header>' +
+      '</h2></div><div class="test-actions"><button class="leave">保存并返回星图</button></div></header>' +
       '<p class="note">' +
       (item.review ? '再试一次 · ' : '') +
       '已完成 ' +
@@ -89,7 +89,15 @@ export function mountTest(
       item.before + (item.revealed ? item.word : '＿＿') + item.after;
     const text = item.before + '，' + (item.revealed ? item.word + '，' : '') + item.after;
     host.querySelector('.buttons').prepend(dictationButton({ speak, stop: stopSpeech }, text));
-    host.querySelector('.leave').onclick = onExit;
+    const leave = host.querySelector('.leave');
+    leave.onclick = onExit;
+    if (onReplay) {
+      const replay = document.createElement('button');
+      replay.type = 'button';
+      replay.textContent = '重玩任务';
+      replay.onclick = onReplay;
+      leave.after(replay);
+    }
     const reveal = host.querySelector('.reveal');
     reveal.disabled = item.revealed;
     reveal.onclick = () => {

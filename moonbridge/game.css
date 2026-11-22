@@ -96,43 +96,11 @@ canvas {
 .screen {
   overflow: auto;
 }
-.home {
-  display: grid;
-  align-items: center;
-  isolation: isolate;
-  background: #131f3d url('art/cover.webp') center 52% / cover;
-}
-.home-shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, #0b1026f7 0%, #0b1026d5 32%, #0b102632 83%),
-    linear-gradient(0deg, #0b1026aa, transparent 65%);
-  z-index: -1;
-}
-.cover {
-  width: min(650px, 100%);
-  padding: 32px clamp(22px, 7vw, 128px);
-}
 .tag {
   font-weight: 750;
   color: var(--gold);
   letter-spacing: 0.13em;
   font-size: 0.91rem;
-}
-.cover h1 {
-  font-family: 'Noto Serif SC', 'Songti SC', serif;
-  font-size: clamp(3.8rem, 10vw, 8.5rem);
-  letter-spacing: 0.04em;
-  text-shadow: 0 4px 24px #131a37;
-  margin: 10px 0;
-  white-space: nowrap;
-}
-.lead {
-  font-size: clamp(1rem, 2.25vw, 1.26rem);
-  max-width: 23rem;
-  margin-bottom: 24px;
-  color: #f6ecdf;
 }
 .buttons {
   display: flex;
@@ -656,18 +624,6 @@ dialog:has(.restart-confirmation) {
   color: var(--paper);
 }
 @media (max-width: 630px) {
-  .home-shade {
-    background: linear-gradient(0deg, #0b1026f9, #0b1026b0 50%, #0b102628);
-  }
-  .home {
-    align-items: end;
-  }
-  .cover {
-    padding-bottom: 8vh;
-  }
-  .cover h1 {
-    font-size: clamp(3.4rem, 15vw, 6rem);
-  }
   .mission h2 {
     font-size: 1rem;
   }
@@ -763,15 +719,6 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
   border: 0;
   background: transparent;
   text-shadow: 0 2px 6px #000;
-}
-
-.universe-return {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--gold2);
-  margin-top: 8px;
-  text-underline-offset: .22em;
 }
 
 .vocab .icon-button,
@@ -952,3 +899,5 @@ body:has(#dialog[data-appearance='trial-result'][open]) #hud {
 .radio-transmission .helper-transcript {
   text-shadow: none;
 }
+
+.test-actions { display: grid; gap: .4rem; }

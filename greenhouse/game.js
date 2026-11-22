@@ -11,7 +11,7 @@ import { evidence } from './evidence.js';
 import { createPhone } from './phone.js';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 import { bindJoystick } from '../shared/joystick.js';
-import { openGameSettings } from '../shared/settings.js';
+import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
@@ -100,7 +100,6 @@ let turned = 0;
 let footstepDistance = 0;
 let effectsEnabled = true;
 let musicEnabled = storedMusic();
-let audioStarted = false;
 let currentTarget = null;
 let cue = { cn: '', en: '' };
 let hintTimer;
@@ -145,23 +144,13 @@ function storedMusic() {
   }
 }
 
-function updateTitleMusic() {
-  const playing = audioStarted && musicEnabled;
-  $('#title-music').setAttribute('aria-pressed', String(playing));
-  $('#title-music').setAttribute('aria-label', playing ? '关闭背景音乐' : '播放背景音乐');
-  $('#music-label').textContent = playing ? '关闭音乐' : '开启音乐';
-}
-
 function startAudio() {
-  if (!audio.start() || audioStarted) return;
-  audioStarted = true;
-  updateTitleMusic();
+  audio.start();
 }
 
 function setMusicPreference(enabled) {
   musicEnabled = enabled;
   audio.setMusicEnabled(enabled);
-  updateTitleMusic();
   try {
     localStorage.setItem(musicKey, enabled ? 'on' : 'off');
   } catch {
@@ -232,7 +221,7 @@ function translation(text) {
 }
 
 for (const [control, body] of [
-  ['#intro-en', '#intro-translation'], ['#cue-en', '#cue-translation'], ['#response-en', '#response-translation'],
+  ['#cue-en', '#cue-translation'], ['#response-en', '#response-translation'],
 ]) connectTranslation($(control), $(body));
 
 const voice = createVoice((status) => {
@@ -311,7 +300,7 @@ function objective(announce = true) {
   } else if (state.phase === 'done') {
     status.textContent = '六项任务已完成';
     title.textContent = '温室准备就绪';
-    setCue({ cn: '查看阿宁的消息。', en: 'Read Ah Ning’s message.' }, announce);
+    setCue(state.finalPassed ? { cn: '第一课已完成。' } : { cn: '查看阿宁的消息。', en: 'Read Ah Ning’s message.' }, announce);
   } else {
     const mission = missions[state.mission];
     status.textContent = '任务 ' + (state.mission + 1) + ' / ' + missions.length;
@@ -957,22 +946,8 @@ function suspendRoom() {
   }
 }
 
-function returnHome() {
-  if (desk.open) {
-    afterClose = returnHome;
-    desk.close();
-    return;
-  }
-  activeTest?.destroy?.();
-  activeTest = null;
-  testScreen.hidden = true;
-  testScreen.replaceChildren();
-  suspendRoom();
-  audio.setMusic('title');
-  updateTitle();
-  $('#splash').hidden = false;
-  const button = $('#start').disabled ? $('#practice-test') : $('#start');
-  if (!button.hidden) button.focus({ preventScroll: true });
+function returnMap() {
+  location.assign('./?level=p6');
 }
 
 async function openLessonTest(mode) {
@@ -991,14 +966,14 @@ async function openLessonTest(mode) {
   const loading = node('div', '', 'lesson-test-loading');
   const status = node('p', '正在准备测验……');
   status.setAttribute('role', 'status');
-  const home = makeButton('返回首页', 'text-button', returnHome);
+  const home = makeButton('返回星图', 'text-button', returnMap);
   loading.append(status, home);
   testScreen.replaceChildren(loading);
   home.focus({ preventScroll: true });
 
   try {
     const [bank, { createLessonTestView }] = await Promise.all([
-      loadLessonTest(), import('./lesson-test-view.js?v=radio-briefings'),
+      loadLessonTest(), import('./lesson-test-view.js?v=direct-entry'),
     ]);
     if (activeTest !== run) return;
     state[slot] = restoreLessonTest(bank, state[slot]);
@@ -1018,7 +993,8 @@ async function openLessonTest(mode) {
         state[slot] = null;
         save();
       },
-      onExit: returnHome,
+      onExit: returnMap,
+      onReplay: final ? confirmReplay : undefined,
     });
   } catch {
     if (activeTest !== run) return;
@@ -1112,7 +1088,21 @@ function showSettings() {
         if (enabled) startAudio();
       },
     },
-    onHome: returnHome,
+    onHome: returnMap,
+    lessonActions: [
+      { label: '重玩任务', run: confirmReplay },
+      ...(state.phase !== 'done' ? [{ label: '重看序幕', run: () => {
+        afterClose = () => {
+          suspendRoom();
+          beginWithComic();
+        };
+        desk.close();
+      } }] : []),
+      ...(state.lessonComplete ? [{ label: '温习测验', run: () => {
+        afterClose = () => { void openLessonTest('practice'); };
+        desk.close();
+      } }] : []),
+    ],
   });
 }
 
@@ -1146,7 +1136,29 @@ function skipCurrentTask() {
   finishMission();
 }
 
+function confirmReplay() {
+  if (state.finalPassed) {
+    replayMission();
+    return;
+  }
+  openPanel(null, '要重玩任务吗？');
+  panel.append(
+    node('p', '这次的任务和课末测试进度将清除。你将从序幕重新开始。', 'body'),
+    buttonRow(
+      makeButton('保留进度', 'text-button', () => desk.close()),
+      makeButton('确认重玩', 'primary', replayMission),
+    ),
+  );
+}
+
 function replayMission() {
+  activeTest?.destroy?.();
+  activeTest = null;
+  testScreen.hidden = true;
+  testScreen.replaceChildren();
+  afterClose = null;
+  if (desk.open) desk.close();
+  suspendRoom();
   state = { ...emptySave(), lessonComplete: state.lessonComplete, practiceTest: state.practiceTest, written: state.written };
   phone.reset();
   phone.setVisible(false);
@@ -1157,7 +1169,6 @@ function replayMission() {
   footstepDistance = 0;
   engine?.reset();
   save();
-  updateTitle();
   beginWithComic();
 }
 
@@ -1181,26 +1192,24 @@ window.addEventListener('keydown', (event) => {
   if (event.code === 'KeyR') replayCue();
 });
 
+function showEntryError() {
+  $('#splash').hidden = false;
+  $('#start-status').textContent = '科学楼未能载入。请重试。';
+  $('#retry-entry').hidden = false;
+}
+
 function begin() {
   if (started) return;
   if (unavailable) {
-    audio.setMusic('title');
+    showEntryError();
     return;
   }
   if (!engine) {
-    $('#start').disabled = true;
-    $('#replay-intro').disabled = true;
+    $('#splash').hidden = false;
     $('#start-status').textContent = '正在准备科学楼……';
     void prepareRoom().then(() => {
-      if (!unavailable) {
-        $('#start').disabled = false;
-        $('#replay-intro').disabled = false;
-      }
-      if (engine) begin();
-      else {
-        $('#start-status').textContent = '科学楼未能载入。请刷新页面再试。';
-        audio.setMusic('title');
-      }
+      if (engine && !unavailable) begin();
+      else showEntryError();
     });
     return;
   }
@@ -1219,7 +1228,7 @@ function begin() {
   engine.setActive(true);
   engine.focus(state.phase === 'explore' && !state.notePending && (state.tutorialDone || !state.phonePicked));
   objective(state.phase !== 'done');
-  if (state.phase === 'done') {
+  if (state.phase === 'done' && !state.finalPassed) {
     if (state.endingSeen) openFinalMessage();
     else showFinale();
   }
@@ -1228,7 +1237,12 @@ function begin() {
 bindJoystick($('#joystick'), (x, forward) => engine?.setVector(x, forward));
 
 function beginWithComic() {
-  if (unavailable || started || !$('#comic-overlay').hidden) return;
+  if (started || !$('#comic-overlay').hidden) return;
+  if (unavailable) {
+    showEntryError();
+    return;
+  }
+  $('#splash').hidden = true;
   audio.setMusic('comic');
   void prepareRoom();
   playComic($('#comic-overlay'), begin, {
@@ -1243,52 +1257,18 @@ function beginWithComic() {
 
 audio.setEnabled(effectsEnabled);
 audio.setMusicEnabled(musicEnabled);
-audio.setMusic('title');
-$('#title-music').addEventListener('click', () => {
-  setMusicPreference(!audioStarted || !musicEnabled);
-  startAudio();
-  audio.cue('ui');
-});
+document.addEventListener('pointerup', startAudio, { once: true });
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const button = event.target.closest('button');
-  if (button?.id === 'title-music') return;
   startAudio();
   if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
 }, true);
 
-function updateTitle() {
-  const done = state.phase === 'done';
-  const assessmentReady = done && state.finalStarted && !state.finalPassed;
-  let label = state.phonePicked ? '继续任务' : '进入科学楼';
-  if (state.finalPassed) label = '重玩任务';
-  else if (assessmentReady) label = '继续测验';
-  else if (done && state.endingSeen) label = '查看最后消息';
-  $('#start-label').textContent = label;
-  $('#start').disabled = unavailable && !assessmentReady;
-  $('#replay-intro').hidden = done || !state.phonePicked;
-  $('#practice-test').hidden = !state.lessonComplete;
-  $('#home-book').hidden = !state.lessonComplete;
-  $('#practice-test-label').textContent = state.practiceTest ? '继续温习测验' : '温习测验';
-  $('.cover-warning').toggleAttribute('data-completed', state.lessonComplete || done);
-  $('#cover-situation').textContent = state.lessonComplete ? '第一课已完成！' : done ?
-    '科学展顺利开幕了。' : '科学展快开门了。西窗还在漏水！';
-  const english = state.lessonComplete ? 'Lesson 1 complete! Take a practice test or revisit the mission.' : done ?
-    'The science fair is open. Finish the lesson with a vocabulary test.' :
-    'The science fair is about to open. The west window is still leaking. Head into the science wing.';
-  resetTranslation($('#intro-en'), $('#intro-translation'), english);
-}
-
-$('#start').addEventListener('click', () => {
-  if (state.finalPassed) replayMission();
-  else if (state.finalStarted) void openLessonTest('final');
-  else if (state.phonePicked) begin();
-  else beginWithComic();
-});
-$('#practice-test').addEventListener('click', () => void openLessonTest('practice'));
-$('#home-book').addEventListener('click', showBook);
-$('#replay-intro').addEventListener('click', beginWithComic);
-updateTitle();
+$('#retry-entry').onclick = () => location.reload();
+if (state.finalStarted && !state.finalPassed) void openLessonTest('final');
+else if (state.phonePicked) begin();
+else beginWithComic();
 
 function prepareRoom() {
   roomRequest ??= Promise.all([import('./engine.js'), import('./world.js')]).then(async ([{ createEngine }, { createWorld }]) => {
@@ -1321,8 +1301,7 @@ function prepareRoom() {
       onStatus({ type, message }) {
         if (type === 'unsupported') {
           unavailable = true;
-          $('#start').disabled = true;
-          $('#start-status').textContent = message;
+          showEntryError();
         } else if (type === 'contextlost' || type === 'contextrestored') {
           response(message, type === 'contextlost' ? 'The 3D view paused while graphics recover.' : 'The 3D view has recovered.');
         }

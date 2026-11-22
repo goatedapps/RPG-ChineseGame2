@@ -11,14 +11,14 @@ import { fieldwork } from './fieldwork.js?v=physical-clues';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
-import { mountWriting, mountTest } from './assess.js?v=radio-briefings';
+import { mountWriting, mountTest } from './assess.js?v=direct-entry';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=lever-trial';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 
 import { playLessonComic } from '../shared/comic.js';
 import { bindJoystick } from '../shared/joystick.js';
-import { openGameSettings } from '../shared/settings.js';
+import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 
 const $ = (id) => document.getElementById(id);
 const audio = createGreenhouseAudio({ radioAlerts: true, trialEffects: true, effectsGain: 1.65, musicGain: .8 });
@@ -214,29 +214,13 @@ function setView(next) {
 function matchesTest(test) {
   return Array.isArray(test?.queue) && test.queue.length > 0;
 }
-function canReplay() {
-  return save.storyFinished && save.stage === tasks.length;
+function returnMap() {
+  location.assign('./?level=p3');
 }
-function home() {
-  disposeTest();
-  disposeTest = () => {};
-  currentTestView = null;
-  closePanel();
+function showEntryError() {
   setView('home');
-  $('start').textContent =
-    canReplay()
-      ? '重玩任务'
-      : save.stage
-        ? '继续冒险'
-        : '开始冒险';
-  $('resume-test').hidden = !save.storyFinished || save.passed;
-  $('home-book').hidden = !save.discoveries.length;
-  $('practice').hidden = !save.passed;
-  $('practice').textContent = matchesTest(save.practice)
-    ? '继续词语练习'
-    : '词语练习';
-  $('bank').hidden = !save.storyFinished && !save.passed;
-  $('start').focus();
+  $('boot-status').textContent = '三维场景未能载入。请重试。';
+  $('retry-entry').hidden = false;
 }
 function showComic(content, title, onFinish) {
   setView('comic');
@@ -251,7 +235,7 @@ function showComic(content, title, onFinish) {
     titleText: title,
     lastLabel: closing
       ? save.passed
-        ? '回到首页'
+        ? '返回星图'
         : '开始课末测试'
       : '进入车站',
     ending: closing,
@@ -476,12 +460,10 @@ function startWorld() {
   try {
     world ??= createWorld(canvas, worldEvent, endRace);
   } catch {
-    home();
-    $('boot-status').textContent =
-      '这个浏览器暂时无法开启三维场景。请换一个支持三维图形的浏览器。';
+    showEntryError();
     return;
   }
-  world.reset(save.stage === 12);
+  world.reset(save.stage >= 12);
   driving = false;
   moveStart = null;
   footstepDistance = 0;
@@ -490,6 +472,9 @@ function startWorld() {
   audio.prepareGameplay();
 }
 function restartMission() {
+  disposeTest();
+  disposeTest = () => {};
+  currentTestView = null;
   closePanel();
   lastRadioAlert = undefined;
   Object.assign(save, structuredClone(initial), {
@@ -517,17 +502,12 @@ function confirmRestart() {
   dialog.addEventListener('close', () => dialog.removeAttribute('aria-describedby'), { once: true });
   cancel.focus();
 }
-function start() {
-  audio.start();
-  $('boot-status').textContent = '';
-  if (canReplay()) {
-    if (save.passed) restartMission();
-    else confirmRestart();
-  } else if (save.stage > 0 && save.stage < tasks.length) {
-    startWorld();
-  } else showComic(opening, '序幕', startWorld);
+function enterLesson() {
+  if (save.storyFinished && !save.passed) openTest('final');
+  else if (save.stage > 0) startWorld();
+  else showComic(opening, '序幕', startWorld);
 }
-$('start').onclick = start;
+$('retry-entry').onclick = startWorld;
 $('speak').onclick = () => {
   const status = $('voice-status');
   status.textContent = '';
@@ -987,7 +967,7 @@ function endStory() {
   save.storyFinished = true;
   persist();
   showComic(ending, '尾声', () => {
-    if (save.passed) home();
+    if (save.passed) returnMap();
     else openTest('final');
   });
 }
@@ -1086,7 +1066,6 @@ function notebook() {
   );
 }
 $('book').onclick = notebook;
-$('home-book').onclick = notebook;
 
 function showBank(index = 0) {
   const q = bank[index];
@@ -1121,7 +1100,6 @@ function showBank(index = 0) {
     group(button('下一题', () => showBank((index + 1) % bank.length), 'gold')),
   );
 }
-$('bank').onclick = () => showBank();
 function openTest(mode) {
   disposeTest();
   closePanel();
@@ -1146,17 +1124,10 @@ function openTest(mode) {
       persist();
       play('finish');
     },
-    onExit: home,
+    onExit: returnMap,
+    onReplay: mode === 'final' ? confirmRestart : undefined,
   });
 }
-$('resume-test').onclick = () => {
-  audio.start();
-  openTest('final');
-};
-$('practice').onclick = () => {
-  audio.start();
-  openTest('practice');
-};
 function settings() {
   audio.start();
   function preference(key) {
@@ -1174,13 +1145,22 @@ function settings() {
     openPanel: showPanel,
     effects: preference('effects'),
     music: preference('music'),
-    onHome: view === 'hud' ? home : undefined,
+    onHome: returnMap,
+    lessonActions: [
+      { label: '重玩任务', run: save.passed ? restartMission : confirmRestart },
+      ...(save.passed ? [
+        { label: matchesTest(save.practice) ? '继续词语练习' : '词语练习', run: () => openTest('practice') },
+        { label: '题库练习', run: () => showBank() },
+      ] : []),
+    ],
   });
 }
 document.querySelectorAll('[data-settings]').forEach((control) => {
   control.onclick = settings;
 });
 
+document.addEventListener('pointerup', () => audio.start(), { once: true });
+document.addEventListener('click', () => audio.start(), true);
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const control = event.target.closest('button');
@@ -1227,4 +1207,4 @@ for (const panel of [...opening, ...ending].slice(1)) {
   const image = new Image();
   image.src = new URL('./art/' + panel.image, import.meta.url).href;
 }
-home();
+enterLesson();

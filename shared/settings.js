@@ -17,7 +17,7 @@ function icon(name, className = 'settings-icon') {
   return svg;
 }
 
-export function openGameSettings({ panel, openPanel, effects, music, onHome }) {
+export function openGameSettings({ panel, openPanel, effects, music, onHome, lessonActions = [] }) {
   openPanel(null, '设置');
   const controls = document.createElement('div');
   controls.className = 'game-settings';
@@ -56,11 +56,18 @@ export function openGameSettings({ panel, openPanel, effects, music, onHome }) {
   }
 
   sound.append(toggle('音效', 'effects', effects), toggle('背景音乐', 'music', music));
+  for (const { label, run } of lessonActions) {
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.textContent = label;
+    action.onclick = run;
+    controls.append(action);
+  }
   if (onHome) {
     const home = document.createElement('button');
     home.type = 'button';
     home.className = 'settings-home';
-    home.append(icon('home'), '返回首页', icon('arrow', 'settings-arrow'));
+    home.append(icon('home'), '返回星图', icon('arrow', 'settings-arrow'));
     home.onclick = onHome;
     controls.append(home);
   }
