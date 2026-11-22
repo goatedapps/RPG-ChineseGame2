@@ -12,20 +12,22 @@
       content="选择年级，探索华文星图。完成一课，前往下一个世界。"
     />
     <title>华文宇宙 · 选择年级</title>
-    <link rel="stylesheet" href="universe/hub.css" />
+    <link rel="stylesheet" href="universe/hub.css?v=universe-music" />
     <link rel="stylesheet" href="shared/joystick.css" />
     <link rel="preload" href="universe/art/observatory.webp" as="image" />
     <script defer src="greenhouse/vendor/gsap.min.js"></script>
-    <script type="module" src="universe/hub.js?v=touch-controls"></script>
+    <script type="module" src="universe/hub.js?v=universe-music"></script>
   </head>
   <body>
     <main>
+      <audio id="hub-music" src="universe/audio/Universe-background.mp3" preload="none" loop></audio>
       <section id="choose" class="choose">
         <div class="hero-stars" aria-hidden="true">
           <i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
         <header class="brand">
           <span aria-hidden="true">✦</span><span>华文探索</span>
+          <button class="hub-music" type="button" aria-label="背景音乐" aria-pressed="false" title="播放背景音乐"><span aria-hidden="true">♫</span></button>
         </header>
         <div class="hero-copy">
           <p class="kicker">从这里出发</p>
@@ -69,7 +71,10 @@
               <h1 id="map-title" tabindex="-1"></h1>
               <p id="completion"></p>
             </div>
-            <button id="directory" type="button">世界目录</button>
+            <div class="map-tools">
+              <button id="directory" type="button">世界目录</button>
+              <button class="hub-music" type="button" aria-label="背景音乐" aria-pressed="false" title="播放背景音乐"><span aria-hidden="true">♫</span></button>
+            </div>
           </header>
           <p id="map-status" role="status"></p>
           <div class="map-footer">

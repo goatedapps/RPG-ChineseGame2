@@ -84,9 +84,8 @@ p {
   font-weight: 750;
   color: #fff3da;
   letter-spacing: 0.14em;
-  width: max-content;
 }
-.brand span:first-child {
+.brand > span:first-child {
   display: grid;
   place-items: center;
   width: 33px;
@@ -95,6 +94,27 @@ p {
   border: 1px solid #ffee9e62;
   color: var(--gold);
   background: #684b4744;
+}
+.hub-music,
+.map-header .hub-music {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+  background: var(--glass);
+  color: var(--gold);
+  font-size: 1.25rem;
+}
+.brand .hub-music { margin-left: auto; }
+.hub-music[aria-pressed='false']::after {
+  content: '';
+  position: absolute;
+  width: 1.2rem;
+  height: 1px;
+  background: currentColor;
+  box-shadow: 0 0 0 1px var(--glass);
+  transform: rotate(-42deg);
 }
 .hero-copy {
   margin: clamp(60px, 14vh, 170px) 0 clamp(44px, 10vh, 110px);
@@ -237,8 +257,14 @@ p {
   background: var(--glass);
   justify-self: start;
 }
-.map-header #directory {
+.map-tools {
   justify-self: end;
+  display: flex;
+  align-items: flex-start;
+  gap: .4rem;
+}
+.map-tools #directory {
+  white-space: nowrap;
 }
 .map-heading {
   text-align: center;
@@ -407,6 +433,10 @@ dialog header button {
   color: #f5d4a7;
 }
 @media (max-width: 660px) {
+  .map-tools {
+    flex-direction: column;
+    align-items: flex-end;
+  }
   .choose {
     background-position: 56% 45%;
   }

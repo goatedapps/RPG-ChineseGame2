@@ -6,6 +6,9 @@ const $ = (id) => document.getElementById(id);
 const gradeKeys = Object.keys(levels);
 const dialog = $('world-directory');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const music = $('hub-music');
+const musicControls = document.querySelectorAll('.hub-music');
+const musicKey = 'rpg-chinese.hub-music';
 const statusText = {
   open: '可以进入',
   complete: '已完成',
@@ -19,6 +22,46 @@ let statusTimer;
 let universe;
 let generation = 0;
 let leaving = false;
+let musicEnabled = true;
+try {
+  musicEnabled = localStorage.getItem(musicKey) !== 'off';
+} catch {}
+
+function startMusic() {
+  if (musicEnabled && !document.hidden && !leaving && music.paused) {
+    void music.play().catch(() => {});
+  }
+}
+
+function updateMusicControls() {
+  for (const control of musicControls) {
+    control.setAttribute('aria-pressed', String(!music.paused));
+    control.title = music.paused ? '播放背景音乐' : '关闭背景音乐';
+  }
+}
+
+for (const control of musicControls) {
+  control.onclick = () => {
+    musicEnabled = music.paused;
+    try {
+      localStorage.setItem(musicKey, musicEnabled ? 'on' : 'off');
+    } catch {}
+    if (musicEnabled) startMusic();
+    else music.pause();
+  };
+}
+music.addEventListener('playing', updateMusicControls);
+music.addEventListener('pause', updateMusicControls);
+for (const type of ['click', 'pointerup', 'keydown']) {
+  document.addEventListener(type, (event) => {
+    if (event.isTrusted && !event.target.closest?.('.hub-music')) startMusic();
+  }, { capture: true, passive: true });
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) music.pause();
+  else startMusic();
+});
+window.addEventListener('pagehide', () => music.pause());
 
 function add(tag, text, className) {
   const element = document.createElement(tag);
@@ -175,7 +218,10 @@ function enterWorld(world) {
     '--destination',
     'url("' + linkAsset(world.art) + '")',
   );
-  const navigate = () => location.assign(new URL(world.href, document.baseURI));
+  const navigate = () => {
+    music.pause();
+    location.assign(new URL(world.href, document.baseURI));
+  };
   if (motion.matches || !window.gsap) {
     navigate();
     return;
@@ -225,6 +271,7 @@ window.addEventListener('keydown', (event) => {
 });
 window.addEventListener('pageshow', (event) => {
   if (event.persisted && currentLevel) openLevel(currentLevel);
+  startMusic();
 });
 bindJoystick($('joystick'), (x, forward) => universe?.setStick(x, forward));
 $('grades').addEventListener('click', (event) => {
@@ -236,3 +283,4 @@ $('grades').addEventListener('click', (event) => {
 animateTitle();
 const firstLevel = new URL(location.href).searchParams.get('level');
 if (gradeKeys.includes(firstLevel)) openLevel(firstLevel);
+startMusic();
