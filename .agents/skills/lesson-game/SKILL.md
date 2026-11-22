@@ -9,9 +9,11 @@ Start with [AGENTS.md](../../../AGENTS.md) for the current project rules. Use th
 
 ## 1. Plan the mission and learning
 
-- Identify the grade and lesson. Read its Tingxie list under `content/<level>/tingxie/` and the grade's question-bank index under `content/<level>/questions/`. Use the supplied story when it suits the requested setting.
+- Identify the grade and lesson. Read its Tingxie list under `content/<level>/tingxie/` and the grade's question-bank index under `content/<level>/questions/`. Create a coherent storyline based on the Tingxie list.
 - Map each required word to an in-world encounter, a meaningful use or comprehension check, a mission dictation, and a final-test item. For a proposal, show how players discover and use the words through actions. Check the finished lesson against the full word list.
+- All vocab in the Tingxie word list must have a dictation practice in each story.
 - Outline the stakes in the prelude, the places the player will visit, what the helper says before each new task, and what the epilogue shows. Make each task give the player a reason to move, inspect, choose, or act.
+- Game will be in simplified Chinese throughout. However, the storyline in each lesson will be 'told' to the player entirely in English via an 'assistant'. This assistant can be a friend that guides you through the mission via a phone or walkie talkie (like P6 lesson 1 and P3 Lesson 1), a robot, a partner for a mission etc. The assistant will be always available at the bottom right corner of the game. After a task has been completed and before a new task is displayed in Chinese, the 'assistant' will have a new alert / notication that explains the next step.
 
 ## 2. Reuse the reference lesson and shared components
 
@@ -25,7 +27,7 @@ Open the [P6 Lesson 1 guide](../../../greenhouse/LESSON.md) and [gameplay screen
 | Game tools and audio | [Settings](../../../shared/settings.js), [Developer mode](../../../shared/developer-mode.js), [menu styling](../../../shared/game-menus.css), and [shared lesson sounds](../../../greenhouse/sounds.js) |
 | Lesson entry and progress | [Universe catalog](../../../universe/catalog.js) and [lesson progress](../../../shared/lesson-progress.js) |
 
-Use ImageGen for player-facing artwork as described in `AGENTS.md`. For close-ups, think through what the player does to the object. Use page edges, pictured controls, and tap-outside dismissal where appropriate. Make actionable areas easy to spot and operable by keyboard. For sound, reuse suitable footsteps and interaction cues, connect music and effects to their settings, and check that speech stays clear against the music. For recorded helper dialogue, keep filenames tied to stable message IDs and verify playback from the helper interface using the [P3 clip mapping](../../../moonbridge/radio-messages.js) as a reference.
+Use ImageGen for player-facing artwork as described in `AGENTS.md`. For close-ups, think through what the player does to the object. Use page edges, pictured controls, and tap-outside dismissal where appropriate. Avoid use of buttons UI, including 'X' button to close a screen. Make actionable areas easy to spot and operable by keyboard / tablet. For sound, reuse suitable footsteps and interaction cues, connect music and effects to their settings, and check that speech stays clear against the music. For recorded helper dialogue, keep filenames tied to stable message IDs and verify playback from the helper interface using the [P3 clip mapping](../../../moonbridge/radio-messages.js) as a reference.
 
 ## 3. Playtest the affected flow
 
