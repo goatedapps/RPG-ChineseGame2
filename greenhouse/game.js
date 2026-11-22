@@ -8,7 +8,7 @@ import { createWriting } from './writing.js';
 import { createGreenhouseAudio } from './sounds.js?v=story-minigames';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
-import { createPhone } from './phone.js?v=briefing-flow';
+import { createPhone } from './phone.js?v=note-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
@@ -317,7 +317,9 @@ function requestNoteReply(notify) {
     prompt: '回复阿宁',
     placeholder: '手写回复',
     characters: noteReply.characters,
+    onWritten() { audio.cue('correct'); },
     onSuccess(answer) {
+      audio.cue('relay');
       state.notePending = false;
       state.noteAnswer = answer.slice(0, 180);
       save();

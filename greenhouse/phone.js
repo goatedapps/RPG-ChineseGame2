@@ -360,6 +360,7 @@ export function createPhone(host, { onToggle, onNotify, contactName = '阿宁', 
       handwrittenReply.lang = 'zh-Hans';
       sendWriting.disabled = false;
       if (!writing.hidden) sendWriting.focus({ preventScroll: true });
+      activeChallenge.onWritten?.();
     }, () => {
       writingFeedback('书写格未能载入。');
       retryWriting.hidden = false;
