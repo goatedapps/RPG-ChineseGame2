@@ -85,8 +85,8 @@ export function guidePassengers(play, finish) {
   const game = makeMinigame('扶他们上渡船', '把干外套递给奶奶。', play, finish);
   const { stage } = game;
   stage.classList.add('shelter-game');
-  const grandma = prop(art('grandma'), 'shelter-grandma');
-  const child = prop(art('child'), 'shelter-child');
+  const grandma = prop(art('grandma-standing'), 'shelter-grandma');
+  const child = prop(art('child-standing'), 'shelter-child');
   const coat = control('拿起干外套', 'shelter-coat');
   coat.append(prop(art('coat')));
   const shoulder = control('把干外套递给奶奶', 'shelter-shoulder');

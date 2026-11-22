@@ -15,9 +15,9 @@ import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
 import { element, control } from '../shared/minigame.js';
 import { art, chapters, ending, labels, opening, arrival } from './story.js?v=harbour-sign';
-import { buildHarbour } from './world.js?v=harbour-sign';
+import { buildHarbour } from './world.js?v=standing-passengers';
 import { signFace, signLines } from './signs.js';
-import { crossSteps, dockFerry, guidePassengers } from './minigames.js';
+import { crossSteps, dockFerry, guidePassengers } from './minigames.js?v=standing-passengers';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.fogharbour';

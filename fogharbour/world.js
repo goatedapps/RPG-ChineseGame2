@@ -132,12 +132,32 @@ export function buildHarbour(THREE, resume = 0, hasPhone = false) {
     }));
   }
   const coat = item('coat', art('coat'), -.85, 1.43, -15.7, .95, 1.48);
-  item('escort', art('grandma'), -.7, 1.43, -20.2, 1.03, 1.79);
-  const child = new THREE.Mesh(new THREE.PlaneGeometry(.71, 1.28), new THREE.MeshStandardMaterial({
-    map: texture(art('child')), transparent: true, alphaTest: .3, side: THREE.DoubleSide,
-  }));
-  child.position.set(.34, 1.05, -20.35);
-  scene.add(child);
+  const grandmaHeight = 1.65;
+  const childHeight = 1.23;
+  const passengers = item('escort', art('grandma-standing'), -.7, grandmaHeight / 2, -20.2, grandmaHeight * 334 / 768, grandmaHeight);
+  const child = new THREE.Mesh(new THREE.PlaneGeometry(childHeight * 269 / 768, childHeight), passengers.children[0].material.clone());
+  child.material.map = texture(art('child-standing'));
+  child.position.set(1.04, (childHeight - grandmaHeight) / 2, -.15);
+  child.userData.nonOccluding = true;
+  passengers.add(child);
+
+  const shadowCanvas = document.createElement('canvas');
+  shadowCanvas.width = shadowCanvas.height = 64;
+  const shadowInk = shadowCanvas.getContext('2d');
+  const fade = shadowInk.createRadialGradient(32, 32, 2, 32, 32, 32);
+  fade.addColorStop(0, '#191008a8');
+  fade.addColorStop(.55, '#19100855');
+  fade.addColorStop(1, '#19100800');
+  shadowInk.fillStyle = fade;
+  shadowInk.fillRect(0, 0, 64, 64);
+  const shadowMaterial = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
+  for (const [x, z, span] of [[-.66, -20.2, .75], [.37, -20.35, .51]]) {
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(span, .37), shadowMaterial);
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.set(x, .005, z);
+    shadow.raycast = () => {};
+    scene.add(shadow);
+  }
   item('winch', art('winch'), .45, 1.24, -25.3, 1.45, 1.53);
   item('handover', new URL('../moonbridge/art/ledger-paper.webp', import.meta.url).href, .63, 1.12, -29.86, 1.11, .75);
   const ferry = new THREE.Group();

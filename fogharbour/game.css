@@ -42,7 +42,7 @@
 .harbour-panel .body { line-height: 1.62; }
 .harbour-review { padding: .48rem; color: #f4dbb4; background: #27424c; border-radius: .45rem; }
 .harbour-review summary { cursor: pointer; }
-#workbench.artifact-inspection:has(.harbour-sign)::backdrop {
+#workbench.artifact-inspection:has(.harbour-sign, .shelter-game)::backdrop {
   background: #031416a8;
   backdrop-filter: blur(7px);
 }
@@ -137,13 +137,13 @@
 .shelter-game .shelter-grandma,
 .shelter-game .shelter-child {
   position: absolute;
-  height: 74%;
   width: 37%;
-  bottom: 8%;
+  bottom: 4%;
+  object-position: center bottom;
   filter: drop-shadow(0 4px 9px #101623d9);
 }
-.shelter-grandma { left: 9%; }
-.shelter-child { right: 9%; }
+.shelter-game .shelter-grandma { left: 7%; height: 91%; }
+.shelter-game .shelter-child { right: 9%; height: 68%; }
 .minigame .shelter-coat {
   position: absolute;
   bottom: 2%;
@@ -153,7 +153,7 @@
   z-index: 2;
   cursor: grab;
 }
-.coat-given .shelter-coat { left: 16%; bottom: 12%; width: 22%; height: 42%; pointer-events: none; transition: left .25s ease-out; }
+.coat-given .shelter-coat { left: 16%; bottom: 35%; width: 20%; height: 43%; pointer-events: none; transition: left .25s ease-out; }
 .minigame :is(.shelter-hand,.shelter-arm,.shelter-shoulder) {
   position: absolute;
   z-index: 3;
@@ -161,10 +161,11 @@
   background: #172734d0;
   border-radius: 50%;
   font-size: .78rem;
+  translate: -50% -50%;
 }
-.shelter-shoulder { left: 32%; top: 42%; }
-.shelter-arm { left: 34%; top: 54%; }
-.shelter-hand { right: 18%; top: 61%; }
+.shelter-shoulder { left: 37%; top: 32%; }
+.shelter-arm { left: 36%; top: 53%; }
+.shelter-hand { left: 68%; top: 69%; }
 .minigame .assisted { background: #567652; border-style: solid; }
 
 .winch-game { background: #274050 url('art/berth.webp') center / cover; }

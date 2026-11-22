@@ -4,4 +4,6 @@ ImageGen generated three original atlases for this lesson. The harbour backgroun
 
 Each asset was cropped, resized and exported as WebP. The prop sprites retain alpha. These illustrations are used as environment textures, comic panels or interactive object faces. The 3D decking also reuses the project's Moonbridge oak texture.
 
+ImageGen extended the original grandmother and child portraits into full-body sprites. The two `-standing` WebP files are used in the 3D shelter and the escort close-up.
+
 The handwriting reference and attribution are in [the shared Hanzi Writer vendor notes](../../stage/vendor/README.md). The lesson bundles a local subset for its required characters.
