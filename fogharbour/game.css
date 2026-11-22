@@ -24,7 +24,7 @@
 .harbour-panel > :is(p, .choices, .button-row, details, .writing-grid) { margin-block: .7rem; }
 .harbour-panel button + button { margin-inline-start: .2rem; }
 .harbour-panel .choices button + button { margin-inline-start: 0; }
-.harbour-panel .writing-grid { margin-inline: auto; }
+.harbour-panel .writing-grid { --writing-side: min(23rem, 54dvh); margin-inline: auto; }
 .harbour-panel .writing-progress { text-align: center; color: #ffd991; }
 .harbour-panel .body { line-height: 1.62; }
 .harbour-review { padding: .48rem; color: #f4dbb4; background: #27424c; border-radius: .45rem; }
