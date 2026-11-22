@@ -2,8 +2,10 @@ export const FORK = 0.33;
 export const MERGE = 0.74;
 export const RACE_RIVAL_RATE = 0.044;
 
-export function advanceRace(race, dt, throttle, brake) {
-  const target = brake ? 8 : throttle ? 58 : 25;
+export function advanceRace(race, dt) {
+  if (!race.started) return race;
+  const boost = Math.max(0, race.boost - dt * .55);
+  const target = boost * 63;
   const rough =
     race.progress > FORK && race.progress < MERGE && race.route === 'rough';
   const tuned = rough ? race.part === 'stabilizer' : race.part === 'runner';
@@ -16,6 +18,7 @@ export function advanceRace(race, dt, throttle, brake) {
       : 1000;
   return {
     ...race,
+    boost,
     speed,
     progress: Math.min(1, race.progress + (speed * dt) / distance),
     rival: Math.min(1, race.rival + RACE_RIVAL_RATE * dt),

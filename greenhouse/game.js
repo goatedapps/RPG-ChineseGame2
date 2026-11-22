@@ -1,19 +1,19 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { missions, objects, tutorial } from './story.js';
+import { missions, objects, tutorial } from './story.js?v=briefing-flow';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=radio-briefings';
 import { createWriting } from './writing.js';
 import { createGreenhouseAudio } from './sounds.js?v=entry-audio';
 import { playComic } from './comic.js';
-import { evidence } from './evidence.js';
-import { createPhone } from './phone.js';
+import { evidence } from './evidence.js?v=briefing-flow';
+import { createPhone } from './phone.js?v=briefing-flow';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
-import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js';
+import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=briefing-flow';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -42,7 +42,8 @@ const actionWords = [
 
 function emptySave() {
   return {
-    tutorialDone: false, mission: 0, action: 0, phase: 'explore', wordIndex: 0, held: null, written: {},
+    introSeen: false, tutorialStep: 0, tutorialDone: false, briefingSeen: null,
+    mission: 0, action: 0, phase: 'explore', wordIndex: 0, held: null, written: {},
     phonePicked: false, notePending: false, noteAnswer: '', unlocked: [], endingSeen: false,
     lessonComplete: false, finalStarted: false, finalPassed: false, finalTest: null, practiceTest: null,
   };
@@ -73,6 +74,9 @@ function load() {
     const lessonComplete = data.lessonComplete === true;
     return {
       tutorialDone, phonePicked: tutorialDone || data.phonePicked === true,
+      introSeen: data.introSeen === true || tutorialDone || data.phonePicked === true,
+      tutorialStep: Number.isInteger(data.tutorialStep) ? Math.min(2, Math.max(0, data.tutorialStep)) : 0,
+      briefingSeen: typeof data.briefingSeen === 'string' ? data.briefingSeen : null,
       mission: data.mission, action, phase, wordIndex, written,
       held: Object.hasOwn(objects, data.held) ? data.held : null,
       notePending: data.notePending === true && data.mission === 0 && action === 1 && phase === 'explore',
@@ -93,19 +97,19 @@ let engine;
 let roomRequest;
 let started = false;
 let unavailable = false;
-let tutorialIndex = state.phonePicked ? 3 : 0;
+let tutorialIndex = state.phonePicked ? 3 : state.tutorialStep;
 let pickingPhone = false;
 let walked = 0;
 let turned = 0;
 let footstepDistance = 0;
-let effectsEnabled = true;
-let musicEnabled = storedMusic();
+const effectsKey = 'greenhouse-sound-effects';
+let effectsEnabled = storedAudio(effectsKey);
+let musicEnabled = storedAudio(musicKey);
 let currentTarget = null;
 let cue = { cn: '', en: '' };
 let hintTimer;
 let activeHintKey;
 let hintTarget;
-let announceAfterPhone = false;
 let finalMessageOpen = false;
 let activeTest = null;
 let cleanup = () => {};
@@ -136,9 +140,9 @@ const developerMode = createDeveloperMode({
   },
 });
 
-function storedMusic() {
+function storedAudio(key) {
   try {
-    return localStorage.getItem(musicKey) !== 'off';
+    return localStorage.getItem(key) !== 'off';
   } catch {
     return true;
   }
@@ -186,43 +190,6 @@ function animate(target, from, to, duration = .26) {
   if (!gsap || motion.matches) return;
   gsap.fromTo(target, from, { ...to, duration, ease: 'power2.out', overwrite: 'auto', clearProps: 'transform,opacity,visibility' });
 }
-
-function resetTranslation(button, body, text) {
-  body.textContent = text;
-  body.hidden = true;
-  button.hidden = !text;
-  button.setAttribute('aria-expanded', 'false');
-}
-
-function connectTranslation(button, body) {
-  if (body.id) button.setAttribute('aria-controls', body.id);
-  button.addEventListener('click', () => {
-    body.hidden = !body.hidden;
-    button.setAttribute('aria-expanded', String(!body.hidden));
-    if (!body.hidden) animate(body, { opacity: 0, y: -4 }, { opacity: 1, y: 0 }, .18);
-  });
-}
-
-let translationId = 0;
-
-function translation(text) {
-  const block = node('p', text, 'translation');
-  block.id = 'english-help-' + ++translationId;
-  block.lang = 'en';
-  block.hidden = true;
-  block.dataset.translation = '';
-  const control = node('button', 'EN', 'icon-button translation-button');
-  control.type = 'button';
-  control.setAttribute('aria-label', '英文翻译');
-  control.title = 'English';
-  control.setAttribute('aria-expanded', 'false');
-  connectTranslation(control, block);
-  return { control, block };
-}
-
-for (const [control, body] of [
-  ['#cue-en', '#cue-translation'], ['#response-en', '#response-translation'],
-]) connectTranslation($(control), $(body));
 
 const voice = createVoice((status) => {
   voiceTween?.kill();
@@ -282,12 +249,22 @@ function updateInterface() {
 function setCue(task, announce) {
   cue = task;
   $('#cue-text').textContent = cue.cn;
-  const previousTarget = state.tutorialDone && state.phase === 'explore' && !state.notePending
-    ? missions[state.mission].actions[state.action - 1]?.target : null;
-  const clueEnglish = evidence[previousTarget]?.lines.map(([, english]) => english).join(' ');
-  resetTranslation($('#cue-en'), $('#cue-translation'), [cue.en, clueEnglish].filter(Boolean).join('\n\n'));
   animate($('#cue-text'), { opacity: .25, y: 10 }, { opacity: 1, y: 0 }, .32);
   if (announce && !phone.isOpen) voice.speak(cue.cn);
+}
+
+function briefingKey() {
+  if (!state.phonePicked || state.phase === 'done') return null;
+  const mission = missions[state.mission];
+  if (state.notePending) return 'note-question';
+  if (state.phase === 'question') return 'check:' + mission.id;
+  const target = state.phase === 'explore' && mission.actions[state.action]?.target;
+  return target ? 'step:' + mission.id + ':' + target : null;
+}
+
+function waitingForBriefing() {
+  const key = briefingKey();
+  return Boolean(key && state.briefingSeen !== key);
 }
 
 function objective(announce = true) {
@@ -297,6 +274,10 @@ function objective(announce = true) {
     status.textContent = '操作练习 · ' + (tutorialIndex + 1) + ' / ' + tutorial.length;
     title.textContent = ['学会行走', '环顾四周', '拿起手机', '查看手机'][tutorialIndex];
     setCue(tutorial[tutorialIndex], announce);
+  } else if (waitingForBriefing()) {
+    status.textContent = '';
+    title.textContent = '阿宁有新消息';
+    setCue({ cn: '打开手机，先看看阿宁说了什么。' }, false);
   } else if (state.phase === 'done') {
     status.textContent = '六项任务已完成';
     title.textContent = '温室准备就绪';
@@ -332,21 +313,21 @@ function requestNoteReply(notify) {
   sendMessage(noteReply.prompt, 'note-question', notify);
   phone.setChallenge({
     id: 'window-note',
-    prompt: 'Reply to Ah Ning',
-    placeholder: 'Write your reply',
+    prompt: '回复阿宁',
+    placeholder: '手写回复',
     characters: noteReply.characters,
     onSuccess(answer) {
       state.notePending = false;
       state.noteAnswer = answer.slice(0, 180);
       save();
       sendStep(missions[0], state.action, false);
-      announceAfterPhone = true;
       objective(false);
     },
   }, { notify: false });
 }
 
 function restorePhone() {
+  const unreadKey = waitingForBriefing() ? briefingKey() : null;
   missions.slice(0, state.mission + 1).forEach((mission, index) => {
     const story = phoneStory[mission.id];
     const finished = index < state.mission;
@@ -355,15 +336,19 @@ function restorePhone() {
     for (let step = 0; step < visibleSteps; step += 1) {
       if (mission.actions[step - 1]?.target === 'westNote') {
         if (state.notePending) {
-          requestNoteReply(false);
+          requestNoteReply(unreadKey === 'note-question');
           break;
         }
         sendMessage(noteReply.prompt, 'note-question', false);
         if (state.noteAnswer) sendMessage(state.noteAnswer, 'note-answer', false, 'outgoing');
       }
-      sendStep(mission, step, false);
+      const key = 'step:' + mission.id + ':' + mission.actions[step].target;
+      sendStep(mission, step, key === unreadKey);
     }
-    if (completed === mission.actions.length) sendMessage(story.checkpoint, 'check:' + mission.id, false);
+    if (completed === mission.actions.length) {
+      const key = 'check:' + mission.id;
+      sendMessage(story.checkpoint, key, key === unreadKey);
+    }
     if (finished) sendMessage(statusReplies[mission.id], 'reply:' + mission.id, false, 'outgoing');
   });
   if (state.endingSeen) sendMessage(closingMessages, 'closing', false);
@@ -376,9 +361,9 @@ function syncPhoneActivity() {
     return;
   }
   const actions = {
-    question: ['Open field check', 'Record what you discovered.'],
-    dictation: ['Continue dictation', 'Pick up where you left off in the field check.'],
-    handover: ['Send handover', 'Send Ah Ning a short update and move the fair forward.'],
+    question: ['打开检查记录', '记录你的发现。'],
+    dictation: ['继续听写', '接着写完检查记录。'],
+    handover: ['提交交接记录', '把检查结果交给阿宁。'],
   };
   const [label, detail] = actions[state.phase];
   phone.setActivity({
@@ -431,7 +416,6 @@ function togglePhone(open) {
     $('#response').hidden = true;
     if (state.phonePicked && tutorialIndex === 3 && !state.tutorialDone) {
       state.tutorialDone = true;
-      announceAfterPhone = true;
       save();
       objective(false);
     }
@@ -441,9 +425,10 @@ function togglePhone(open) {
     return;
   } else if (!desk.open && $('#comic-overlay').hidden) {
     engine?.setActive(true);
-    if (announceAfterPhone) {
-      announceAfterPhone = false;
-      replayCue();
+    if (waitingForBriefing()) {
+      state.briefingSeen = briefingKey();
+      save();
+      objective();
     }
   }
   updateInterface();
@@ -451,12 +436,23 @@ function togglePhone(open) {
 
 function resetHint() {
   const target = state.notePending ? 'westNote' : nextObject();
-  const key = started && state.tutorialDone && target ? `${state.mission}:${state.action}:${target}` : null;
+  const key = started && state.tutorialDone && !waitingForBriefing() && target
+    ? `${state.mission}:${state.action}:${target}` : null;
   if (key === activeHintKey) return;
   activeHintKey = key;
   clearTimeout(hintTimer);
   hintTarget = null;
-  phone.setHint(null);
+  phone.setHint(key ? {
+    id: key,
+    text: state.notePending
+      ? 'Read the first four Chinese characters on the note. They tell you when the window leaks.'
+      : fieldHints[target],
+    onLocate() {
+      if (key !== activeHintKey) return;
+      hintTarget = target;
+      worldState();
+    },
+  } : null);
   if (!key) return;
 
   function offerHint() {
@@ -465,34 +461,24 @@ function resetHint() {
       hintTimer = setTimeout(offerHint, 5000);
       return;
     }
-    phone.setHint({
-      id: key,
-      text: state.notePending
-        ? 'Read the first four Chinese characters on the note. They tell you when the window leaks.'
-        : fieldHints[target],
-      onLocate() {
-        if (key !== activeHintKey) return;
-        hintTarget = target;
-        worldState();
-      },
-    });
+    phone.remindAboutHint();
   }
   hintTimer = setTimeout(offerHint, hintDelay);
 }
 
-function response(cn, en) {
+function response(cn) {
   const toast = $('#response');
   clearTimeout(responseTimer);
   $('#response-text').textContent = cn;
-  resetTranslation($('#response-en'), $('#response-translation'), en);
   toast.hidden = desk.open;
   animate(toast, { opacity: 0, y: 8 }, { opacity: 1, y: 0 });
   responseTimer = window.setTimeout(() => {
-    if ($('#response-translation').hidden) toast.hidden = true;
+    toast.hidden = true;
   }, 10500);
 }
 
 function nextObject() {
+  if (waitingForBriefing()) return null;
   if (!state.tutorialDone) return tutorialIndex === 2 && !state.phonePicked ? 'radio' : null;
   return state.phase === 'explore' && !state.notePending ? missions[state.mission].actions[state.action].target : null;
 }
@@ -500,7 +486,7 @@ function nextObject() {
 function updateTarget(target) {
   currentTarget = target;
   const known = target && objects[target.id];
-  const canInteract = !!known && started && !desk.open && !phone.isOpen && !pickingPhone;
+  const canInteract = !!known && started && !desk.open && !phone.isOpen && !pickingPhone && !waitingForBriefing();
   reticle.classList.toggle('targeted', canInteract);
   interact.hidden = !canInteract;
   if (!canInteract) return;
@@ -511,7 +497,7 @@ function updateTarget(target) {
 }
 
 function useObject(target) {
-  if (!target || !started || desk.open || phone.isOpen || pickingPhone || !objects[target.id]) return;
+  if (!target || !started || desk.open || phone.isOpen || pickingPhone || waitingForBriefing() || !objects[target.id]) return;
   const thing = objects[target.id];
   if (target.id === 'radio') {
     if (target.id === nextObject()) takePhone();
@@ -523,9 +509,9 @@ function useObject(target) {
   }
   if (target.id !== nextObject()) {
     if (target.id === 'westWindow' && state.mission === 0 && state.action === 0) {
-      response('窗框在滴水。窗台上压着一张纸。', 'Water is dripping from the frame. There’s a piece of paper on the sill.');
+      response('窗框在滴水。窗台上压着一张纸。');
     } else {
-      response(thing.descriptionCN, thing.descriptionEN);
+      response(thing.descriptionCN);
     }
     audio.cue('dew');
     return;
@@ -650,13 +636,6 @@ function row(...buttons) {
   return controls;
 }
 
-function addTranslation(parent, english, placement = panel) {
-  if (!english) return;
-  const { control, block } = translation(english);
-  parent.append(control);
-  placement.append(block);
-}
-
 function showEvidence(id, next) {
   const item = evidence[id];
   const sheet = node('article', '', 'artifact-sheet artifact-' + item.kind);
@@ -702,14 +681,9 @@ function inspectEvidence(target, next) {
 
 function showQuestion(item, label, onNext, context) {
   openPanel(label, item.cn, 'question');
-  const english = [item.en, ...item.choices.map((choice, i) => (i + 1) + '. ' + choice.en)].filter(Boolean).join('\n');
-  const support = translation(english);
-  const replay = speakerButton(() => voice.speak(item.cn), '重听');
-  const controls = row(replay, support.control);
-  panel.append(support.block);
+  const controls = row(speakerButton(() => voice.speak(item.cn), '重听'));
   if (context?.cn && !item.image) {
     const note = node('div', '', 'clue-note');
-    const hint = translation(context.en);
     const clue = makeButton('回看线索', 'text-button', () => {
       note.hidden = !note.hidden;
       clue.setAttribute('aria-expanded', String(!note.hidden));
@@ -717,9 +691,7 @@ function showQuestion(item, label, onNext, context) {
     });
     clue.setAttribute('aria-expanded', 'false');
     note.hidden = true;
-    const clueLine = node('div', '', 'clue-line');
-    clueLine.append(node('p', context.cn), hint.control);
-    note.append(clueLine, hint.block);
+    note.append(node('p', context.cn));
     controls.append(clue);
     panel.append(note);
   }
@@ -757,7 +729,6 @@ function showQuestion(item, label, onNext, context) {
       const next = onNext();
       if (next) {
         const buttons = row(makeButton(next.label, 'primary', next.run));
-        addTranslation(buttons, item.feedbackEN);
         buttons.firstElementChild.focus();
       }
     });
@@ -800,7 +771,6 @@ function showWord(entry, label, complete, guided = false) {
   const audioLine = entry.sentence + ' 要写的是：' + spoken;
   const buttons = buttonRow(dictationButton(voice, audioLine));
   directions.append(buttons);
-  addTranslation(buttons, [entry.instructionEN, entry.en].filter(Boolean).join('\n'), directions);
   voiceMessage(directions);
   const workspace = node('div', '', 'writing-workspace');
   const grid = node('div', '', 'writing-grid');
@@ -865,7 +835,7 @@ function openTask() {
       save();
       syncPhoneActivity();
       return { label: state.phase === 'handover' ? '完成交接' : '开始听写', run: openTask };
-    }, { cn: mission.actions.at(-1).resultCN, en: mission.actions.at(-1).resultEN });
+    }, { cn: mission.actions.at(-1).resultCN });
   } else if (state.phase === 'dictation') {
     const entry = mission.dictation[state.wordIndex];
     showWord(entry, mission.titleCN + ' · ' + (state.wordIndex + 1) + ' / ' + mission.dictation.length, (guided) => {
@@ -934,7 +904,6 @@ function openFinalMessage() {
 function suspendRoom() {
   started = false;
   finalMessageOpen = false;
-  announceAfterPhone = false;
   engine?.setActive(false);
   engine?.hide();
   resetHint();
@@ -973,7 +942,7 @@ async function openLessonTest(mode) {
 
   try {
     const [bank, { createLessonTestView }] = await Promise.all([
-      loadLessonTest(), import('./lesson-test-view.js?v=direct-entry'),
+      loadLessonTest(), import('./lesson-test-view.js?v=briefing-flow'),
     ]);
     if (activeTest !== run) return;
     state[slot] = restoreLessonTest(bank, state[slot]);
@@ -1012,15 +981,12 @@ async function openLessonTest(mode) {
 function showBook() {
   openPanel(null, '词语手册');
   const known = discovered();
-  const controls = row(makeButton('练习题库', 'primary', () => showBank(0, 0)));
-  addTranslation(controls, 'Vocabulary notebook. Entries appear as you discover them. Tap the speaker to hear a word or tap EN for its English meaning.');
+  row(makeButton('练习题库', 'primary', () => showBank(0, 0)));
   panel.append(node('p', `已发现 ${known.size} / ${entries.length} 个词语。`, 'body'));
   voiceMessage();
   const { list, examples } = vocabularyList(entries, known, (entry) => {
     const { word } = entry;
     const data = lexicon[word];
-    const hint = translation(data.en);
-    hint.control.setAttribute('aria-label', word + '的英文意思');
     const speak = speakerButton(() => voice.speak(data.spoken ?? word), '听' + word + '的发音');
     const review = makeButton('写', 'icon-button', () => {
       showWord(entry, '词语复习', (guided) => {
@@ -1032,8 +998,7 @@ function showBook() {
       pinyin: data.pinyin,
       meaning: data.cn,
       reminder: state.written[word] === 'guided' ? '可再试听写' : '',
-      controls: [speak, hint.control, review],
-      extra: hint.block,
+      controls: [speak, review],
     };
   });
   panel.append(list);
@@ -1077,6 +1042,9 @@ function showSettings() {
       get: () => effectsEnabled,
       set(enabled) {
         effectsEnabled = enabled;
+        try {
+          localStorage.setItem(effectsKey, enabled ? 'on' : 'off');
+        } catch {}
         audio.setEnabled(enabled);
         if (enabled) startAudio();
       },
@@ -1130,7 +1098,6 @@ function skipCurrentTask() {
     if (Object.hasOwn(screenChecks, target) && !state.unlocked.includes(target)) state.unlocked.push(target);
   }
   state.notePending = false;
-  announceAfterPhone = false;
   phone.setChallenge(null);
   last = null;
   finishMission();
@@ -1226,7 +1193,7 @@ function begin() {
   else if (state.phonePicked) sendStep(missions[0], 0);
   engine.show();
   engine.setActive(true);
-  engine.focus(state.phase === 'explore' && !state.notePending && (state.tutorialDone || !state.phonePicked));
+  engine.focus(state.phase === 'explore' && !state.notePending && !waitingForBriefing());
   objective(state.phase !== 'done');
   if (state.phase === 'done' && !state.finalPassed) {
     if (state.endingSeen) openFinalMessage();
@@ -1245,7 +1212,13 @@ function beginWithComic() {
   $('#splash').hidden = true;
   audio.setMusic('comic');
   void prepareRoom();
-  playComic($('#comic-overlay'), begin, {
+  playComic($('#comic-overlay'), () => {
+    if (!state.introSeen) {
+      state.introSeen = true;
+      save();
+    }
+    begin();
+  }, {
     onPage(page) {
       if (page === 1) audio.prepareGameplay();
       else if (page === 2) audio.cue('storm');
@@ -1265,7 +1238,7 @@ document.addEventListener('click', (event) => {
 
 $('#retry-entry').onclick = () => location.reload();
 if (state.finalStarted && !state.finalPassed) void openLessonTest('final');
-else if (state.phonePicked) begin();
+else if (state.introSeen) begin();
 else beginWithComic();
 
 function prepareRoom() {
@@ -1284,6 +1257,8 @@ function prepareRoom() {
         walked += distance;
         if (walked > .85) {
           tutorialIndex = 1;
+          state.tutorialStep = 1;
+          save();
           audio.cue('dew');
           objective();
         }
@@ -1293,6 +1268,8 @@ function prepareRoom() {
         turned += Math.abs(dx) + Math.abs(dy);
         if (turned > 92) {
           tutorialIndex = 2;
+          state.tutorialStep = 2;
+          save();
           objective();
         }
       },
@@ -1301,7 +1278,7 @@ function prepareRoom() {
           unavailable = true;
           showEntryError();
         } else if (type === 'contextlost' || type === 'contextrestored') {
-          response(message, type === 'contextlost' ? 'The 3D view paused while graphics recover.' : 'The 3D view has recovered.');
+          response(message);
         }
       },
     });

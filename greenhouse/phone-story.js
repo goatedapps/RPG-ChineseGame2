@@ -87,12 +87,12 @@ export const closingMessages = [
 ];
 
 export const statusReplies = {
-  storm: 'I sealed the gap. The sill is dry now.',
-  equipment: 'I found the kit and checked the carrying picture.',
-  seedling: 'The plant’s sheltered, and I found the old root footage.',
-  records: 'I’ve got the rehearsal recording.',
-  exhibit: 'The stand is ready and the light’s on.',
-  handover: 'The notes are ready for the next group. See you at the stand!',
+  storm: '我封好了窗框的缝，窗台已经干了。',
+  equipment: '我找齐了工具，也看过搬运图。',
+  seedling: '幼苗已经避开了风，我找到了根系录像。',
+  records: '我拿到了排练录像。',
+  exhibit: '展台布置好了，展灯也亮了。',
+  handover: '交接记录准备好了。展台见！',
 };
 
 export const fieldHints = {

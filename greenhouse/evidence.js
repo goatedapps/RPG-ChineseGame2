@@ -6,6 +6,12 @@ export const evidence = {
       ['天气恶劣时，记得检查西窗。', 'Check the west window when the weather is severe.'],
     ],
   },
+  tray: {
+    title: '搬运须知', label: '搬运须知', kind: 'note',
+    lines: [
+      ['搬运规定很严格。请用双手托住盆底，把花盆稳稳地放在托盘上。'],
+    ],
+  },
   diary: {
     title: '阿宁的日记', label: '昨晚', kind: 'page', art: 'page-diary',
     alt: '一株比学校还高的豆苗。',
@@ -46,6 +52,7 @@ export const evidence = {
     lines: [
       ['师姐的手势很优雅。', 'The older student’s gestures are graceful.'],
       ['每天练习，她介绍展品时就更从容了。', 'Daily practice helped her present the exhibit with confidence.'],
+      ['师姐提前练习、耐心检查，是大家学习的榜样。'],
     ],
   },
 };

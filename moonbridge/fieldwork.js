@@ -3,6 +3,11 @@ import { mei } from './radio-messages.js';
 
 const question = (prompt, choices, correct, feedback) => ({ prompt, choices, correct, feedback });
 
+export const workshopWriting = {
+  handbook: { title: '司机手册', line: '请帮我做一件事：先装好车扣，再试跑。', words: ['做', '件'] },
+  shelf: { title: '零件架', line: '这篇课文讲的是怎样为不同路线选车扣。', words: ['篇', '讲'] },
+};
+
 export const fieldwork = {
   4: {
     title: '东侧瞭望台',
@@ -42,7 +47,7 @@ export const fieldwork = {
       question('“那篇课文讲的是怎样固定火种”里的“讲”是什么意思？', ['介绍做法。', '大声喊人。', '要求把书合上。'], '介绍做法。', '课文可以“讲”一个故事，也可以介绍怎样做一件事。'),
       question('你要完成师傅交代的一件事。怎样回答最合适？', ['我会读完第三页，再选车扣。', '我会给手册写上第三页。', '我读完第三件，再把车扣藏起来。'], '我会读完第三页，再选车扣。', '先读第三页，弄清楚做法，再选车扣。'),
     ],
-    writing: ['翻到', '课文', '读', '做', '件', '篇', '讲'],
+    writing: ['翻到', '课文', '读'],
     done: '到档案柜旁的工作台，把司机手册翻到第三页。',
   },
   10: {
@@ -69,7 +74,7 @@ export const fieldwork = {
     hint: mei.dispatchHint,
     paper: 'archive-paper',
     heading: '发车须知',
-    clue: '车手们举手，表示准备好了。大家互相祝对方马到成功。\n\n先到终点的人得第一名，但把火种安全送过桥，才是这次的任务。',
+    clue: '上车后举手，表示准备好了。大家互相祝对方马到成功。\n\n连点踏板加速。分岔前可以选左边的颠簸近路或右边的平坦长路。\n\n先到终点的人得第一名，但把火种安全送过桥，才是这次的任务。',
     words: ['马到成功', '第一', '举手'],
     questions: [
       question('对手出发前对你说“马到成功”，他是什么意思？', ['祝你顺利成功。', '要你把马牵过来。', '告诉你已经得了第一名。'], '祝你顺利成功。', '“马到成功”是出发前可以送给对方的祝福。'),

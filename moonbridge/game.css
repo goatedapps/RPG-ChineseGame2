@@ -142,7 +142,6 @@ dialog header,
 }
 .identity,
 .mission,
-.drive,
 .toast {
   background: var(--glass);
   border: 1px solid var(--line);
@@ -419,41 +418,117 @@ dialog header,
   color: var(--jade);
   width: max-content;
 }
+#hud.is-driving .controls { display: none; }
 .drive {
+  --dash-height: clamp(140px, 30dvh, 290px);
   position: absolute;
-  left: 50%;
-  bottom: 125px;
-  transform: translateX(-50%);
-  width: min(385px, calc(100vw - 65px));
-  padding: 9px 12px;
+  inset: auto 0 0;
+  min-height: var(--dash-height);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 0 max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  isolation: isolate;
 }
-.drive > div:first-child {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.drive::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 max(0px, (100% - 1140px) / 2);
+  background: url('art/race-cockpit.webp') center bottom / 100% 100% no-repeat;
+  content: '';
 }
-.drive strong {
-  color: var(--gold);
+.race-status {
+  position: absolute;
+  top: -.8rem;
+  display: grid;
+  gap: .28rem;
+  width: min(180px, 45vw);
+  text-align: center;
+  color: var(--paper);
+  font-size: .85rem;
+  font-weight: 700;
+  text-shadow: 0 1px 5px #000;
 }
-.drive progress {
+.race-status progress {
   width: 100%;
-  height: 8px;
+  height: .44rem;
   accent-color: var(--gold);
 }
-.drive p {
-  font-size: 0.85rem;
-  color: var(--muted);
+.race-instruments {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 1.8fr) 1fr;
+  align-items: end;
+  gap: clamp(8px, 3vw, 24px);
+  width: min(100%, 620px);
 }
-.drive .buttons {
-  margin-top: 5px;
+.speedometer {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  justify-self: end;
+  width: clamp(62px, 14vw, 105px);
+  aspect-ratio: 1;
+  border: 2px solid #ffd18b;
+  border-radius: 50%;
+  background: radial-gradient(circle, #101c2a 0 60%, transparent 62%),
+    conic-gradient(from 225deg, #ffcb70 var(--speed, 0deg), #65544d 0 270deg, #161a22 0);
+  color: #ffe3ae;
+  box-shadow: 0 3px 12px #02040bcc;
+  font-size: .68rem;
+  line-height: 1.05;
 }
-.drive button {
-  min-height: 37px;
-  padding: 4px 10px;
+.speedometer strong {
+  font-size: clamp(1.25rem, 4.5vw, 2.15rem);
+  font-variant-numeric: tabular-nums;
 }
-.drive:not([hidden]) ~ .controls #action {
-  visibility: hidden;
+.race-pedal { align-self: stretch; display: flex; align-items: end; }
+#accelerator {
+  width: 100%;
+  min-height: clamp(56px, 11dvh, 90px);
+  padding: .45rem;
+  border: 2px solid #ffd095;
+  border-radius: 1.3rem;
+  background: linear-gradient(#ffdb95, #d47727);
+  box-shadow: 0 5px 0 #582d1f, 0 8px 20px #080611aa, inset 0 0 0 4px #5c321d65;
+  color: #291609;
+  font-size: clamp(1.05rem, 4vw, 1.55rem);
+  touch-action: manipulation;
+  user-select: none;
 }
+#accelerator:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #582d1f, inset 0 0 0 4px #5c321d65;
+}
+.race-route { align-self: end; }
+.race-route p {
+  margin: 0 0 .28rem;
+  color: #ffdfb6;
+  font-size: .72rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px #000;
+}
+.race-route .buttons { flex-wrap: nowrap; gap: .24rem; margin: 0; }
+.race-route button {
+  min-width: 34px;
+  min-height: 44px;
+  padding: .25rem;
+  font-size: .72rem;
+  white-space: nowrap;
+}
+.race-route button[aria-pressed='true'] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+#race-hand {
+  position: absolute;
+  right: 13%;
+  bottom: 52%;
+  width: min(25vw, 160px);
+  opacity: 0;
+  pointer-events: none;
+}
+.fitting-notes.fitting-clue { display: block; }
 dialog {
   color: var(--paper);
   background: #19213a;
@@ -638,13 +713,7 @@ dialog:has(.restart-confirmation) {
   #control-hint {
     font-size: 0.8rem;
   }
-  .drive {
-    bottom: 72px;
-    left: auto;
-    right: 12px;
-    transform: none;
-    width: 272px;
-  }
+
   .toast {
     bottom: 66px;
   }

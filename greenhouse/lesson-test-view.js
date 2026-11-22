@@ -2,7 +2,6 @@ import { dictationButton } from '../shared/speaker.js?v=radio-briefings';
 import { currentLessonQuestion, revealLessonWord, completeLessonQuestion } from './lesson-test.js';
 import { createWriting } from './writing.js';
 
-const helpEN = '看字 (Show word) reveals the answer. That word comes back at the end.';
 const poster = new URL('./art/science-poster.webp', import.meta.url);
 
 function node(tag, className, text) {
@@ -24,7 +23,6 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
   let state = initialState;
   let stopWriting = () => {};
   let motion;
-  let englishOpen = false;
   let destroyed = false;
   host.setAttribute('aria-labelledby', 'lesson-test-title');
 
@@ -104,21 +102,8 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const spokenGap = question.revealed ? question.word : '，空格，';
     const read = dictationButton({ speak, stop: stopSpeech }, question.before + spokenGap + question.after);
     read.classList.add('lesson-test-icon', 'lesson-test-speaker');
-    const translation = node('p', 'lesson-test-translation', helpEN);
-    translation.lang = 'en';
-    translation.id = 'lesson-test-english';
-    translation.hidden = !englishOpen;
-    const english = button('lesson-test-icon lesson-test-en', 'EN', () => {
-      englishOpen = !englishOpen;
-      translation.hidden = !englishOpen;
-      english.setAttribute('aria-expanded', String(englishOpen));
-    });
-    english.title = 'English';
-    english.setAttribute('aria-label', '英文说明');
-    english.setAttribute('aria-controls', translation.id);
-    english.setAttribute('aria-expanded', String(englishOpen));
     if (question.review) promptTools.append(node('p', 'lesson-test-review', '再试一次'));
-    promptTools.append(read, english);
+    promptTools.append(read);
     const sentence = node('p', 'lesson-test-sentence');
     sentence.tabIndex = -1;
     const gap = node('span', 'lesson-test-gap', question.revealed ? question.word : '');
@@ -137,7 +122,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
       });
       help.append(showWord);
     }
-    prompt.append(promptTools, sentence, translation, help);
+    prompt.append(promptTools, sentence, help);
 
     const writing = node('div', 'lesson-test-writing');
     const grid = node('div', 'lesson-test-grid');

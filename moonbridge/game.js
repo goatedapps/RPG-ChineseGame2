@@ -1,17 +1,17 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js?v=desktop-pointer';
+import { createWorld } from './world.js?v=cockpit-race';
 import {
   opening,
   parts,
   tasks,
   objects,
-} from './story.js?v=desktop-pointer';
+} from './story.js?v=cockpit-race';
 import { words, bank } from './curriculum.js';
-import { fieldwork } from './fieldwork.js?v=mei-voice';
+import { fieldwork, workshopWriting } from './fieldwork.js?v=cockpit-race';
 import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
-import { testPart } from './race.js';
+import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=direct-entry';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=entry-audio';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
@@ -37,6 +37,8 @@ const ending = [
 ];
 const initial = {
   version: 2,
+  introSeen: false,
+  workshop: { handbook: 0, shelf: 0 },
   fieldDone: [],
   fieldProgress: null,
   seenRadioMessages: [],
@@ -62,8 +64,15 @@ function readSave() {
   try {
     const value = JSON.parse(localStorage.getItem(saveKey));
     if (![1, 2].includes(value?.version)) return structuredClone(initial);
+    const oldArchive = value.stage > 7 || value.fieldDone?.includes?.(7) ? 7
+      : value.stage === 7 ? limitProgress(value.fieldProgress?.writing, 7) : 0;
     return {
       ...structuredClone(initial),
+      introSeen: value.introSeen === true || value.stage > 0,
+      workshop: {
+        handbook: limitProgress(value.workshop?.handbook ?? oldArchive - 3, 2),
+        shelf: limitProgress(value.workshop?.shelf ?? oldArchive - 5, 2),
+      },
       stage:
         Number.isInteger(value.stage) &&
         value.stage >= 0 &&
@@ -140,6 +149,7 @@ let driving = false;
 let testing = false;
 let practicePassed = false;
 let practiceSpeed = 68;
+let raceStarted = false;
 let currentTestView = null;
 let devSkipDictation = false;
 let moveStart;
@@ -398,6 +408,7 @@ function update(notifyRadio = false) {
   });
   world?.point(null);
   if (!driving) {
+    $('hud').classList.remove('is-driving');
     $('reticle').hidden = false;
     $('drive').hidden = true;
   }
@@ -437,16 +448,17 @@ function worldEvent(event) {
     const { race } = event;
     const routeName = race.route === 'rough' ? '颠簸近路' : '平坦长路';
     const label =
-      race.progress >= 1
+      !race.started ? '等待发车' : race.progress >= 1
         ? '到达终点'
         : race.progress >= race.rival
           ? '暂时领先'
           : '对手在前';
-    $('speed').textContent = '时速 ' + Math.round(race.speed);
+    $('speed').textContent = String(Math.round(race.speed));
+    $('speedometer').style.setProperty('--speed', (Math.min(65, race.speed) / 65 * 270) + 'deg');
     $('place').textContent = label;
     $('race-progress').value = race.progress;
     $('race-hint').textContent =
-      (race.locked ? '已进入' : '分岔前可选路线：') + routeName;
+      race.locked ? '已进入' + routeName : '分岔前可选路线';
     $('left-route').disabled = race.locked;
     $('right-route').disabled = race.locked;
     $('left-route').setAttribute(
@@ -492,6 +504,10 @@ function startWorld() {
     return;
   }
   world.reset(save.stage >= 12);
+  if (!save.introSeen) {
+    save.introSeen = true;
+    persist();
+  }
   driving = false;
   practicePassed = false;
   practiceSpeed = 68;
@@ -535,7 +551,7 @@ function confirmRestart() {
 }
 function enterLesson() {
   if (save.storyFinished && !save.passed) openTest('final');
-  else if (save.stage > 0) startWorld();
+  else if (save.introSeen) startWorld();
   else showComic(opening, '序幕', startWorld);
 }
 $('retry-entry').onclick = startWorld;
@@ -712,6 +728,10 @@ function objectHotspot(label, className, activate) {
 }
 
 function handbook() {
+  if (save.workshop.handbook === 1) {
+    writeWorkshop('handbook', finishHandbook);
+    return;
+  }
   showPanel('artifact', '司机手册');
   play('paper');
   let page = 0;
@@ -746,7 +766,7 @@ function handbook() {
     description.textContent = [
       '老师傅讲了一件事：希望将来当司机，就要先学会检查灯车。',
       '轻敲车铃，再看看灯是否亮了。',
-      '稳轮夹适合颠簸的近路。快轮扣适合平坦的长路。先装好，再试跑。',
+      '稳轮夹适合颠簸的近路。快轮扣适合平坦的长路。' + workshopWriting.handbook.line,
     ][page];
     pageNumber.textContent = (page + 1) + ' / 3';
     previous.disabled = page === 0;
@@ -758,8 +778,28 @@ function handbook() {
   body.append(sheet);
   render();
   dismissInspection = () => {
-    if (readThird && save.stage === 7) go(8);
+    if (readThird && save.stage === 7) queueMicrotask(() => writeWorkshop('handbook', finishHandbook));
   };
+}
+
+function finishHandbook() {
+  go(8);
+  closePanel();
+}
+
+function writeWorkshop(location, complete) {
+  const { title, line, words: targets } = workshopWriting[location];
+  const index = save.workshop[location];
+  if (index >= targets.length || devSkipDictation) {
+    complete();
+    return;
+  }
+  const term = words.find(({ word }) => word === targets[index]);
+  showDictation(term, title + ' · 听写 ' + (index + 1) + ' / ' + targets.length, () => {
+    save.workshop[location]++;
+    persist();
+    writeWorkshop(location, complete);
+  }, undefined, line);
 }
 
 function choosePart() {
@@ -772,15 +812,17 @@ function choosePart() {
   for (const [id, part] of Object.entries(parts)) {
     const label = part.name + '。' + part.line;
     shelf.append(objectHotspot(label, 'fitting-' + id, () => {
-      save.part = id;
       play('pickup');
-      go(9);
-      closePanel();
+      writeWorkshop('shelf', () => {
+        save.part = id;
+        go(9);
+        closePanel();
+      });
     }));
     caption.append(make('span', id === 'stabilizer' ? '稳轮夹 · 颠簸近路' : '快轮扣 · 平坦长路'));
   }
   shelf.append(caption);
-  body.append(shelf);
+  body.append(shelf, make('p', workshopWriting.shelf.line, 'fitting-notes fitting-clue'));
 }
 function runTrial(success, power, onResult) {
   if (testing) return;
@@ -1079,28 +1121,39 @@ function finishFieldwork(field) {
 function enterRace() {
   if (driving || save.stage !== 11) return;
   driving = true;
+  raceStarted = false;
+  $('hud').classList.add('is-driving');
   $('reticle').hidden = true;
   $('drive').hidden = false;
   $('district').textContent = '任务 4 / 5 · 月桥';
   $('objective').textContent = '把火种送过桥';
   $('control-hint').textContent =
-    '按前方加速，按后方刹车。到分岔前可以换路线。';
+    '举手发车，再连点踏板加速。';
   $('action').disabled = true;
   closePanel();
   world.startRace(save.part);
+  $('accelerator').textContent = '举手发车';
+  $('accelerator').focus({ preventScroll: true });
   play('relay');
 }
-function launchPanel() {
-  showPanel(null, '月桥竞速');
-  body.append(
-    make('p', '对手举手示意。你也准备好了吗？', 'dialog-copy'),
-    make(
-      'p',
-      '按向前加速，按向后减速。分岔前可以选左边的颠簸近路或右边的平坦长路。',
-      'note',
-    ),
-    group(button('举手，准备出发', enterRace, 'gold')),
-  );
+
+function accelerateRace() {
+  if (!driving || dialog.open) return;
+  if (!raceStarted) {
+    raceStarted = true;
+    $('accelerator').textContent = '连点加速';
+    $('control-hint').textContent = '连点踏板或空格键加速。';
+    const hand = $('race-hand');
+    if (!reducedMotion.matches) {
+      hand.animate([
+        { opacity: 0, transform: 'translateY(75%) rotate(9deg)' },
+        { opacity: 1, transform: 'translateY(0) rotate(0)', offset: .45 },
+        { opacity: 0, transform: 'translateY(75%) rotate(9deg)' },
+      ], { duration: 630 });
+    }
+    play('wheels');
+  }
+  world.tapAccelerator();
 }
 function endStory() {
   play('finish');
@@ -1158,7 +1211,7 @@ function action() {
       practiceRun();
       break;
     case 11:
-      launchPanel();
+      enterRace();
       break;
     case 12:
       endStory();
@@ -1166,19 +1219,20 @@ function action() {
   }
 }
 $('action').onclick = action;
+$('accelerator').onclick = accelerateRace;
 window.addEventListener('keydown', (event) => {
+  if (driving && !dialog.open && event.code === 'Space' && !event.target.closest?.('button')) {
+    event.preventDefault();
+    if (!event.repeat) accelerateRace();
+    return;
+  }
   if (event.repeat || view !== 'hud' || dialog.open) return;
   if (event.code === 'KeyE') action();
   if (event.code === 'KeyF') openRadio();
   if (driving && event.code === 'ArrowLeft') world.chooseRoute('rough');
   if (driving && event.code === 'ArrowRight') world.chooseRoute('smooth');
 });
-bindJoystick($('joystick'), (x, forward) => {
-  world?.setStick(x, -forward);
-  if (driving && Math.abs(x) > 0.65 && Math.abs(forward) < 0.5) {
-    world.chooseRoute(x < 0 ? 'rough' : 'smooth');
-  }
-});
+bindJoystick($('joystick'), (x, forward) => world?.setStick(x, -forward));
 $('left-route').onclick = () => world.chooseRoute('rough');
 $('right-route').onclick = () => world.chooseRoute('smooth');
 
@@ -1303,7 +1357,7 @@ document.querySelectorAll('[data-settings]').forEach((control) => {
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const control = event.target.closest('button');
-  if (!control || control.matches('.comic-hit,#action,.options button')) return;
+  if (!control || control.matches('.comic-hit,#action,#accelerator,.options button')) return;
   play('ui');
 });
 

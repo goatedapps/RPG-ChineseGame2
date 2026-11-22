@@ -12,7 +12,7 @@
       content="在月桥上驾驶灯车，把火种送到对岸。新加坡小学三年级华文第一课。"
     />
     <title>月桥竞速 · 三年级华文第一课</title>
-    <link rel="stylesheet" href="moonbridge/game.css?v=desktop-pointer" />
+    <link rel="stylesheet" href="moonbridge/game.css?v=cockpit-race" />
     <link rel="stylesheet" href="shared/comic.css" />
     <link rel="stylesheet" href="shared/game-menus.css" />
     <link rel="stylesheet" href="shared/lesson-entry.css" />
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="shared/vocabulary.css" />
     <link rel="preload" href="moonbridge/art/prelude-1.webp" as="image" />
     <script defer src="greenhouse/vendor/gsap.min.js"></script>
-    <script type="module" src="moonbridge/game.js?v=desktop-pointer"></script>
+    <script type="module" src="moonbridge/game.js?v=cockpit-race"></script>
   </head>
   <body>
     <main>
@@ -90,18 +90,28 @@
         </section>
         <div id="reticle" aria-hidden="true"></div>
         <p id="toast" class="toast" role="status" hidden></p>
-        <div id="drive" class="drive" hidden>
-          <div><strong id="speed">时速 0</strong><span id="place"></span></div>
-          <progress
-            id="race-progress"
-            max="1"
-            value="0"
-            aria-label="赛程"
-          ></progress>
-          <p id="race-hint"></p>
-          <div class="buttons">
-            <button id="left-route">走左线</button
-            ><button id="right-route">走右线</button>
+        <div id="drive" class="drive" role="group" aria-label="灯车操控台" hidden>
+          <img id="race-hand" src="moonbridge/art/race-hand.webp" alt="" />
+          <div class="race-status">
+            <span id="place"></span>
+            <progress
+              id="race-progress"
+              max="1"
+              value="0"
+              aria-label="赛程"
+            ></progress>
+          </div>
+          <div class="race-instruments">
+            <p id="speedometer" class="speedometer"><strong id="speed">0</strong><span>时速</span></p>
+            <div class="race-pedal">
+              <button id="accelerator" type="button" aria-keyshortcuts="Space">举手发车</button>
+            </div>
+            <div class="race-route">
+              <p id="race-hint"></p>
+              <div class="buttons">
+                <button id="left-route">左线</button><button id="right-route">右线</button>
+              </div>
+            </div>
           </div>
         </div>
         <footer class="controls">

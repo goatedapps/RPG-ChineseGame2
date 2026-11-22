@@ -16,9 +16,9 @@ function button(cls, text, label) {
 
 export function createPhone(host, { onToggle, onNotify } = {}) {
   host.classList.add('field-phone');
-  host.lang = 'en';
+  host.lang = 'zh-Hans';
 
-  const dock = button('phone-dock', '', 'Open phone');
+  const dock = button('phone-dock', '', '打开手机');
   const glass = element('span', 'phone-dock-glass');
   const badge = element('span', 'phone-badge');
   badge.hidden = true;
@@ -30,7 +30,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   dock.setAttribute('aria-controls', 'phone-screen');
   dock.setAttribute('aria-expanded', 'false');
   dock.setAttribute('aria-keyshortcuts', 'F');
-  dock.title = 'Open phone (F)';
+  dock.title = '打开手机（F）';
 
   const alert = button('phone-alert', '');
   alert.hidden = true;
@@ -50,19 +50,19 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   const clock = element('span', 'phone-clock');
   statusBar.append(clock, element('span', 'phone-camera'), element('span', 'phone-battery'));
   const contact = element('div', 'phone-contact-line');
-  const closeButton = button('phone-back', '‹', 'Put down phone');
-  const avatar = element('span', 'phone-avatar', 'AN');
+  const avatar = element('span', 'phone-avatar', '宁');
   avatar.setAttribute('aria-hidden', 'true');
-  const heading = element('h2', 'phone-contact', 'Ah Ning');
+  const heading = element('h2', 'phone-contact', '阿宁');
   heading.id = 'phone-contact';
-  contact.append(closeButton, avatar, heading);
+  heading.tabIndex = -1;
+  contact.append(avatar, heading);
   header.append(statusBar, contact);
 
   const scroll = element('div', 'phone-scroll');
   const inbox = element('div', 'phone-inbox');
   inbox.setAttribute('role', 'log');
-  inbox.setAttribute('aria-label', 'Messages');
-  const empty = element('p', 'phone-empty', 'No messages yet');
+  inbox.setAttribute('aria-label', '消息');
+  const empty = element('p', 'phone-empty', '暂无消息');
   const hintSlot = element('div', 'phone-hint-slot');
   const activitySlot = element('div', 'phone-activity-slot');
   scroll.append(inbox, empty, hintSlot, activitySlot);
@@ -80,9 +80,9 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   input.setAttribute('enterkeyhint', 'send');
   input.setAttribute('aria-labelledby', prompt.id);
   input.setAttribute('aria-describedby', 'phone-reply-feedback');
-  const send = button('phone-send', 'Send');
+  const send = button('phone-send', '发送');
   send.type = 'submit';
-  const handwrittenReply = button('phone-reply phone-handwritten-reply', 'Write a reply');
+  const handwrittenReply = button('phone-reply phone-handwritten-reply', '手写回复');
   handwrittenReply.setAttribute('aria-labelledby', prompt.id);
   replyRow.append(input, handwrittenReply, send);
   const choices = element('div', 'phone-choices');
@@ -97,23 +97,23 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   const writing = element('section', 'phone-writing');
   writing.hidden = true;
   const writingHeader = element('div', 'phone-writing-header');
-  const writingBack = button('phone-writing-back', '‹ Chat', 'Back to chat');
-  const writingTitle = element('h3', 'phone-writing-title', 'Write your reply');
+  const writingBack = button('phone-writing-back', '返回聊天', '返回聊天');
+  const writingTitle = element('h3', 'phone-writing-title', '手写回复');
   writingTitle.tabIndex = -1;
   writingHeader.append(writingBack, writingTitle);
   const writingGrid = element('div', 'writing-grid');
   const writingProgress = element('ol', 'writing-progress');
-  writingProgress.setAttribute('aria-label', 'Character progress');
+  writingProgress.setAttribute('aria-label', '书写进度');
   const writingStatus = element('p', 'phone-feedback');
   writingStatus.setAttribute('role', 'status');
   writingStatus.hidden = true;
-  const retryWriting = button('phone-writing-back', 'Try again');
+  const retryWriting = button('phone-writing-back', '再试一次');
   retryWriting.hidden = true;
-  const sendWriting = button('phone-send phone-send-written', 'Send');
+  const sendWriting = button('phone-send phone-send-written', '发送');
   sendWriting.disabled = true;
   writing.append(writingHeader, writingGrid, writingProgress, writingStatus, retryWriting, sendWriting);
 
-  const home = button('phone-home', '', 'Put down phone');
+  const home = button('phone-home', '', '放下手机');
   home.append(element('span', 'phone-home-indicator'));
   screen.append(header, scroll, composer, writing, home);
   sheet.append(screen);
@@ -122,9 +122,10 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   const seen = new Set();
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const viewport = window.visualViewport;
-  const timeFormat = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit', hourCycle: 'h23' });
+  const timeFormat = new Intl.DateTimeFormat('zh-SG', { hour: 'numeric', minute: '2-digit', hourCycle: 'h23' });
   let unread = 0;
   let hintUnread = false;
+  let hintRevealed = false;
   let activeHint;
   let activeChallenge;
   let activityId;
@@ -153,8 +154,10 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   function appendMessage(text, outgoing = false) {
     if (!text) return;
     const item = element('div', 'phone-bubble ' + (outgoing ? 'outgoing' : 'incoming'));
-    const meta = element('span', 'phone-visually-hidden', outgoing ? 'You' : 'Ah Ning');
-    item.append(meta, element('p', 'phone-message-text', text), element('time', 'phone-message-time', time()));
+    const meta = element('span', 'phone-visually-hidden', outgoing ? '你' : '阿宁');
+    const message = element('p', 'phone-message-text', text);
+    message.lang = outgoing ? 'zh-Hans' : 'en';
+    item.append(meta, message, element('time', 'phone-message-time', time()));
     inbox.append(item);
     empty.hidden = true;
     if (expanded) scrollToLatest();
@@ -164,16 +167,16 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     const total = unread + Number(hintUnread);
     badge.textContent = total > 9 ? '9+' : String(total);
     badge.hidden = total === 0;
-    dock.setAttribute('aria-label', total ? `Open phone, ${total} unread ${total === 1 ? 'notification' : 'notifications'}` : 'Open phone');
+    dock.setAttribute('aria-label', total ? `打开手机，${total} 条未读消息` : '打开手机');
     alert.hidden = expanded || total === 0;
-    alertTitle.textContent = hintUnread ? 'Hint available' : 'Ah Ning';
-    alertSummary.textContent = hintUnread ? 'Tap to open.' : unread === 1 ? 'New message' : `${unread} new messages`;
+    alertTitle.textContent = hintUnread ? '有新提示' : '阿宁';
+    alertSummary.textContent = hintUnread ? '轻触查看。' : unread === 1 ? '新消息' : `${unread} 条新消息`;
     alert.dataset.kind = hintUnread ? 'hint' : 'message';
   }
 
   function notify(kind) {
     if (expanded || host.hidden) return;
-    status.textContent = kind === 'hint' ? 'Hint available. Open your phone to read it.' : 'New message from Ah Ning.';
+    status.textContent = kind === 'hint' ? '有新提示，请打开手机查看。' : '阿宁发来了新消息。';
     onNotify?.(kind);
     const now = performance.now();
     if (now - lastBuzz < 400) return;
@@ -216,7 +219,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     viewport?.addEventListener('resize', fitViewport);
     viewport?.addEventListener('scroll', fitViewport);
     fitViewport();
-    closeButton.focus({ preventScroll: true });
+    heading.focus({ preventScroll: true });
     scrollToLatest();
     if (!motion.matches) {
       window.gsap?.fromTo(sheet, { opacity: 0, y: 28, scale: 0.8 }, {
@@ -252,28 +255,31 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   function setHint(hint) {
     if (hint && hint.id === activeHint?.id) return;
     activeHint = hint;
-    hintUnread = Boolean(hint);
+    hintUnread = false;
+    hintRevealed = false;
     hintSlot.replaceChildren();
     updateDock();
     if (!hint) return;
 
     const card = element('section', 'phone-hint');
-    const title = element('strong', 'phone-hint-title', 'Hint available');
-    const reveal = button('phone-hint-button', 'Read hint');
+    const title = element('strong', 'phone-hint-title', '提示');
+    const reveal = button('phone-hint-button', '查看提示');
     const explanation = element('p', 'phone-hint-text', hint.text);
-    const locate = button('phone-hint-button', 'Show the spot');
+    explanation.lang = 'en';
+    const locate = button('phone-hint-button', '标出位置');
     explanation.hidden = true;
     locate.hidden = true;
     card.append(title, reveal, explanation, locate);
     hintSlot.append(card);
     reveal.addEventListener('click', () => {
       hintUnread = false;
+      hintRevealed = true;
       updateDock();
-      title.textContent = 'Hint';
+      title.textContent = '提示';
       reveal.hidden = true;
       explanation.hidden = false;
       locate.hidden = !hint.onLocate;
-      (locate.hidden ? closeButton : locate).focus({ preventScroll: true });
+      (locate.hidden ? home : locate).focus({ preventScroll: true });
       scrollToLatest();
       hint.onReveal?.();
     });
@@ -282,6 +288,12 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
       hint.onLocate?.();
     });
     if (expanded) scrollToLatest();
+  }
+
+  function remindAboutHint() {
+    if (!activeHint || hintRevealed) return;
+    hintUnread = true;
+    updateDock();
     notify('hint');
   }
 
@@ -349,10 +361,10 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
       sendWriting.disabled = false;
       if (!writing.hidden) sendWriting.focus({ preventScroll: true });
     }, () => {
-      writingFeedback('The handwriting grid didn’t load.');
+      writingFeedback('书写格未能载入。');
       retryWriting.hidden = false;
     }, () => {
-      writingFeedback('Try that stroke again.');
+      writingFeedback('请再写一遍这一笔。');
     }, (completed) => {
       const marker = markers[completed - 1];
       marker.textContent = characters[completed - 1];
@@ -379,12 +391,12 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     if (!activeChallenge) return;
     const answer = value.trim();
     if (!answer) {
-      setFeedback('Type a reply first.');
+      setFeedback('请先填写回复。');
       return;
     }
     const result = activeChallenge.validate ? activeChallenge.validate(answer) : true;
     if (result !== true) {
-      const message = typeof result === 'string' ? result : 'Try that again.';
+      const message = typeof result === 'string' ? result : '请再试一次。';
       if (writing.hidden) setFeedback(message);
       else writingFeedback(message);
       return;
@@ -392,7 +404,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     const accepted = activeChallenge;
     appendMessage(answer, true);
     setChallenge(null);
-    if (expanded) closeButton.focus({ preventScroll: true });
+    if (expanded) heading.focus({ preventScroll: true });
     accepted.onSuccess?.(answer);
   }
 
@@ -401,9 +413,9 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     backToChat();
     resetWriting();
     activeChallenge = challenge;
-    prompt.textContent = challenge?.prompt || 'Reply';
+    prompt.textContent = challenge?.prompt || '回复';
     input.value = '';
-    input.placeholder = challenge?.placeholder || 'Type a reply';
+    input.placeholder = challenge?.placeholder || '输入回复';
     const options = challenge?.choices || [];
     const useHandwriting = Boolean(challenge?.characters);
     replyRow.hidden = options.length > 0;
@@ -411,7 +423,7 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
     input.hidden = useHandwriting;
     send.hidden = useHandwriting;
     handwrittenReply.hidden = !useHandwriting;
-    handwrittenReply.textContent = challenge?.placeholder || 'Write a reply';
+    handwrittenReply.textContent = challenge?.placeholder || '手写回复';
     handwrittenReply.removeAttribute('lang');
     choices.replaceChildren(...options.map((choice) => {
       const answer = button('phone-choice', typeof choice === 'string' ? choice : choice.label);
@@ -444,7 +456,6 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
 
   dock.addEventListener('click', open);
   alert.addEventListener('click', open);
-  closeButton.addEventListener('click', close);
   home.addEventListener('click', close);
   sheet.addEventListener('close', () => { if (!sheet.open) finishClose(); });
   sheet.addEventListener('cancel', (event) => {
@@ -467,5 +478,5 @@ export function createPhone(host, { onToggle, onNotify } = {}) {
   retryWriting.addEventListener('click', startWriting);
   sendWriting.addEventListener('click', () => submit(writtenAnswer));
 
-  return { open, close, setVisible, receive, setChallenge, setHint, setActivity, reset, get isOpen() { return expanded; } };
+  return { open, close, setVisible, receive, setChallenge, setHint, remindAboutHint, setActivity, reset, get isOpen() { return expanded; } };
 }

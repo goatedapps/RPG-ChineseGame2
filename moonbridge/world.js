@@ -1,7 +1,7 @@
 import { createHintPortal } from '../shared/hint-portal.js';
 import { bindScenePointer, MOUSE_LOOK_RATE } from '../shared/scene-pointer.js';
 import * as T from '../greenhouse/vendor/three.module.min.js';
-import { advanceRace, FORK, MERGE } from './race.js';
+import { advanceRace, FORK, MERGE } from './race.js?v=cockpit-race';
 
 const V = (x, y, z) => new T.Vector3(x, y, z);
 const between = (x, low, high) => Math.min(high, Math.max(low, x));
@@ -1260,12 +1260,7 @@ export function createWorld(canvas, notify, finished, onInteract) {
     } else if (mode === 'trial') {
       animateTrial(elapsed);
     } else {
-      race = advanceRace(
-        race,
-        dt,
-        input.has('up') || stick.y < -0.24,
-        input.has('down') || stick.y > 0.24,
-      );
+      race = advanceRace(race, dt);
       if (race.progress >= FORK && !race.locked)
         race = { ...race, locked: true };
       const tangent = positionCart(playerCart, race.progress, race.route, 0.68);
@@ -1273,13 +1268,13 @@ export function createWorld(canvas, notify, finished, onInteract) {
       const p = playerCart.object.position;
       camera.position
         .copy(p)
-        .addScaledVector(tangent, -4.35)
-        .add(V(0, 3.13, 0));
+        .addScaledVector(tangent, 0.45)
+        .add(V(0, 1.35, 0));
       camera.lookAt(
         p
           .clone()
-          .addScaledVector(tangent, 5)
-          .add(V(0, 0.68, 0)),
+          .addScaledVector(tangent, 8)
+          .add(V(0, 1.04, 0)),
       );
       for (const wheel of playerCart.wheels)
         wheel.rotation.x += race.speed * dt * 0.42;
@@ -1290,6 +1285,7 @@ export function createWorld(canvas, notify, finished, onInteract) {
         finishId = requestAnimationFrame(() => {
           finishId = undefined;
           mode = 'walk';
+          playerCart.object.visible = true;
           player.set(8.55, 1.65, -87.4);
           yaw = -0.98;
           pitch = -0.08;
@@ -1322,6 +1318,7 @@ export function createWorld(canvas, notify, finished, onInteract) {
   function reset(far = false) {
     stopTrial();
     mode = 'walk';
+    playerCart.object.visible = true;
     player.set(far ? 8.55 : 0.2, 1.65, far ? -87.4 : 9.8);
     yaw = far ? -0.98 : -0.28;
     pitch = -0.07;
@@ -1384,16 +1381,24 @@ export function createWorld(canvas, notify, finished, onInteract) {
     startRace(part) {
       mode = 'race';
       pointer.release();
+      playerCart.object.visible = false;
       race = {
         part,
         route: part === 'runner' ? 'smooth' : 'rough',
-        speed: 6,
+        speed: 0,
+        started: false,
+        boost: 0,
         progress: 0,
         rival: 0,
         locked: false,
       };
       cue.visible = false;
       input.clear();
+    },
+    tapAccelerator() {
+      if (mode !== 'race' || race.progress >= 1) return;
+      race.started = true;
+      race.boost = Math.min(1, race.boost + .3);
     },
     chooseRoute(style) {
       if (mode === 'race' && !race.locked) race = { ...race, route: style };
