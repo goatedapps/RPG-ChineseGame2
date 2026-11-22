@@ -7,6 +7,7 @@ Footstep files alternate four heel and toe textures. Both lessons reuse these re
 Paper uses staggered crackle and flutter layers.
 The phone notification is an original three-note synthesized chime, with soft harmonics and short stereo reflections.
 The game uses it for new phone messages and hint notifications. Moonbridge preloads a separate `moonbridge-radio-alert.mp3` with a short burst of synthesized squelch and a two-tone call signal.
+Moonbridge also uses synthesized stereo clips for the trial lever latch, rolling wheels, the track joint, and the loose canister landing.
 The mix was rendered at 44.1 kHz and encoded with LAME as stereo MP3 at 96 kbps and 32 kHz for effects, and 112 kbps and 44.1 kHz for rain.
 
 The game starts the audio graph after a player gesture, lowers the rain and effects during Mandarin speech, and stops background audio on blur or when the tab is hidden.

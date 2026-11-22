@@ -4,6 +4,10 @@ const clips = {
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
   notification: { files: ['phone-notification'], volume: .45, cooldown: .65 },
   radio: { files: ['moonbridge-radio-alert'], volume: .8, cooldown: .16 },
+  lever: { files: ['moonbridge-lever-clack'], volume: .7, cooldown: .2 },
+  wheels: { files: ['moonbridge-trial-wheels'], volume: .6, cooldown: .2 },
+  jolt: { files: ['moonbridge-trial-jolt'], volume: .68, cooldown: .2 },
+  impact: { files: ['moonbridge-trial-impact'], volume: .88, cooldown: .2 },
   seal: { files: ['seal-press'], volume: .50, cooldown: .22 },
   correct: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
@@ -23,10 +27,11 @@ const tracks = {
 const rainFile = 'rain-window';
 const musicLoopStart = .145;
 const comicClips = ['page', 'storm'];
+const trialClips = ['lever', 'wheels', 'jolt', 'impact'];
 const sceneClips = {
   title: ['ui'],
   comic: ['ui', 'notification', ...comicClips],
-  game: Object.keys(clips).filter((name) => name !== 'radio' && !comicClips.includes(name)),
+  game: Object.keys(clips).filter((name) => name !== 'radio' && !comicClips.includes(name) && !trialClips.includes(name)),
 };
 const maxEffects = 7;
 const maxCueDelay = 650;
@@ -35,7 +40,7 @@ function fileURL(category, name) {
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
 }
 
-export function createGreenhouseAudio({ radioAlerts = false, effectsGain = 1, musicGain = 1 } = {}) {
+export function createGreenhouseAudio({ radioAlerts = false, trialEffects = false, effectsGain = 1, musicGain = 1 } = {}) {
   let context;
   let master;
   let effects;
@@ -180,6 +185,7 @@ export function createGreenhouseAudio({ radioAlerts = false, effectsGain = 1, mu
   function prepareSceneEffects() {
     if (!enabled) return;
     if (radioAlerts) prepareEffect(clips.radio.files[0]);
+    if (trialEffects) for (const name of trialClips) prepareEffect(clips[name].files[0]);
     for (const name of sceneClips[musicScene] ?? sceneClips.title) {
       for (const file of clips[name].files) prepareEffect(file);
     }

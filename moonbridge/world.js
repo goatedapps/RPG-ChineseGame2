@@ -927,8 +927,12 @@ export function createWorld(canvas, notify, finished) {
   const quadrant = new T.TorusGeometry(.27, .024, 8, 26, Math.PI * .86);
   for (const z of [-.087, .087])
     mesh(lever, quadrant, color.rail, [0, .14, z], [1, 1, 1], [0, 0, .22]);
-  beam(lever, color.dark, V(0, .17, 0), V(-.29, .63, 0), .067, .066);
-  mesh(lever, wheelGeo, color.red, [-.29, .63, 0], [.15, .34, .15], [0, 0, Math.PI / 2]);
+  const handle = groupAt(effects, -3.75, 1.185, 2.16);
+  const grip = V(-.29, .46, 0);
+  beam(handle, color.dark, V(0, 0, 0), grip, .067, .066);
+  mesh(handle, wheelGeo, color.red, grip.toArray(), [.15, .34, .15], [0, 0, Math.PI / 2]);
+  for (const x of [-.66, .66])
+    box(fixed, color.rail, x, .187, 1.45, .17, .08, .3);
   cloth(fixed, -4.69, 2.21, 5.8, color.red, 1.2, 1.02);
 
   const radio = device(effects, 2.77, 1.015, 4.82);
@@ -937,6 +941,19 @@ export function createWorld(canvas, notify, finished) {
   const spark = canister(effects, 3.9, 1.025, 4.59);
   const playerCart = cart(effects);
   playerCart.object.position.set(0, 0.03, 3.32);
+  const trialCanister = canister(effects, 0, 0, 0);
+  trialCanister.visible = false;
+  const reachTexture = new T.TextureLoader().load(
+    new URL('./art/lever-hand.webp', import.meta.url).href,
+  );
+  reachTexture.colorSpace = T.SRGBColorSpace;
+  const reachHand = new T.Sprite(new T.SpriteMaterial({
+    map: reachTexture, depthTest: false, depthWrite: false, toneMapped: false,
+  }));
+  reachHand.center.set(.29, .57);
+  reachHand.visible = false;
+  reachHand.renderOrder = 6;
+  scene.add(reachHand);
   const opponent = cart(effects, true);
   opponent.object.position.set(-2.62, 0.03, 1.5);
   const lampRoot = groupAt(effects, 12.4, 0, -89);
@@ -1004,6 +1021,7 @@ export function createWorld(canvas, notify, finished) {
   let yaw = -0.28;
   let pitch = -0.07;
   let race;
+  let trial;
   let last = 0;
   let raf = 0;
   let finishId;
@@ -1119,6 +1137,92 @@ export function createWorld(canvas, notify, finished) {
     return tangent;
   }
 
+  const leverView = V(-3.25, 1.91, 3.74);
+  const leverFocus = V(-3.9, 1.45, 2.17);
+  const trackView = V(-1.94, 1.88, 5);
+  const trackFocus = V(.3, .64, 1.95);
+  const trialImpact = V(1.38, .09, 2.04);
+  const trialRelease = V(.5, .74, 3.16);
+  const gripPosition = V(0, 0, 0);
+  const viewRight = V(0, 0, 0);
+
+  function stopTrial() {
+    if (!trial) return;
+    playerCart.object.position.set(0, .03, 3.32);
+    playerCart.object.rotation.set(0, 0, 0);
+    for (const wheel of playerCart.wheels) wheel.rotation.x = 0;
+    playerCart.cargo.visible = trial.cargo;
+    trialCanister.visible = false;
+    reachHand.visible = false;
+    handle.rotation.z = 0;
+    trial = undefined;
+    mode = 'walk';
+  }
+
+  function animateTrial(dt) {
+    const current = trial;
+    const { success, power, play, complete } = current;
+    const t = current.time += Math.min(dt, .12);
+    const smooth = T.MathUtils.smoothstep;
+    const reach = smooth(t, .22, .72);
+    const pull = smooth(t, .72, 1.18);
+    const release = smooth(t, 1.2, 1.49);
+    const toTrack = reducedMotion.matches ? Number(t >= 1.62) : smooth(t, 1.42, 2.05);
+
+    handle.rotation.z = -1.2 * pull;
+    camera.position.copy(leverView).lerp(trackView, toTrack);
+    camera.lookAt(leverFocus.clone().lerp(trackFocus, toTrack));
+    reachHand.visible = t >= .2 && t < 1.5;
+    if (reachHand.visible) {
+      handle.localToWorld(gripPosition.copy(grip));
+      viewRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
+      const offset = Math.max(1 - reach, release);
+      reachHand.position.copy(gripPosition).addScaledVector(viewRight, .02 + offset * .75);
+      reachHand.position.y += .025 - offset * .37;
+      reachHand.position.z += .13 + offset * .16;
+      const image = reachTexture.image;
+      reachHand.scale.set(.55 * (image ? image.width / image.height : 1.7), .49, 1);
+      reachHand.material.rotation = pull * -.15;
+    }
+
+    const rollStart = 2.06;
+    const bump = 2.78;
+    const land = 3.31;
+    const speed = .86 + power * .55;
+    const distance = 1.08 * smooth(t, rollStart, bump) + 1.43 * speed * smooth(t, bump, 3.62);
+    const jolt = t >= bump ? Math.sin((t - bump) * 18) * Math.exp(-(t - bump) * 8) : 0;
+    playerCart.object.position.set(0, .03 + Math.max(jolt, 0) * .17, 3.32 - distance);
+    playerCart.object.rotation.x = jolt * .15;
+    for (const wheel of playerCart.wheels) wheel.rotation.x = distance / .28;
+
+    const thrown = !success && t >= bump;
+    playerCart.cargo.visible = !thrown && current.cargo;
+    trialCanister.visible = thrown;
+    if (thrown) {
+      const flight = between((t - bump) / (land - bump), 0, 1);
+      trialCanister.position.copy(trialRelease).lerp(trialImpact, flight);
+      trialCanister.position.y += Math.sin(Math.PI * flight) * .76;
+      trialCanister.rotation.set(flight * 1.23, flight * .8, -flight * .62);
+    }
+    if (!reducedMotion.matches && t >= land && !success)
+      camera.position.y += Math.sin((t - land) * 40) * Math.exp(-(t - land) * 15) * .027;
+
+    for (const [beat, when] of [
+      ['lever', 1.18],
+      ['wheels', rollStart],
+      ['jolt', bump],
+      ['impact', land],
+    ]) {
+      if (t < when || current.beats.has(beat)) continue;
+      current.beats.add(beat);
+      if (beat !== 'impact' || thrown) play(beat);
+    }
+    if (t >= 4.1 && !current.done) {
+      current.done = true;
+      complete();
+    }
+  }
+
   function frame(now) {
     if (!active) return;
     const elapsed = Math.min(0.6, (now - (last || now)) / 1000);
@@ -1157,6 +1261,8 @@ export function createWorld(canvas, notify, finished) {
         player.z,
       );
       notify({ mode, moving, distance, target: currentTarget() });
+    } else if (mode === 'trial') {
+      animateTrial(elapsed);
     } else {
       race = advanceRace(
         race,
@@ -1219,6 +1325,7 @@ export function createWorld(canvas, notify, finished) {
     raf = requestAnimationFrame(frame);
   }
   function reset(far = false) {
+    stopTrial();
     mode = 'walk';
     player.set(far ? 8.55 : 0.2, 1.65, far ? -87.4 : 9.8);
     yaw = far ? -0.98 : -0.28;
@@ -1264,6 +1371,19 @@ export function createWorld(canvas, notify, finished) {
         bulb.material = lit ? color.lamp : color.off;
       beacon.material = lit ? color.spark : color.off;
       lampGlow.intensity = lit ? 62 : 0;
+    },
+    startTrial({ success, power, play, complete }) {
+      stopTrial();
+      trial = { success, power, play, complete, time: 0, done: false, beats: new Set(),
+        cargo: playerCart.cargo.visible };
+      mode = 'trial';
+      cue.visible = false;
+      input.clear();
+      stick.set(0, 0);
+      drag = null;
+    },
+    releaseTrial() {
+      if (trial?.done) stopTrial();
     },
     startRace(part) {
       mode = 'race';

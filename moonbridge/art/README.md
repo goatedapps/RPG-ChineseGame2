@@ -14,3 +14,5 @@ Texture sheets and radio views are cropped and exported as WebP for use in the g
 The fieldwork close-ups `lookout.webp`, `archive.webp`, `workshop.webp`, and `dispatch.webp` came from a new ImageGen sheet using the third prelude panel as reference. Each quadrant was cropped and exported at 540 × 540 pixels. The archive and dispatch illustrations also appear on their in-world signs.
 
 The prop close-ups use ImageGen. `radio-closeup.webp` is a transparent front view based on the in-game radio artwork. `test-lever-v2.webp` is the ImageGen close-up of a mechanical railway lever with a pinned base and red grip. It also guided the shape of the workbench model. The four paper surfaces (`note-paper.webp`, `archive-paper.webp`, `repair-paper.webp`, and `ledger-paper.webp`) were cropped from a generated atlas. The game renders the Chinese text as HTML over the paper so it can wrap, scale and be read aloud.
+
+The trial animation uses `lever-hand.webp`, an ImageGen cutout of a gloved hand based on the lever’s lighting and materials. The sprite follows the grip on the in-world lever.

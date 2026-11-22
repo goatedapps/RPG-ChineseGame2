@@ -1,5 +1,5 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { createWorld } from './world.js?v=field-sounds';
+import { createWorld } from './world.js?v=lever-trial';
 import {
   opening,
   parts,
@@ -12,7 +12,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
 import { testPart } from './race.js';
 import { mountWriting, mountTest } from './assess.js?v=radio-briefings';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=field-sounds';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=lever-trial';
 import { createVoice } from '../greenhouse/voice.js?v=radio-briefings';
 import { createDeveloperMode } from '../shared/developer-mode.js';
 
@@ -21,7 +21,7 @@ import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js';
 
 const $ = (id) => document.getElementById(id);
-const audio = createGreenhouseAudio({ radioAlerts: true, effectsGain: 1.65, musicGain: .8 });
+const audio = createGreenhouseAudio({ radioAlerts: true, trialEffects: true, effectsGain: 1.65, musicGain: .8 });
 const dialog = $('dialog');
 const body = $('dialog-body');
 const canvas = $('world');
@@ -290,6 +290,7 @@ dialog.addEventListener('click', (event) => {
   if (event.target === dialog) closePanel();
 });
 dialog.addEventListener('close', () => {
+  world?.releaseTrial();
   disposeWriting();
   disposeWriting = () => {};
   voice.stop();
@@ -580,7 +581,7 @@ function radioMessage(text, kind, onDisplayed) {
 }
 
 function openRadio() {
-  if (save.stage < 3 || driving) return;
+  if (save.stage < 3 || driving || testing) return;
   const stage = save.stage;
   const task = objective();
   const guide = task?.guide;
@@ -719,62 +720,43 @@ function choosePart() {
     );
   }
 }
-function runVisual(ok) {
-  const strip = make('div', '', 'test-strip');
-  strip.setAttribute('aria-hidden', 'true');
-  const icon = make('span', '◆', 'test-cart');
-  const flame = make('span', '✦', 'test-spark');
-  icon.append(flame);
-  strip.append(icon);
-  body.append(strip);
-  if (!window.gsap || reducedMotion.matches) {
-    icon.style.left = ok ? '82%' : '50%';
-    flame.hidden = !ok;
-    return;
-  }
-  window.gsap
-    .timeline()
-    .to(icon, {
-      left: ok ? '82%' : '47%',
-      duration: 0.62,
-      ease: 'power2.inOut',
-    })
-    .to(icon, { rotation: ok ? 0 : -8, duration: 0.15 }, '-=.20')
-    .to(
-      flame,
-      { y: ok ? 0 : -35, x: ok ? 0 : 36, opacity: ok ? 1 : 0, duration: 0.31 },
-      '-=.08',
-    );
-}
-function firstRun() {
+function runTrial(success, power, onResult) {
   if (testing) return;
-  showPanel('equipment', '第一次试跑');
-  body.append(fieldImage('test-lever-v2'));
-  play('seal');
-  runVisual(false);
-  play('wrong');
-  body.append(make('p', '灯车一颠，火种就弹出了架子。', 'dialog-copy'));
-  body.append(
-    group(
-      button(
-        '查看司机手册',
-        () => {
-          go(7);
-          closePanel();
-        },
-        'gold',
-      ),
-    ),
-  );
+  testing = true;
+  closePanel();
+  $('hud').classList.add('trial-playing');
+  world.startTrial({
+    success,
+    power: power / 100,
+    play,
+    complete() {
+      testing = false;
+      $('hud').classList.remove('trial-playing');
+      onResult();
+    },
+  });
 }
-function practiceRun() {
+
+function firstRun() {
+  runTrial(false, 68, () => {
+    showPanel('trial-result', '第一次试跑');
+    body.append(
+      make('p', '灯车一颠，火种就弹出了架子，砰的一声落在木板上。', 'dialog-copy'),
+      group(button('查看司机手册', () => {
+        go(7);
+        closePanel();
+      }, 'gold')),
+    );
+  });
+}
+
+function practiceRun(power = 68) {
   if (testing) return;
   if (save.fieldProgress?.stage === 10) {
     openFieldwork();
     return;
   }
   showPanel('equipment', '试跑台');
-  body.append(fieldImage('test-lever-v2'));
   const part = parts[save.part];
   const note = make(
     'p',
@@ -785,39 +767,35 @@ function practiceRun() {
   range.type = 'range';
   range.min = 0;
   range.max = 100;
-  range.value = 68;
+  range.value = power;
   range.id = 'test-power';
   range.setAttribute('aria-label', '试跑速度');
-  const value = make('output', '速度 68');
-  range.oninput = () => {
-    value.textContent = '速度 ' + range.value;
-  };
-  const launch = button(
-    '拉下试跑杆',
-    () => {
-      if (testing) return;
-      testing = true;
-      const ok = testPart(save, Number(range.value) / 100);
-      launch.disabled = true;
-      range.disabled = true;
-      body.querySelector('.test-strip')?.remove();
-      play('seal');
-      runVisual(ok);
-      play(ok ? 'correct' : 'wrong');
-      note.textContent = ok
-        ? '这一次，火种稳稳地留在架子上！'
-        : '火种又晃了。把速度调到中间，再试一次。';
-      testing = false;
-      if (ok) body.append(group(button('查看试跑记录', openFieldwork, 'gold')));
-      else {
-        launch.disabled = false;
-        range.disabled = false;
-      }
-    },
-    'gold',
-  );
+  const value = make('output', '速度 ' + power);
+  range.oninput = () => { value.textContent = '速度 ' + range.value; };
+  const launch = button('拉下试跑杆', () => {
+    const selected = Number(range.value);
+    const ok = testPart(save, selected / 100);
+    runTrial(ok, selected, () => {
+      showPanel('trial-result', '试跑结果');
+      body.append(
+        make('p', ok
+          ? '灯车颠了一下，火种还是稳稳地留在架子上！'
+          : '灯车一颠，火种就掉了出来。把速度调到中间，再试一次。', 'dialog-copy'),
+        group(ok
+          ? button('查看试跑记录', () => {
+              world.releaseTrial();
+              openFieldwork();
+            }, 'gold')
+          : button('再试一次', () => {
+              world.releaseTrial();
+              practiceRun(selected);
+            }, 'gold')),
+      );
+    });
+  }, 'gold');
   body.append(note, value, range, group(launch));
 }
+
 function pronounce(label, text, status) {
   return speakerButton(() => speaker(text, status), label);
 }
@@ -1014,7 +992,7 @@ function endStory() {
   });
 }
 function action() {
-  if (view !== 'hud' || dialog.open || driving || briefingPending()) return;
+  if (view !== 'hud' || dialog.open || driving || testing || briefingPending()) return;
   if (save.stage === 1) {
     world.lookNudge();
     return;
@@ -1243,7 +1221,7 @@ const developer = createDeveloperMode({
   },
 });
 $('developer').onclick = () => {
-  if (!driving) developer.open();
+  if (!driving && !testing) developer.open();
 };
 for (const panel of [...opening, ...ending].slice(1)) {
   const image = new Image();
