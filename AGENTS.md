@@ -3,6 +3,7 @@
 Use this guide for requirements shared across lessons.
 Update it whenever shared gameplay, requirements, or project conventions change in a significant way.
 Keep it to 200 lines or fewer and link to separate references for lesson-specific details.
+Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, building, or reviewing a lesson. This file remains the source for project requirements.
 
 ## Lesson structure
 
