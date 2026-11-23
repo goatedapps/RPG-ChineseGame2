@@ -9,4 +9,4 @@ The character data derives from Make Me a Hanzi and is distributed under the inc
 
 [Moonbridge Run's character data](../../moonbridge/stroke-data.json) uses the same dataset and license for the 45 unique characters in the [P3 Lesson 1 Tingxie list](../../content/p3/tingxie/1.yaml). The stroke records are unchanged.
 
-[Fog Harbour's character data](../../fogharbour/stroke-data.json) uses the same dataset and license for all 42 unique characters in the [P6 Lesson 2 Tingxie list](../../content/p6/tingxie/2.yaml). The stroke records are unchanged.
+[The Shadow Market’s character data](../../shadowmarket/stroke-data.json) uses the same dataset and license for all 42 unique characters in the [P6 Lesson 2 Tingxie list](../../content/p6/tingxie/2.yaml). The stroke records are unchanged.

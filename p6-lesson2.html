@@ -4,11 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08171c">
-  <meta name="description" content="穿过云海寻找奶奶，练习六年级第二课的华文词语。">
-  <title>雾港归航 · 六年级华文</title>
+  <meta name="description" content="穿过镜巷，找回家人的影子和祖孙一起做的旧灯笼。">
+  <title>影子集市 · 六年级华文</title>
   <link rel="stylesheet" href="greenhouse/game.css">
   <link rel="stylesheet" href="shared/comic.css">
-  <link rel="stylesheet" href="shared/minigame.css?v=story-minigames">
   <link rel="stylesheet" href="greenhouse/phone.css?v=briefing-flow">
   <link rel="stylesheet" href="greenhouse/lesson-test.css">
   <link rel="stylesheet" href="greenhouse/developer-mode.css">
@@ -16,19 +15,19 @@
   <link rel="stylesheet" href="shared/lesson-entry.css">
   <link rel="stylesheet" href="shared/joystick.css">
   <link rel="stylesheet" href="shared/vocabulary.css">
-  <link rel="stylesheet" href="fogharbour/game.css?v=standing-passengers">
+  <link rel="stylesheet" href="shadowmarket/game.css?v=1">
   <script defer src="greenhouse/vendor/gsap.min.js"></script>
-  <script type="module" src="fogharbour/game.js?v=standing-passengers"></script>
+  <script type="module" src="shadowmarket/game.js?v=1"></script>
 </head>
 <body>
 <main id="app">
-  <canvas id="scene" tabindex="-1" aria-label="雾港的三维场景"></canvas>
+  <canvas id="scene" tabindex="-1" aria-label="影子集市的三维场景"></canvas>
   <div class="vellum" aria-hidden="true"></div>
 
   <header class="hud">
     <div class="identity">
       <span class="emblem-plant" aria-hidden="true">✦</span>
-      <div><strong>雾港归航</strong><span>六年级华文 · 第二课</span></div>
+      <div><strong>影子集市</strong><span>六年级华文 · 第二课</span></div>
     </div>
     <div id="toolbar" class="toolbar" hidden>
       <button id="book" type="button" class="hud-button"><span aria-hidden="true">▤</span><span>词语手册</span><strong id="word-count">0 / 24</strong></button>
@@ -67,7 +66,7 @@
   <section id="comic-overlay" hidden></section>
   <section id="lesson-test" class="lesson-test" hidden></section>
   <dialog id="workbench" class="game-panel" aria-labelledby="panel-title"><div id="panel"></div></dialog>
-  <noscript>请启用 JavaScript，才能探索雾港。</noscript>
+  <noscript>请启用 JavaScript，才能探索影子集市。</noscript>
 </main>
 </body>
 </html>

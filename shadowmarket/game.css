@@ -1,0 +1,46 @@
+:root {
+  --cream: #fff0d4;
+  --sun: #ffce83;
+  --line: #ceb08975;
+  --jade: #e0c7f3;
+}
+#app { background: #21192f url('art/square.webp') center / cover; }
+.vellum { opacity: .44; }
+.identity { padding: .18rem .35rem; background: #19182bc9; border-radius: .35rem; }
+#mission-ui { background: linear-gradient(95deg, #19192bf0, #282039c9); }
+.emblem-plant { color: var(--sun); }
+.lesson-entry { background: linear-gradient(#20163452, #151224dd), url('art/square.webp') center / cover; }
+#workbench:not(.artifact-inspection, :has(.developer-menu, .game-settings)) { background: #251e36fa; }
+.market-panel > :is(p, .market-answers, .button-row, details, .writing-grid) { margin-block: .7rem; }
+.market-panel .sentence, .market-panel .feedback { color: var(--sun); }
+.market-panel .writing-grid { --writing-side: min(23rem, 54dvh); margin-inline: auto; }
+.market-panel .writing-progress { text-align: center; color: var(--sun); }
+.market-panel .body { line-height: 1.62; }
+.market-answers { display: grid; gap: .45rem; }
+.market-answer {
+  min-height: 44px;
+  padding: .6rem .8rem;
+  border: 1px solid #a897bc;
+  border-radius: .45rem;
+  background: #3d3152;
+  color: var(--cream);
+  text-align: start;
+  line-height: 1.5;
+}
+.market-answer:enabled:is(:hover, :focus-visible) { background: #554268; }
+.market-review { padding: .55rem; background: #3a2e4d; border-radius: .45rem; }
+.market-review summary { cursor: pointer; }
+.market-review p { margin-block-start: .4rem; line-height: 1.6; }
+#workbench.artifact-inspection::backdrop { background: #140d25ad; backdrop-filter: blur(6px); }
+.market-clue { width: min(100%, 35rem); text-align: center; }
+.market-clue h2 { color: var(--sun); }
+.clue-touch { display: inline-grid; justify-items: center; margin-block: .2rem; padding: .4rem; background: none; border: 0; }
+.clue-touch span { min-height: 44px; display: grid; align-items: center; text-decoration: underline; text-underline-offset: .25em; }
+.clue-object { display: block; width: auto; max-width: 80vw; height: min(34dvh, 16rem); object-fit: contain; filter: drop-shadow(0 .6rem 1rem #0d0b19af); }
+.clue-copy { padding: .75rem .95rem; border: 1px solid var(--line); border-radius: .5rem; color: var(--cream); background: #22192fe8; line-height: 1.72; text-align: start; }
+@media (max-width: 450px) {
+  .identity div span { white-space: nowrap; }
+  .identity .emblem-plant { display: none; }
+  .hud { gap: .5rem; }
+  .toolbar { gap: .35rem; }
+}

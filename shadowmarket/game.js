@@ -1,5 +1,5 @@
-import { createEngine } from '../greenhouse/engine.js?v=fogharbour';
-import { createPhone } from '../greenhouse/phone.js?v=fogharbour';
+import { createEngine } from '../greenhouse/engine.js?v=shadow-market';
+import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
@@ -13,14 +13,11 @@ import { showSkippedFinal } from '../shared/skipped-final.js';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
-import { element, control } from '../shared/minigame.js';
-import { art, chapters, ending, labels, opening, arrival } from './story.js?v=harbour-sign';
-import { buildHarbour } from './world.js?v=standing-passengers';
-import { signFace, signLines } from './signs.js';
-import { crossSteps, dockFerry, guidePassengers } from './minigames.js?v=standing-passengers';
+import { art, arrival, chapters, ending, objects, opening } from './story.js';
+import { buildShadowMarket, checkpoints } from './world.js';
 
 const $ = (id) => document.getElementById(id);
-const key = 'rpg-chinese.p6.l2.fogharbour';
+const key = 'rpg-chinese.p6.l2.shadowmarket';
 const strokeDataUrl = new URL('./stroke-data.json', import.meta.url);
 const audio = createGreenhouseAudio({ musicGain: .82 });
 const voice = createVoice((status) => audio.setDucked(status === 'playing'));
@@ -29,7 +26,6 @@ const desk = $('workbench');
 const panel = $('panel');
 const canvas = $('scene');
 const map = () => location.assign('./?level=p6');
-const games = { stairs: crossSteps, escort: guidePassengers, winch: dockFerry };
 const defaultState = () => ({
   phase: 'prelude', index: 0, phone: false, called: false, briefing: '',
   step: 'seek', question: 0, writing: 0, known: [], passed: false, final: null, practice: null,
@@ -77,6 +73,13 @@ const phone = createPhone($('phone'), {
   },
 });
 
+function element(tag, className = '', text = '') {
+  const node = document.createElement(tag);
+  node.className = className;
+  node.textContent = text;
+  return node;
+}
+
 function button(label, handler, classes = 'primary') {
   const item = element('button', classes, label);
   item.type = 'button';
@@ -101,7 +104,7 @@ function renderTarget(next) {
   const available = Boolean(next && next.id === objectiveId() && active && !desk.open && !phone.isOpen);
   $('interact').hidden = !available;
   $('reticle').classList.toggle('targeted', available);
-  if (available) $('interact').querySelector('span').textContent = labels[next.id];
+  if (available) $('interact').querySelector('span').textContent = objects[next.id].name;
 }
 
 function refresh() {
@@ -110,15 +113,15 @@ function refresh() {
   $('word-count').textContent = state.known.length + ' / ' + words.size;
   $('mission-number').textContent = state.called ? `任务 ${state.index + 1} / ${chapters.length}` : '操作练习';
   $('mission-name').textContent = !state.phone ? '拿起智能手机' : !state.called ? '拨打阿岚' : waiting() ? '阿岚有新消息' : task?.title ?? '';
-  currentCue = !state.phone ? '走到团圆桌旁，看看四周，拿起桌上的智能手机。'
+  currentCue = !state.phone ? '看看灯笼广场，拿起前面矮桌上的智能手机。'
     : !state.called ? '打开手机，拨打阿岚的号码。'
       : waiting() ? '打开手机，先看看阿岚说了什么。'
-        : state.step === 'seek' ? task?.cue : '再查看' + (labels[task?.id] ?? '线索') + '，完成记录和听写。';
+        : state.step === 'seek' ? task?.cue : '再查看' + (objects[task?.id]?.name ?? '线索') + '，完成记录和听写。';
   $('cue-text').textContent = currentCue ?? '';
   $('replay-cue').disabled = Boolean(waiting());
-  const holdingCoat = state.index === 3 && state.step === 'seek';
-  $('held').hidden = !holdingCoat;
-  $('held').textContent = holdingCoat ? '手上 · 干外套' : '';
+  const holdingLantern = state.index === 4 || (state.index === 5 && state.step === 'seek');
+  $('held').hidden = !holdingLantern;
+  $('held').textContent = holdingLantern ? '手上 · 旧灯笼' : '';
   phone.setVisible(state.phone);
   if (state.phone && !state.called) {
     phone.setActivity({ id: 'call', label: '拨打阿岚', detail: '阿岚 · 家人', onOpen: callLan });
@@ -155,7 +158,7 @@ function showPanel(content, focus, inspection = false) {
   focus.focus({ preventScroll: true });
 }
 function openPanel(_, title) {
-  const sheet = element('article', 'harbour-panel');
+  const sheet = element('article', 'market-panel');
   const heading = element('h2', '', title);
   heading.id = 'panel-title';
   heading.tabIndex = -1;
@@ -193,6 +196,7 @@ function discover(task) {
 function advance() {
   if (desk.open) desk.close();
   state.index++;
+  if (state.index === 5) engine?.reset(checkpoints[5]);
   state.step = 'seek';
   state.question = state.writing = 0;
   hint = undefined;
@@ -206,24 +210,6 @@ function advance() {
     refresh();
   }
 }
-function showHarbourSign(task, continueToCheck) {
-  const sign = control('读完路牌，继续', 'harbour-sign');
-  const caption = element('span', 'harbour-sign-caption', '轻触路牌继续');
-  caption.id = 'panel-title';
-  const fallback = element('span', 'harbour-sign-fallback', signLines[task.id].join('　'));
-  fallback.id = 'harbour-sign-directions';
-  sign.setAttribute('aria-describedby', fallback.id);
-  sign.append(fallback, caption);
-  sign.onclick = continueToCheck;
-  showPanel(sign, sign, true);
-  signFace(task.id).then((canvas) => {
-    canvas.setAttribute('aria-hidden', 'true');
-    sign.prepend(canvas);
-    fallback.hidden = true;
-  }).catch(() => {});
-  play('paper');
-}
-
 function study(task) {
   if (state.step === 'writing') {
     showDictation(task);
@@ -233,25 +219,24 @@ function study(task) {
     showCheck(task);
     return;
   }
-  const continueToCheck = () => {
+  const object = objects[task.id];
+  const heading = element('h2', '', object.name);
+  heading.id = 'panel-title';
+  const picture = element('img', 'clue-object');
+  picture.src = art(object.art);
+  picture.alt = '';
+  picture.draggable = false;
+  const read = button('', () => {
     state.step = 'check';
     save();
     showCheck(task);
-  };
-  if (task.id === 'markers') {
-    showHarbourSign(task, continueToCheck);
-    return;
-  }
-  const sheet = element('article', 'harbour-note');
-  const heading = element('h2', '', task.paper);
-  heading.id = 'panel-title';
-  const text = element('p', '', task.clue);
-  const page = control('读完这页，完成记录', 'harbour-note-tap');
-  page.append(element('span', '', '轻触这页，完成记录'));
-  page.onclick = continueToCheck;
-  sheet.append(heading, text, page);
-  showPanel(sheet, page, true);
-  play('paper');
+  }, 'clue-touch');
+  read.setAttribute('aria-label', '读完线索，继续');
+  read.append(picture, element('span', '', '轻触物件继续'));
+  const sheet = element('article', 'market-clue');
+  sheet.append(heading, read, element('p', 'clue-copy', task.clue));
+  showPanel(sheet, read, true);
+  play(task.id === 'mirror' ? 'seal' : 'paper');
 }
 
 function showCheck(task) {
@@ -267,7 +252,7 @@ function showCheck(task) {
   const status = element('p', 'feedback');
   status.setAttribute('role', 'status');
   sheet.append(element('p', 'body', check.prompt), status);
-  const choices = element('div', 'harbour-answers');
+  const choices = element('div', 'market-answers');
   const start = (state.index + state.question + 1) % check.choices.length;
   for (let n = 0; n < check.choices.length; n++) {
     const index = (n + start) % check.choices.length;
@@ -283,12 +268,11 @@ function showCheck(task) {
       save();
       play('correct');
       sheet.append(button('继续', () => showCheck(task)));
-    }, 'harbour-answer');
+    }, 'market-answer');
     choices.append(option);
   }
-  const review = element('details', 'harbour-review');
-  review.append(element('summary', '', task.id === 'markers' ? '回看路牌和通话线索' : '回看记录'));
-  if (task.id === 'markers') review.append(element('p', '', signLines[task.id].join('　')));
+  const review = element('details', 'market-review');
+  review.append(element('summary', '', '回看线索'));
   review.append(element('p', '', task.clue));
   sheet.append(choices, review);
 }
@@ -353,20 +337,13 @@ function useObject(id) {
     return;
   }
   const task = chapter();
-  if (state.step !== 'seek') { study(task); return; }
-  function solved(stillOpen = true) {
+  if (state.step === 'seek') {
     discover(task);
-    if (!task.words.length) { advance(); return; }
     state.step = 'clue';
     save();
-    refresh();
-    if (stillOpen) study(task);
+    worldState();
   }
-  const build = games[id];
-  if (build) {
-    const minigame = build(play, solved);
-    showPanel(minigame.root, minigame.focusTarget, true);
-  } else solved();
+  study(task);
 }
 
 function showBook() {
@@ -396,11 +373,11 @@ async function showPractice(index = 0) {
   const item = data[index % data.length];
   const status = element('p', 'feedback');
   sheet.append(element('p', 'body', item.prompt), status);
-  const choices = element('div', 'harbour-answers');
+  const choices = element('div', 'market-answers');
   item.choices.forEach((choice, n) => choices.append(button(choice, () => {
     status.textContent = n === item.answer ? '答对了。' : '再想一想。';
     play(n === item.answer ? 'correct' : 'wrong');
-  }, 'harbour-answer')));
+  }, 'market-answer')));
   sheet.append(choices, button('下一题', () => showPractice(index + 1)), button('返回词语手册', showBook, 'text-button'));
 }
 
@@ -439,8 +416,11 @@ function showTest(mode, skip = skipDictation) {
     return;
   }
   const slot = mode === 'final' ? 'final' : 'practice';
+  const assessment = state[slot] ? restoreLessonTest(bank, state[slot]) : createLessonTest(bank);
+  state[slot] = assessment;
+  save();
   testCleanup = createLessonTestView(host, {
-    bank, mode, state: state[slot] ? restoreLessonTest(bank, state[slot]) : createLessonTest(bank),
+    bank, mode, state: assessment,
     speak: voice.speak, stopSpeech: voice.stop, cue: play, strokeDataUrl, awardArt: art('ending'), lessonLabel: '第二课',
     autoDictation: mode === 'practice',
     showReplayOnPass: mode === 'final',
@@ -467,20 +447,20 @@ function showComic(isEnding) {
     if (isEnding) showTest('final');
     else void startWorld();
   }, {
-    titleText: isEnding ? '雾港归航 · 尾声' : '雾港归航 · 序幕',
+    titleText: isEnding ? '影子集市 · 尾声' : '影子集市 · 序幕',
     panels: isEnding ? ending : opening, ending: isEnding,
-    lastLabel: isEnding ? '开始课末测试' : '进入雾港',
+    lastLabel: isEnding ? '开始课末测试' : '走进灯笼广场',
     onPage: () => play('page'),
   });
 }
 
 async function startWorld() {
   $('splash').hidden = false;
-  $('start-status').textContent = '正在载入雾港……';
+  $('start-status').textContent = '正在载入夜市……';
   if (!engine) {
     let unsupported = false;
     engine = createEngine({
-      canvas, reducedMotion: motion, worldFactory: (THREE) => buildHarbour(THREE, state.index, state.phone),
+      canvas, reducedMotion: motion, worldFactory: (THREE) => buildShadowMarket(THREE, state.index),
       onTarget: renderTarget, onInteract: ({ id }) => useObject(id),
       onMove({ distance: walked }) {
         distance += walked;
