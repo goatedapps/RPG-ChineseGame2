@@ -18,23 +18,43 @@ export function speakerButton(click, label) {
 }
 
 
-export function dictationButton(voice, text, onState, { autoplay = false } = {}) {
-  const button = speakerButton(null, '播放听写');
+function playbackControl(voice, text, onState, subject) {
+  const button = speakerButton(null, '播放' + subject);
   const icon = button.querySelector('path');
   const speaker = icon.getAttribute('d');
   let playing = false;
   function render(state) {
     playing = state === 'playing';
-    const label = playing ? '停止听写' : '播放听写';
+    const label = (playing ? '停止' : '播放') + subject;
     button.title = label;
     button.setAttribute('aria-label', label);
     icon.setAttribute('d', playing ? 'M6 6h12v12H6z' : speaker);
     onState?.(state);
   }
-  button.onclick = () => {
-    if (playing) voice.stop();
-    else voice.speak(text, .85, render);
+  const start = () => voice.speak(text, .85, render);
+  const stop = () => { if (playing) voice.stop(); };
+  button.onclick = () => playing ? stop() : start();
+  return { button, start, stop };
+}
+
+export function dictationButton(voice, text, onState, { autoplay = false } = {}) {
+  const control = playbackControl(voice, text, onState, '听写');
+  if (autoplay) control.start();
+  return control.button;
+}
+
+export function createClueReader(voice) {
+  const presented = new Set();
+  return (id, text) => {
+    const control = playbackControl(voice, text, null, '线索');
+    control.button.classList.add('clue-speaker');
+    return {
+      ...control,
+      reveal() {
+        if (presented.has(id)) return;
+        presented.add(id);
+        control.start();
+      },
+    };
   };
-  if (autoplay) voice.speak(text, .85, render);
-  return button;
 }

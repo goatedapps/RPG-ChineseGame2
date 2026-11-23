@@ -101,7 +101,7 @@ export function mountTest(
     if (onDeveloper) {
       const developer = document.createElement('button');
       developer.type = 'button';
-      developer.textContent = '开发者模式';
+      developer.textContent = 'Developer mode';
       developer.onclick = onDeveloper;
       host.querySelector('.test-actions').append(developer);
     }

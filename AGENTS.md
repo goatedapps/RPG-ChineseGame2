@@ -36,7 +36,7 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 - Use the lesson's Tingxie wordlist in `content/<level>/tingxie/` as the required curriculum and teach every entry through clues and actions in context. Follow P6 Lesson 1’s pattern of object clues, usage checks with feedback, and handwriting. Keep standalone word lists in the notebook. Give every Tingxie entry at least one mission dictation before the separate final assessment.
 - Use the supplied stories as optional references.
 - Include practice from the supplied question bank, with lesson-tagged questions used in their matching lesson and untagged questions eligible anywhere in that primary level.
-- **Across all levels and every lesson, only the dedicated helper who tells the storyline uses English. Everything else in the game is in Chinese.** Use Simplified Chinese for player-facing text and Mandarin for spoken content. Use English for the helper’s storyline narration, next-action guidance, contextual hints, and walkie-talkie interface.
+- **Across all levels and every lesson, use Chinese for player-facing game content and English for the dedicated story helper.** Use Simplified Chinese for text and Mandarin for spoken content. Use English for the helper’s storyline narration, next-action guidance, contextual hints, and walkie-talkie interface. Developer mode uses English.
 - Apply the Chinese language rule to titles, menus, buttons, tutorial prompts, comic dialogue and captions, other character dialogue, object labels, vocabulary definitions, exercises, tests, feedback, and settings. Use Chinese for helper controls outside the walkie-talkie. Use English for every walkie-talkie label, control, and status message. Open the walkie-talkie as an illustrated close-up and have its dialogue appear from the speaker. Keep Mandarin task instructions and audio controls in the task interface.
 - Use concise Chinese for learning and task cues. Automatically read each new task instruction aloud in Mandarin when it appears on the HUD, after any helper briefing. Keep a manual replay control. Keep Hanyu Pinyin as pronunciation support in the vocabulary notebook.
 - Keep visible and spoken instructions brief, omit directions the interface already makes clear, and reveal longer text in short chunks.
@@ -58,9 +58,9 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 ## Developer mode
 
 - Put Settings and Developer mode in the top-right game toolbar. Reuse the greenhouse [settings menu](shared/settings.js), [Developer mode panel](shared/developer-mode.js), and [menu styling](shared/game-menus.css). Use the shared labeled switches for music and effects, and the separate return-home action during gameplay. Connect these controls to the lesson’s existing preferences and save flow.
-- Require the password `greenhouse` and keep Developer mode locked by default on every page load.
+- Use English for Developer mode. Require the password `greenhouse` when opening Developer mode for the first time in a browser tab.
 - Reuse the Developer mode panel and connect its controls to each lesson's progression.
-- Let developers skip the current task and turn on automatic skipping of mission dictation and the final dictation test. Make Developer mode available from an in-progress final test.
+- Let developers jump to a numbered task using the same numbers as the lesson HUD. Let them skip mission dictation and the final test with one switch that stays on in the current tab until turned off. Make Developer mode available from an in-progress or skipped final test.
 - Advance the scene and story together when skipping, and award handwriting credit only for work the player completes.
 - Preserve unfinished assessment progress when a developer skips the final test. Leave practice tests and normal completion credit on the regular assessment flow.
 

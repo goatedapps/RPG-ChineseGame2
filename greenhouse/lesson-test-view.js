@@ -97,7 +97,7 @@ export function createLessonTestView(host, { bank, state: initialState, mode, sp
     const saveAndLeave = button('lesson-test-pause', '保存并返回星图', onExit);
     header.append(heading, counter, saveAndLeave);
     if (onReplay) header.append(button('lesson-test-pause', '重玩任务', onReplay));
-    if (onDeveloper) header.append(button('lesson-test-pause', '开发者模式', onDeveloper));
+    if (onDeveloper) header.append(button('lesson-test-pause', 'Developer mode', onDeveloper));
     header.append(bar);
 
     const layout = node('div', 'lesson-test-layout');

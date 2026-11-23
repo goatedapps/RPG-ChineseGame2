@@ -1,15 +1,15 @@
 import { createEngine } from '../greenhouse/engine.js?v=shadow-market';
 import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
-import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=dictation-outline';
+import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
 import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.js';
 import { bindJoystick } from '../shared/joystick.js';
-import { dictationButton, speakerButton } from '../shared/speaker.js?v=dictation-outline';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
-import { showSkippedFinal } from '../shared/skipped-final.js';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
@@ -21,6 +21,7 @@ const key = 'rpg-chinese.p6.l2.shadowmarket';
 const strokeDataUrl = new URL('./stroke-data.json', import.meta.url);
 const audio = createGreenhouseAudio({ musicGain: .82 });
 const voice = createVoice((status) => audio.setDucked(status === 'playing'));
+const clueReader = createClueReader(voice);
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const desk = $('workbench');
 const panel = $('panel');
@@ -41,7 +42,6 @@ function save() {
 }
 let words, bank, engine, active, target, hint, lastRead, currentCue, testCleanup;
 let writingCleanup = () => {};
-let skipDictation = false;
 let distance = 0;
 let loadPromise;
 const chapter = () => chapters[state.index];
@@ -147,6 +147,7 @@ function callLan() {
 
 function showPanel(content, focus, inspection = false) {
   voice.stop();
+  desk.lang = 'zh-Hans';
   writingCleanup();
   writingCleanup = () => {};
   panel.replaceChildren(content);
@@ -169,8 +170,12 @@ desk.addEventListener('click', (event) => {
   if (event.target !== desk) return;
   const { left, right, top, bottom } = desk.getBoundingClientRect();
   if (desk.classList.contains('artifact-inspection') || event.clientX < left || event.clientX > right ||
-      event.clientY < top || event.clientY > bottom) desk.close();
+      event.clientY < top || event.clientY > bottom) {
+    voice.stop();
+    desk.close();
+  }
 });
+desk.addEventListener('cancel', () => voice.stop());
 desk.addEventListener('close', () => {
   if (desk.open) return;
   writingCleanup();
@@ -234,8 +239,12 @@ function study(task) {
   read.setAttribute('aria-label', '读完线索，继续');
   read.append(picture, element('span', '', '轻触物件继续'));
   const sheet = element('article', 'market-clue');
-  sheet.append(heading, read, element('p', 'clue-copy', task.clue));
+  const copy = element('div', 'clue-copy');
+  const playback = clueReader(task.id, task.clue);
+  copy.append(element('p', '', task.clue), playback.button);
+  sheet.append(heading, read, copy);
   showPanel(sheet, read, true);
+  playback.reveal();
   play(task.id === 'mirror' ? 'seal' : 'paper');
 }
 
@@ -273,7 +282,12 @@ function showCheck(task) {
   }
   const review = element('details', 'market-review');
   review.append(element('summary', '', '回看线索'));
-  review.append(element('p', '', task.clue));
+  const playback = clueReader(task.id, task.clue);
+  review.append(element('p', '', task.clue), playback.button);
+  review.addEventListener('toggle', () => {
+    if (!review.open) playback.stop();
+    else if (review.isConnected && desk.open) playback.reveal();
+  });
   sheet.append(choices, review);
 }
 function showWriting(entry, title, done, back = undefined) {
@@ -314,7 +328,7 @@ function showWriting(entry, title, done, back = undefined) {
 }
 function showDictation(task) {
   const word = task.words[state.writing];
-  if (!word || skipDictation) {
+  if (!word || dev.skipDictation) {
     advance();
     return;
   }
@@ -401,17 +415,18 @@ function confirmReplay() {
   sheet.append(element('p', 'body', '这次的任务和课末测试进度将清除。你将从序幕重新开始。'),
     button('保留进度', () => desk.close(), 'text-button'), button('确认重玩', replay));
 }
-function showTest(mode, skip = skipDictation) {
+function showTest(mode) {
   wrapUp();
   audio.setMusic(null);
   const host = $('lesson-test');
   host.hidden = false;
   testCleanup?.();
   testCleanup = undefined;
-  if (mode === 'final' && skip) {
+  if (mode === 'final' && dev.skipDictation) {
     showSkippedFinal(host, {
       cardClass: 'lesson-test-sheet', headingId: 'lesson-test-title', onExit: map,
-      onResume: () => showTest(mode, false),
+      onResume() { dev.setSkipDictation(false); showTest(mode); },
+      onDeveloper: dev.open,
     });
     return;
   }
@@ -500,20 +515,26 @@ $('settings').onclick = () => {
   });
 };
 const dev = createDeveloperMode({
-  panel, openPanel, canSkip: () => Boolean(active),
+  panel,
+  openPanel(title) { openPanel(null, title); desk.lang = 'en'; },
   onClose: () => desk.close(),
-  getSkipLabel: () => '跳过当前任务',
-  onSkip() {
-    if (!state.called) {
-      state.phone = state.called = true;
-      save(); desk.close(); sendBriefing(); refresh();
-    } else {
-      discover(chapter());
-      advance();
-    }
+  taskCount: chapters.length,
+  canJump: () => active || (state.phase === 'final' && !$('lesson-test').hidden),
+  currentTask: () => active && state.called ? state.index : -1,
+  onJump(index) {
+    testCleanup?.();
+    testCleanup = undefined;
+    $('lesson-test').hidden = true;
+    Object.assign(state, { phase: 'world', index, phone: true, called: true, briefing: '', step: 'seek', question: 0, writing: 0 });
+    phone.reset();
+    hint = undefined;
+    lastRead = undefined;
+    save();
+    desk.close();
+    engine?.reset(checkpoints[index]);
+    void startWorld();
   },
   onSkipDictation(value) {
-    skipDictation = value;
     if (value && state.phase === 'final' && !$('lesson-test').hidden) showTest('final');
   },
 });

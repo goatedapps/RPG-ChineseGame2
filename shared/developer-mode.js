@@ -1,4 +1,5 @@
 const developerPassword = 'greenhouse';
+const sessionKey = 'rpg-chinese.developer';
 
 function makeElement(tag, text, className) {
   const element = document.createElement(tag);
@@ -13,35 +14,43 @@ function makeButton(text, className) {
   return button;
 }
 
-export function createDeveloperMode({
-  panel,
-  openPanel,
-  canSkip,
-  getSkipLabel,
-  onSkip,
-  onSkipDictation,
-  onClose,
-}) {
-  let unlocked = false;
-  let skipDictation = false;
+function settingsForTab() {
+  try {
+    const value = sessionStorage.getItem(sessionKey);
+    return { unlocked: value === 'on' || value === 'off', skip: value === 'on' };
+  } catch {
+    return { unlocked: false, skip: false };
+  }
+}
+
+export function createDeveloperMode({ panel, openPanel, taskCount, canJump, currentTask, onJump, onSkipDictation, onClose }) {
+  const settings = settingsForTab();
+  function persist() {
+    try { sessionStorage.setItem(sessionKey, settings.skip ? 'on' : 'off'); } catch {}
+  }
+  function setSkipDictation(value) {
+    if (!settings.unlocked || settings.skip === value) return;
+    settings.skip = value;
+    persist();
+    onSkipDictation(value);
+  }
 
   function open() {
-    openPanel(null, '开发者模式');
+    openPanel('Developer mode');
     const content = makeElement('div', '', 'developer-menu');
-    if (unlocked) showControls(content);
+    content.lang = 'en';
+    if (settings.unlocked) showControls(content);
     else showUnlock(content);
-    if (onClose) {
-      const close = makeButton('关闭菜单', 'text-button developer-footer');
-      close.onclick = onClose;
-      (content.querySelector('.developer-footer-actions') ?? content).append(close);
-    }
+    const close = makeButton('Close', 'text-button developer-footer');
+    close.onclick = onClose;
+    content.append(close);
     panel.append(content);
-    content.querySelector(unlocked ? '#developer-skip-dictation' : '#developer-password').focus({ preventScroll: true });
+    content.querySelector(settings.unlocked ? '#developer-skip-dictation' : '#developer-password').focus({ preventScroll: true });
   }
 
   function showUnlock(content) {
     const form = makeElement('form', '', 'developer-unlock');
-    const label = makeElement('label', '密码');
+    const label = makeElement('label', 'Password');
     const password = makeElement('input');
     password.id = 'developer-password';
     label.htmlFor = password.id;
@@ -54,11 +63,11 @@ export function createDeveloperMode({
     error.id = 'developer-error';
     error.setAttribute('role', 'alert');
     password.setAttribute('aria-describedby', error.id);
-    const submit = makeElement('button', '解锁', 'primary');
+    const submit = makeElement('button', 'Unlock', 'primary');
     submit.type = 'submit';
     const row = makeElement('div', '', 'developer-password-row');
     row.append(password, submit);
-    form.append(makeElement('p', '输入密码后，可使用任务和听写测试工具。', 'developer-description'), label, row, error);
+    form.append(label, row, error);
     content.append(form);
 
     password.addEventListener('input', () => {
@@ -68,12 +77,13 @@ export function createDeveloperMode({
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       if (password.value !== developerPassword) {
-        error.textContent = '密码不正确。';
+        error.textContent = 'Incorrect password.';
         password.setAttribute('aria-invalid', 'true');
         password.select();
         return;
       }
-      unlocked = true;
+      settings.unlocked = true;
+      persist();
       open();
     });
   }
@@ -84,56 +94,60 @@ export function createDeveloperMode({
     checkbox.id = 'developer-skip-dictation';
     checkbox.type = 'checkbox';
     checkbox.setAttribute('role', 'switch');
-    checkbox.checked = skipDictation;
+    checkbox.checked = settings.skip;
     const copy = makeElement('span');
-    const label = makeElement('strong', '自动跳过听写');
+    const label = makeElement('strong', 'Skip dictation');
     label.id = 'developer-dictation-title';
-    const description = makeElement('small', '适用于任务听写和课末测试', 'developer-description');
+    const description = makeElement('small', 'Skips task dictation and the final test until you turn it off in this tab.', 'developer-description');
     description.id = 'developer-dictation-description';
     checkbox.setAttribute('aria-labelledby', label.id);
     checkbox.setAttribute('aria-describedby', description.id);
     copy.append(label, description);
     const track = makeElement('span', '', 'settings-track');
-    const state = makeElement('span', skipDictation ? '已开启' : '已关闭', 'settings-state');
+    const state = makeElement('span', settings.skip ? 'On' : 'Off', 'settings-state');
     track.setAttribute('aria-hidden', 'true');
     state.setAttribute('aria-hidden', 'true');
     row.append(copy, state, checkbox, track);
     checkbox.addEventListener('change', () => {
-      if (!unlocked) return;
-      skipDictation = checkbox.checked;
-      state.textContent = skipDictation ? '已开启' : '已关闭';
-      onSkipDictation(skipDictation);
+      state.textContent = checkbox.checked ? 'On' : 'Off';
+      setSkipDictation(checkbox.checked);
     });
 
-    const skip = makeButton(getSkipLabel(), 'primary');
-    skip.id = 'developer-skip-task';
-    skip.disabled = !canSkip();
-    skip.addEventListener('click', () => {
-      if (unlocked && canSkip()) onSkip();
+    const task = makeElement('form', '', 'developer-task');
+    const taskLabel = makeElement('label', 'Jump to task');
+    taskLabel.htmlFor = 'developer-task-number';
+    const select = makeElement('select');
+    select.id = taskLabel.htmlFor;
+    const prompt = makeElement('option', 'Select a task');
+    prompt.value = '';
+    select.append(prompt);
+    const active = currentTask();
+    for (let index = 0; index < taskCount; index++) {
+      const option = makeElement('option', `Task ${index + 1}${active === index ? ' (current)' : ''}`);
+      option.value = String(index + 1);
+      select.append(option);
+    }
+    select.disabled = !canJump();
+    const jump = makeButton('Go to task', 'primary');
+    jump.id = 'developer-skip-task';
+    jump.type = 'submit';
+    jump.disabled = true;
+    select.addEventListener('change', () => { jump.disabled = !select.value; });
+    task.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const taskNumber = Number(select.value);
+      if (settings.unlocked && canJump() && Number.isInteger(taskNumber) && taskNumber >= 1 && taskNumber <= taskCount) onJump(taskNumber - 1);
     });
-
-    const lock = makeButton('锁定开发者模式', 'text-button');
-    lock.id = 'developer-lock';
-    lock.addEventListener('click', () => {
-      unlocked = false;
-      const wasSkipping = skipDictation;
-      skipDictation = false;
-      if (wasSkipping) onSkipDictation(false);
-      open();
-    });
-
-    const task = makeElement('div', '', 'developer-task');
-    task.append(makeElement('p', skip.disabled ? '此处没有可跳过的任务。' : '立即前往下一项任务。', 'developer-description'), skip);
-    lock.classList.add('developer-footer');
-    const footer = makeElement('div', '', 'developer-footer-actions');
-    footer.append(lock);
-    content.append(row, task, makeElement('p', '这些设置只在本次游玩生效。', 'developer-description'), footer);
+    const controls = makeElement('div', '', 'developer-jump-row');
+    controls.append(select, jump);
+    task.append(taskLabel, controls);
+    if (select.disabled) task.append(makeElement('p', 'Task jumping is unavailable on this screen.', 'developer-description'));
+    content.append(row, task);
   }
 
   return {
     open,
-    get skipDictation() {
-      return unlocked && skipDictation;
-    },
+    setSkipDictation,
+    get skipDictation() { return settings.unlocked && settings.skip; },
   };
 }

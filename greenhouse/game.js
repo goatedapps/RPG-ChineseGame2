@@ -1,16 +1,16 @@
 import { vocabularyList } from '../shared/vocabulary.js';
-import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js?v=story-minigames';
 import { lexicon, practiceBank } from './lexicon.js';
-import { createVoice } from './voice.js?v=speech-recovery';
+import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
 import { createGreenhouseAudio } from './sounds.js?v=effect-recovery';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
-import { showSkippedFinal } from '../shared/skipped-final.js';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
@@ -86,7 +86,7 @@ function load() {
       unlocked: unlocked.filter((id) => Object.hasOwn(screenChecks, id)),
       endingSeen, lessonComplete, finalStarted,
       finalPassed: finalStarted && lessonComplete && data.finalPassed === true,
-      finalTest: finalStarted ? data.finalTest ?? null : null,
+      finalTest: data.finalTest ?? null,
       practiceTest: lessonComplete ? data.practiceTest ?? null : null,
     };
   } catch {
@@ -118,6 +118,7 @@ let cleanup = () => {};
 let afterClose = null;
 let last = null;
 let responseTimer;
+let responseSpeech;
 let voiceTween;
 let panelVoiceStatus;
 let backdropPointer = null;
@@ -129,16 +130,26 @@ const phone = createPhone($('#phone'), {
   },
 });
 const developerMode = createDeveloperMode({
-  panel, openPanel,
-  canSkip: canSkipTask,
-  getSkipLabel: () => state.tutorialDone ? '跳过当前任务' : '跳过操作练习',
-  onSkip: skipCurrentTask,
+  panel,
+  openPanel(title) {
+    openPanel(null, title);
+    desk.lang = 'en';
+    panel.querySelector('.panel-top button').remove();
+  },
+  onClose: () => desk.close(),
+  taskCount: missions.length,
+  canJump: () => (started && !pickingPhone) || activeTest?.mode === 'final',
+  currentTask: () => state.tutorialDone ? state.mission : -1,
+  onJump: jumpToTask,
   onSkipDictation(enabled) {
     if (enabled && activeTest?.mode === 'final') {
       desk.close();
       activeTest.destroy?.();
       activeTest = null;
       void openLessonTest('final');
+    } else if (enabled && state.notePending) {
+      requestNoteReply(true);
+      objective(false);
     } else if (enabled && state.phase === 'dictation') {
       moveToHandover(missions[state.mission]);
       save();
@@ -215,6 +226,7 @@ const voice = createVoice((status) => {
     panelVoiceStatus.hidden = status !== 'unavailable';
   }
 });
+const clueReader = createClueReader(voice);
 
 function discovered() {
   if (state.lessonComplete) return lessonWords;
@@ -317,6 +329,13 @@ function sendStep(mission, index, notify = true) {
 }
 
 function requestNoteReply(notify) {
+  if (developerMode.skipDictation) {
+    state.notePending = false;
+    phone.setChallenge(null);
+    sendStep(missions[0], state.action, notify);
+    save();
+    return;
+  }
   sendMessage(noteReply.prompt, 'note-question', notify);
   phone.setChallenge({
     id: 'window-note',
@@ -368,6 +387,10 @@ function syncPhoneActivity() {
   if (!mission || state.phase === 'explore') {
     phone.setActivity(null);
     return;
+  }
+  if (state.phase === 'dictation' && developerMode.skipDictation) {
+    moveToHandover(mission);
+    save();
   }
   const actions = {
     question: ['打开检查记录', '记录你的发现。'],
@@ -422,7 +445,7 @@ function togglePhone(open) {
   if (open) {
     engine?.setActive(false);
     voice.stop();
-    $('#response').hidden = true;
+    hideResponse();
     if (state.phonePicked && tutorialIndex === 3 && !state.tutorialDone) {
       state.tutorialDone = true;
       save();
@@ -475,15 +498,26 @@ function resetHint() {
   hintTimer = setTimeout(offerHint, hintDelay);
 }
 
-function response(cn) {
+function hideResponse() {
+  $('#response').hidden = true;
+  responseSpeech?.stop();
+  responseSpeech?.button.remove();
+  responseSpeech = undefined;
+}
+
+function response(cn, clue = false) {
   const toast = $('#response');
   clearTimeout(responseTimer);
+  hideResponse();
   $('#response-text').textContent = cn;
   toast.hidden = desk.open;
+  if (clue && !toast.hidden) {
+    responseSpeech = clueReader('object:' + cn, cn);
+    toast.append(responseSpeech.button);
+    responseSpeech.reveal();
+  }
   animate(toast, { opacity: 0, y: 8 }, { opacity: 1, y: 0 });
-  responseTimer = window.setTimeout(() => {
-    toast.hidden = true;
-  }, 10500);
+  responseTimer = window.setTimeout(hideResponse, 10500);
 }
 
 function nextObject() {
@@ -530,9 +564,9 @@ function useObject(target) {
   }
   if (target.id !== nextObject()) {
     if (target.id === 'westWindow' && state.mission === 0 && state.action === 0) {
-      response('窗框在滴水。窗台上压着一张纸。');
+      response('窗框在滴水。窗台上压着一张纸。', true);
     } else {
-      response(thing.descriptionCN);
+      response(thing.descriptionCN, true);
     }
     audio.cue('dew');
     return;
@@ -564,7 +598,7 @@ function completeObject(target, inspected = false) {
   save();
   if (target.id !== 'westNote') sendStep(mission, state.action);
   if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'correct'));
-  $('#response').hidden = true;
+  hideResponse();
   objective();
 }
 
@@ -577,13 +611,14 @@ function clearPanel() {
 
 function presentPanel(content, focusTarget, inspection = false) {
   clearPanel();
+  desk.lang = 'zh-Hans';
   delete desk.dataset.practice;
   desk.classList.toggle('artifact-inspection', inspection);
   panel.replaceChildren(content);
   if (!desk.open) {
     engine?.setActive(false);
     desk.showModal();
-    $('#response').hidden = true;
+    hideResponse();
     reticle.hidden = true;
     interact.hidden = true;
     if (!inspection) animate(desk, { opacity: 0, y: 13 }, { opacity: 1, y: 0 });
@@ -616,8 +651,12 @@ desk.addEventListener('pointerdown', (event) => {
 desk.addEventListener('pointerup', (event) => {
   if (event.pointerId !== backdropPointer) return;
   backdropPointer = null;
-  if (document.elementFromPoint(event.clientX, event.clientY) === desk) desk.close();
+  if (document.elementFromPoint(event.clientX, event.clientY) === desk) {
+    voice.stop();
+    desk.close();
+  }
 });
+desk.addEventListener('cancel', () => voice.stop());
 
 desk.addEventListener('pointercancel', (event) => {
   if (event.pointerId === backdropPointer) backdropPointer = null;
@@ -657,9 +696,10 @@ function row(...buttons) {
   return controls;
 }
 
-function playCloseup(build, next) {
+function playCloseup(build, next, showResult) {
   const game = build(audio.cue, (stillOpen) => {
-    if (stillOpen) {
+    if (stillOpen && showResult) showResult();
+    else if (stillOpen) {
       afterClose = next;
       desk.close();
     } else next();
@@ -668,9 +708,9 @@ function playCloseup(build, next) {
   presentPanel(game.root, game.focusTarget, true);
 }
 
-function showEvidence(id, next) {
-  if (id === 'rootCam' && next) {
-    playCloseup(readRootFootage, next);
+function showEvidence(id, next, recorded = false) {
+  if (id === 'rootCam' && next && !recorded) {
+    playCloseup(readRootFootage, next, () => showEvidence(id, next, true));
     return;
   }
   const item = evidence[id];
@@ -691,8 +731,11 @@ function showEvidence(id, next) {
   label.hidden = !item.label;
   content.append(label);
   for (const [chinese] of item.lines) content.append(node('p', chinese, 'artifact-line'));
+  const clue = clueReader(id, item.lines.map(([chinese]) => chinese).join(''));
+  content.append(clue.button);
   sheet.append(content);
   presentPanel(sheet, sheet, true);
+  clue.reveal();
   afterClose = next;
   audio.cue(monitor ? 'relay' : 'paper');
   const enter = monitor ? { opacity: 0, scale: .91 } : {
@@ -717,17 +760,19 @@ function inspectEvidence(target, next) {
 
 function showQuestion(item, label, onNext, context) {
   openPanel(label, item.cn, 'question');
-  const controls = row(speakerButton(() => voice.speak(item.cn), '重听'));
+  const controls = row(dictationButton(voice, item.cn, undefined, { autoplay: true }));
   if (context?.cn && !item.image) {
     const note = node('div', '', 'clue-note');
+    const playback = clueReader('review:' + context.cn, context.cn);
     const clue = makeButton('回看线索', 'text-button', () => {
       note.hidden = !note.hidden;
       clue.setAttribute('aria-expanded', String(!note.hidden));
-      if (!note.hidden) voice.speak(context.cn);
+      if (note.hidden) playback.stop();
+      else playback.reveal();
     });
     clue.setAttribute('aria-expanded', 'false');
     note.hidden = true;
-    note.append(node('p', context.cn));
+    note.append(node('p', context.cn), playback.button);
     controls.append(clue);
     panel.append(note);
   }
@@ -778,7 +823,6 @@ function showQuestion(item, label, onNext, context) {
   layout.append(content);
   panel.append(layout);
   voiceMessage();
-  voice.speak(item.cn);
 }
 
 function sentenceWithGap(sentence, word) {
@@ -955,7 +999,7 @@ function returnMap() {
   location.assign('./?level=p6');
 }
 
-async function openLessonTest(mode, skip = developerMode.skipDictation) {
+async function openLessonTest(mode) {
   const final = mode === 'final';
   if (activeTest || (final ? !state.endingSeen || state.finalPassed : !state.lessonComplete)) return;
   const run = { mode };
@@ -968,10 +1012,15 @@ async function openLessonTest(mode, skip = developerMode.skipDictation) {
   suspendRoom();
   $('#splash').hidden = true;
   testScreen.hidden = false;
-  if (final && skip) {
+  if (final && developerMode.skipDictation) {
     showSkippedFinal(testScreen, {
       cardClass: 'lesson-test-sheet', headingId: 'lesson-test-title', onExit: returnMap,
-      onResume() { activeTest = null; void openLessonTest(mode, false); },
+      onResume() {
+        developerMode.setSkipDictation(false);
+        activeTest = null;
+        void openLessonTest(mode);
+      },
+      onDeveloper: developerMode.open,
     });
     return;
   }
@@ -985,7 +1034,7 @@ async function openLessonTest(mode, skip = developerMode.skipDictation) {
 
   try {
     const [bank, { createLessonTestView }] = await Promise.all([
-      loadLessonTest(), import('./lesson-test-view.js?v=final-skip'),
+      loadLessonTest(), import('./lesson-test-view.js?v=numbered-tasks'),
     ]);
     if (activeTest !== run) return;
     state[slot] = restoreLessonTest(bank, state[slot]);
@@ -1014,7 +1063,7 @@ async function openLessonTest(mode, skip = developerMode.skipDictation) {
     status.textContent = '测验未能载入。请再试一次。';
     const retry = makeButton('重试', 'primary', () => {
       activeTest = null;
-      void openLessonTest(mode, skip);
+      void openLessonTest(mode);
     });
     home.before(retry);
     testScreen.replaceChildren(loading);
@@ -1118,33 +1167,36 @@ function showSettings() {
   });
 }
 
-function canSkipTask() {
-  return started && !pickingPhone && state.phase !== 'done';
-}
+const taskCheckpoints = [
+  { x: -8.6, z: -2.9, yaw: .49, pitch: -.22 },
+  { x: 4.05, z: 7.3, pitch: -.23 },
+  { x: -7.4, z: -4.05, pitch: -.23 },
+  { x: -8.67, z: 5.25, pitch: -.23 },
+  { x: 2.45, z: -6.55, pitch: -.25 },
+  { x: 5.68, z: -3.65, pitch: -.2 },
+];
 
-function skipCurrentTask() {
-  if (!canSkipTask()) return;
-  if (!state.tutorialDone) {
-    tutorialIndex = tutorial.length - 1;
-    state.tutorialDone = true;
-    state.phonePicked = true;
-    save();
-    phone.setVisible(true);
-    afterClose = () => {
-      sendStep(missions[0], 0);
-      objective();
-    };
-    desk.close();
-    return;
-  }
-
-  for (const { target } of missions[state.mission].actions) {
-    if (Object.hasOwn(screenChecks, target) && !state.unlocked.includes(target)) state.unlocked.push(target);
-  }
-  state.notePending = false;
-  phone.setChallenge(null);
+function jumpToTask(mission) {
+  activeTest?.destroy?.();
+  activeTest = null;
+  testScreen.hidden = true;
+  Object.assign(state, {
+    mission, action: 0, phase: 'explore', wordIndex: 0, held: null, notePending: false, briefingSeen: null,
+    introSeen: true, tutorialDone: true, phonePicked: true, endingSeen: false, finalStarted: false, finalPassed: false,
+  });
+  phone.reset();
+  afterClose = null;
   last = null;
-  finishMission();
+  save();
+  desk.close();
+  const spawn = taskCheckpoints[mission];
+  if (!started) begin(spawn);
+  else {
+    engine.reset(spawn);
+    phone.setVisible(true);
+    restorePhone();
+    objective();
+  }
 }
 
 function confirmReplay() {
@@ -1209,7 +1261,7 @@ function showEntryError() {
   $('#retry-entry').hidden = false;
 }
 
-function begin() {
+function begin(spawn) {
   if (started) return;
   if (unavailable) {
     showEntryError();
@@ -1219,12 +1271,13 @@ function begin() {
     $('#splash').hidden = false;
     $('#start-status').textContent = '正在准备科学楼……';
     void prepareRoom().then(() => {
-      if (engine && !unavailable) begin();
+      if (engine && !unavailable) begin(spawn);
       else showEntryError();
     });
     return;
   }
   $('#start-status').textContent = '';
+  if (spawn) engine.reset(spawn);
   started = true;
   audio.setMusic('game');
   audio.setAmbience(true);

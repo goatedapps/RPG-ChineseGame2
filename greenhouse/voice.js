@@ -16,6 +16,11 @@ export function createVoice(onChange) {
     previous?.('idle');
   }
 
+  window.addEventListener('pagehide', stop);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && activeListener) stop();
+  });
+
   function speak(text, rate = .87, onState = () => {}) {
     stop();
     const id = revision;

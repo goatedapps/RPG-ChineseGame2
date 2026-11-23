@@ -1,15 +1,16 @@
-export function showSkippedFinal(host, { cardClass, headingId, onExit, onResume }) {
+export function showSkippedFinal(host, { cardClass, headingId, onExit, onResume, onDeveloper }) {
   const card = document.createElement('article');
   card.className = cardClass;
+  card.lang = 'en';
   const heading = document.createElement('h2');
   heading.id = headingId;
   heading.tabIndex = -1;
-  heading.textContent = '已跳过课末测试';
+  heading.textContent = 'Final test skipped';
   const message = document.createElement('p');
-  message.textContent = '开发者模式已跳过听写。已有测验进度会保留。';
+  message.textContent = 'Developer mode kept your saved test progress.';
   const actions = document.createElement('div');
   actions.className = 'button-row buttons';
-  for (const [label, action] of [['返回星图', onExit], ['参加课末测试', onResume]]) {
+  for (const [label, action] of [['Return to star map', onExit], ['Turn off skipping and take the test', onResume], ['Developer mode', onDeveloper]]) {
     const control = document.createElement('button');
     control.type = 'button';
     control.className = 'primary gold';

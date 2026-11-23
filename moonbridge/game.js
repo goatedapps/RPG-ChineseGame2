@@ -11,13 +11,13 @@ import { words, bank } from './curriculum.js';
 import { fieldwork, workshopWriting } from './fieldwork.js?v=story-minigames';
 import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { dictationButton, speakerButton } from '../shared/speaker.js?v=radio-briefings';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { testPart } from './race.js?v=cockpit-race';
-import { mountWriting, mountTest } from './assess.js?v=final-skip';
+import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
-import { createDeveloperMode } from '../shared/developer-mode.js?v=developer-menu';
-import { showSkippedFinal } from '../shared/skipped-final.js';
+import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
+import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 
 import { playLessonComic } from '../shared/comic.js';
 import { bindJoystick } from '../shared/joystick.js';
@@ -30,6 +30,7 @@ const body = $('dialog-body');
 const canvas = $('world');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const saveKey = 'rpg-chinese.p3.l1.moonbridge';
+const taskStarts = [0, 4, 7, 10, 12];
 const ending = [
   {
     image: 'ending.webp',
@@ -156,10 +157,10 @@ let practicePassed = false;
 let practiceSpeed = 68;
 let raceStarted = false;
 let currentTestView = null;
-let devSkipDictation = false;
 let moveStart;
 const stepSpacing = 1.25;
 let footstepDistance = 0;
+const clueReader = createClueReader(voice);
 
 function play(name) {
   audio.cue(name);
@@ -301,7 +302,7 @@ function showPanel(appearance, title, language = 'zh-Hans') {
   dismissInspection = undefined;
   dialog.dataset.appearance = appearance ?? 'panel';
   dialog.lang = language;
-  $('dialog-close').hidden = ['artifact', 'fittings', 'radio', 'trial-controls', 'trial-result'].includes(appearance);
+  $('dialog-close').hidden = ['artifact', 'fittings', 'radio', 'trial-controls', 'trial-result', 'developer'].includes(appearance);
   $('dialog-close').setAttribute('aria-label', language === 'en' ? 'Close' : '关闭');
   disposeWriting();
   disposeWriting = () => {};
@@ -319,15 +320,17 @@ function showPanel(appearance, title, language = 'zh-Hans') {
 function closePanel() {
   if (!dialog.open) return;
   stopMeiClip();
+  voice.stop();
   dialog.close();
   if (view === 'hud') world?.resume();
 }
 $('dialog-close').onclick = closePanel;
-dialog.addEventListener('cancel', stopMeiClip);
+dialog.addEventListener('cancel', () => { stopMeiClip(); voice.stop(); });
 dialog.addEventListener('click', (event) => {
   if (event.target === dialog || event.target === body) closePanel();
 });
 dialog.addEventListener('close', () => {
+  if (dialog.open) return;
   const onDismiss = dismissInspection;
   dismissInspection = undefined;
   voice.stop();
@@ -392,17 +395,8 @@ function update(notifyRadio = false) {
   $('control-hint').textContent = waiting ? '打开对讲机，确认小梅的消息。'
     : checking ? '再次查看线索，继续理解检查与听写。'
       : (task?.cue ?? '');
-  const missionNumber =
-    save.stage < 4
-      ? 1
-      : save.stage < 7
-        ? 2
-        : save.stage < 10
-          ? 3
-          : save.stage < 12
-            ? 4
-            : 5;
-  $('district').textContent = '任务 ' + missionNumber + ' / 5';
+  const missionNumber = taskStarts.filter((stage) => stage <= save.stage).length;
+  $('district').textContent = '任务 ' + missionNumber + ' / ' + taskStarts.length;
   $('voice-status').hidden = true;
   $('voice-status').textContent = '';
   const item =
@@ -764,6 +758,7 @@ function handbook() {
   play('paper');
   let page = 0;
   let readThird = false;
+  let playback;
   const title = make('p', '', 'artifact-heading');
   const description = make('p', '', 'artifact-ink');
   const pageNumber = make('p', '', 'artifact-page-number');
@@ -788,6 +783,8 @@ function handbook() {
   }
 
   function render() {
+    playback?.stop();
+    playback?.button.remove();
     title.textContent = [
       '好司机先练习', '检查车铃与车灯', '火种架和车扣',
     ][page];
@@ -800,6 +797,9 @@ function handbook() {
     previous.disabled = page === 0;
     next.disabled = page === 2;
     readThird ||= page === 2;
+    playback = clueReader('handbook:' + page, description.textContent);
+    sheet.append(playback.button);
+    playback.reveal();
     sheet.focus({ preventScroll: true });
   }
 
@@ -818,7 +818,7 @@ function finishHandbook() {
 function writeWorkshop(location, complete) {
   const { title, line, words: targets } = workshopWriting[location];
   const index = save.workshop[location];
-  if (index >= targets.length || devSkipDictation) {
+  if (index >= targets.length || developer.skipDictation) {
     complete();
     return;
   }
@@ -850,7 +850,11 @@ function choosePart() {
     caption.append(make('span', id === 'stabilizer' ? '稳轮夹 · 颠簸近路' : '快轮扣 · 平坦长路'));
   }
   shelf.append(caption);
-  body.append(shelf, make('p', workshopWriting.shelf.line, 'fitting-notes fitting-clue'));
+  const clue = make('p', workshopWriting.shelf.line, 'fitting-notes fitting-clue');
+  const playback = clueReader('fittings', workshopWriting.shelf.line);
+  clue.append(playback.button);
+  body.append(shelf, clue);
+  playback.reveal();
 }
 function runTrial(success, power, onResult) {
   if (testing) return;
@@ -887,7 +891,10 @@ function showTrialNote(title, result, instruction, onTap, onDismiss) {
     make('p', instruction, 'trial-note-instruction'),
   );
   sheet.append(objectHotspot(instruction, 'trial-note-hotspot', onTap));
+  const playback = clueReader('trial:' + result, result);
+  sheet.append(playback.button);
   body.append(sheet);
+  playback.reveal();
   dismissInspection = onDismiss;
 }
 
@@ -969,8 +976,8 @@ function practiceRun() {
       practicePassed = ok;
       showTrialNote('试跑结果', ok
         ? '灯车颠了一下，火种还是稳稳地留在架子上！'
-        : '灯车一颠，火种就掉了出来。把速度调到中间，再试一次。',
-      ok ? '轻触这页，翻看试跑记录。' : '轻触这页，回到试跑台。', () => {
+        : '灯车一颠，火种就掉了出来。',
+      ok ? '轻触这页，翻看试跑记录。' : '把速度调到中间，再试一次。轻触这页，回到试跑台。', () => {
         world.releaseTrial();
         practiceRun();
       });
@@ -1024,7 +1031,9 @@ function fieldArtifact(field) {
     return line;
   });
   if (field.signature) lines.push(make('p', field.signature, 'artifact-signature'));
-  return artifactPage(field.paper, heading, ...lines);
+  const playback = clueReader('field:' + field.clue, field.clue);
+  const sheet = artifactPage(field.paper, heading, ...lines, playback.button);
+  return { sheet, playback };
 }
 
 function playCloseup(build, complete) {
@@ -1055,7 +1064,9 @@ function openFieldwork() {
   play('paper');
   addWords(field.words);
   persist();
-  body.append(fieldArtifact(field));
+  const { sheet, playback } = fieldArtifact(field);
+  body.append(sheet);
+  playback.reveal();
   dismissInspection = () => {
     save.fieldProgress = { stage: save.stage, question: 0, writing: 0 };
     persist();
@@ -1071,11 +1082,13 @@ function fieldCheck(field) {
     return;
   }
   showPanel(null, '理解检查');
-  const clue = fieldArtifact(field);
+  const { sheet: clue, playback } = fieldArtifact(field);
   clue.hidden = true;
   const reviewClue = button('回看线索', () => {
     clue.hidden = !clue.hidden;
     reviewClue.setAttribute('aria-expanded', String(!clue.hidden));
+    if (clue.hidden) playback.stop();
+    else playback.reveal();
   });
   reviewClue.setAttribute('aria-expanded', 'false');
   const status = make('p', '', 'dialog-note');
@@ -1115,7 +1128,7 @@ function fieldCheck(field) {
 function fieldDictation(field) {
   const progress = save.fieldProgress;
   const target = field.writing[progress.writing];
-  if (!target || devSkipDictation) {
+  if (!target || developer.skipDictation) {
     finishFieldwork(field);
     return;
   }
@@ -1344,16 +1357,17 @@ function showBank(index = 0) {
     group(button('下一题', () => showBank((index + 1) % bank.length), 'gold')),
   );
 }
-function openTest(mode, skip = devSkipDictation) {
+function openTest(mode) {
   disposeTest();
   disposeTest = () => {};
   closePanel();
   setView('assessment');
   currentTestView = mode;
-  if (mode === 'final' && skip) {
+  if (mode === 'final' && developer.skipDictation) {
     showSkippedFinal($('assessment-body'), {
       cardClass: 'assessment-card', headingId: 'assessment-title', onExit: returnMap,
-      onResume: () => openTest(mode, false),
+      onResume() { developer.setSkipDictation(false); openTest(mode); },
+      onDeveloper: developer.open,
     });
     return;
   }
@@ -1421,33 +1435,29 @@ document.addEventListener('click', (event) => {
 
 const developer = createDeveloperMode({
   panel: body,
-  openPanel: showPanel,
-  canSkip: () => view === 'hud' && !driving && save.stage < tasks.length,
-  getSkipLabel: () => '跳过当前任务',
-  onSkip: () => {
-    const field = pendingFieldwork();
-    if (field) {
-      addWords(field.words);
-      finishFieldwork(field);
-      return;
-    }
-    if (save.stage === 8) save.part = 'stabilizer';
-    if (save.stage === 11) {
-      world.reset(true);
-      go(12);
-      closePanel();
-      return;
-    }
-    if (save.stage === 12) {
-      closePanel();
-      endStory();
-      return;
-    }
-    go(save.stage + 1);
-    closePanel();
+  openPanel: title => showPanel('developer', title, 'en'),
+  onClose: closePanel,
+  taskCount: taskStarts.length,
+  canJump: () => (view === 'hud' && !driving && !testing) || currentTestView === 'final',
+  currentTask: () => view === 'hud' ? taskStarts.filter(stage => stage <= save.stage).length - 1 : -1,
+  onJump(index) {
+    const stage = taskStarts[index];
+    disposeTest();
+    disposeTest = () => {};
+    currentTestView = null;
+    save.fieldDone = save.fieldDone.filter(value => value < stage);
+    save.minigames = save.minigames.filter(value => value < stage);
+    if (stage <= 7) save.workshop = { ...initial.workshop };
+    if (stage < 10) save.part = null;
+    else save.part ??= 'stabilizer';
+    save.acknowledgedBriefings = save.acknowledgedBriefings.filter(key => Number(key.split(':')[0]) < stage);
+    save.storyFinished = false;
+    save.stage = stage;
+    save.fieldProgress = null;
+    persist();
+    startWorld();
   },
   onSkipDictation: (value) => {
-    devSkipDictation = value;
     if (value && currentTestView === 'final') openTest('final');
   },
 });
