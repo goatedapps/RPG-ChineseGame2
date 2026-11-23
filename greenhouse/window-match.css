@@ -1,0 +1,152 @@
+#workbench .window-match { width: min(100%, 32rem, 52dvh); }
+.window-match :is(.minigame-title, .minigame-status) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.window-match .minigame-stage {
+  display: block;
+  aspect-ratio: auto;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.match-window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  max-height: 65dvh;
+  overflow: hidden;
+  border-radius: .65rem .65rem 0 0;
+  background: #183d36 url('art/window-match.webp') center / 100% 100%;
+}
+.window-warmth {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse at 50% 72%, #ffdb8c47, transparent 78%);
+  pointer-events: none;
+}
+.window-dry { box-shadow: inset 0 0 1.4rem #ffdb8c55; }
+.minigame .match-gap,
+.minigame .match-gap:hover:enabled {
+  position: absolute;
+  z-index: 1;
+  width: 42%;
+  min-height: 58px;
+  padding-block-end: 10px;
+  translate: -50% -100%;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  overflow: visible;
+}
+.gap-meaning {
+  width: 100%;
+  min-height: 2.65rem;
+  display: grid;
+  place-items: center;
+  padding: .28rem .25rem;
+  border: 1px solid #9bdce796;
+  border-radius: .38rem;
+  background: #0b2429eb;
+  color: #effaf6;
+  text-shadow: none;
+  text-align: center;
+  font: 650 clamp(.7rem, 3.15vw, .96rem)/1.23 system-ui, sans-serif;
+  text-wrap: balance;
+  pointer-events: none;
+}
+.match-gap:focus-visible .gap-meaning { border-color: #ffd78a; }
+@media (hover: hover) {
+  .match-gap:hover:enabled .gap-meaning { border-color: #ffd78a; }
+}
+.gap-meaning.mismatch { background: #592e2c; border-color: #ff9b89; }
+.window-crack {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: min(54%, 3.25rem);
+  height: 8px;
+  translate: -50% 0;
+  background: #7cf0de;
+  clip-path: polygon(0 45%, 21% 35%, 34% 15%, 52% 47%, 69% 23%, 100% 42%, 78% 72%, 64% 66%, 47% 86%, 29% 61%, 15% 78%);
+  pointer-events: none;
+}
+.window-drop {
+  position: absolute;
+  left: 51%;
+  bottom: -8px;
+  width: 4px;
+  height: 9px;
+  border-radius: 75% 50% 64% 66%;
+  background: #b8f2fe;
+  box-shadow: 0 0 5px #6dd8ff;
+  pointer-events: none;
+}
+.window-drop + .window-drop { left: 48%; width: 3px; }
+[data-sealed] :is(.window-crack, .window-drop) { display: none; }
+[data-sealed] .gap-meaning { border-color: #b6d6a7; background: #122d25e8; }
+.patch-flash {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  width: 62%;
+  height: 29px;
+  translate: -50% 0;
+  opacity: 0;
+  background: radial-gradient(ellipse, #ffe5aade, transparent 72%);
+  pointer-events: none;
+}
+.tape-tray {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  width: min(94%, 26rem);
+  margin-inline: auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(.25rem, 1.5vw, .55rem);
+  padding: .55rem .48rem;
+  background: linear-gradient(#274239, #132621);
+  border: 1px solid #739789;
+  border-radius: 0 0 .55rem .55rem;
+  box-shadow: 0 .65rem 1.7rem #0007;
+}
+.tape-slot { min-width: 0; }
+.minigame .match-tape,
+.minigame .match-tape:hover:enabled,
+.window-patch {
+  color: #3a2a1d;
+  background: #d8bc8e url('art/window-tape.webp') center / 100% 100%;
+  border-radius: .25rem;
+  text-shadow: none;
+  font: 800 clamp(1rem, 4.5vw, 1.42rem)/1 system-ui, sans-serif;
+}
+.minigame .match-tape { width: 100%; min-width: 44px; min-height: 44px; cursor: grab; }
+.minigame .match-tape[aria-pressed='true'] { outline: 2px solid #ffcf77; outline-offset: 2px; }
+.minigame .match-tape[data-dragging] { position: relative; pointer-events: none; cursor: grabbing; }
+.minigame .match-tape:disabled { visibility: hidden; }
+.window-patch {
+  position: absolute;
+  z-index: 1;
+  bottom: -12px;
+  left: 50%;
+  translate: -50% 0;
+  width: min(72%, 5rem);
+  min-height: 25px;
+  padding: 3px;
+  display: grid;
+  place-items: center;
+  font-size: .88rem;
+  pointer-events: none;
+}
+@media (orientation: landscape) and (max-height: 490px) {
+  #workbench .window-match { width: min(100%, 28rem); }
+  .match-window { max-height: 62dvh; }
+}

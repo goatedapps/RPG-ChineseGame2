@@ -1,7 +1,7 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { missions, objects, tutorial } from './story.js?v=story-minigames';
+import { missions, objects, tutorial } from './story.js?v=window-match';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
@@ -14,9 +14,10 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
-import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=briefing-flow';
+import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=window-match';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
-import { prepareExhibit, readRootFootage, sealWindow, supportSeedling } from './minigames.js';
+import { prepareExhibit, readRootFootage, supportSeedling } from './minigames.js?v=window-match';
+import { sealWindow } from './window-match.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
@@ -549,7 +550,9 @@ function useObject(target) {
   if (target.id === nextObject()) {
     const current = missions[state.mission]?.actions[state.action];
     const game = {
-      westWindow: sealWindow,
+      westWindow: (play, finish) => sealWindow(
+        missions[state.mission].dictation.map(({ word }) => ({ word, meaning: lexicon[word].en })), play, finish,
+      ),
       weakPlant: supportSeedling,
       exhibitStand: current?.action === 'place' ? prepareExhibit : undefined,
     }[target.id];
@@ -706,6 +709,7 @@ function playCloseup(build, next, showResult) {
   });
   afterClose = null;
   presentPanel(game.root, game.focusTarget, true);
+  game.activate?.();
 }
 
 function showEvidence(id, next, recorded = false) {

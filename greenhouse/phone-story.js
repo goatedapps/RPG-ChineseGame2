@@ -3,7 +3,7 @@ export const phoneStory = {
     steps: {
       westNote: 'Hey! It’s Ah Ning. The fair opens this morning, and I spotted a puddle in the greenhouse after last night’s rain. Could you check the greenhouse windows for me?',
       seal: 'That explains the puddle. Could you grab the spare weatherstripping from the storeroom?',
-      westWindow: 'You’ve got the strip! Press it over the gap in the west window.',
+      westWindow: 'You’ve got the tape. Match the Chinese word on each strip to the English meaning at the leak.',
     },
     checkpoint: 'The window’s sealed! Can you log what caused the leak so the next group knows what to look for?',
   },
@@ -98,7 +98,7 @@ export const statusReplies = {
 export const fieldHints = {
   westNote: 'Go into the greenhouse and compare the two windows. At the one with water marks, look along the ledge.',
   seal: 'Look for a small packet on the shelves at the far right of the storeroom. Its label says 密封条.',
-  westWindow: 'Take the weatherstrip back to the wet window. Look for the gap near the windowsill.',
+  westWindow: 'Take the tape to the west window. Look for four dripping gaps.',
   brightLamp: 'Compare the lights on the storeroom workbench. The inspection lamp has the stronger white beam.',
   vividTape: 'Look on the storeroom workbench for a bright orange roll.',
   tray: 'The carrying tray is on the storeroom workbench, next to the picture about moving pots.',

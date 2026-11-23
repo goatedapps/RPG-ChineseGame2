@@ -186,57 +186,6 @@ dialog .minigame-title {
 }
 .moon-beam.aligned { opacity: .95; }
 
-.seal-window {
-  background: #154249 url('../greenhouse/art/minigame-window.webp') center / 100% 100%;
-  touch-action: none;
-}
-.window-sill { position: absolute; top: 67%; width: 100%; height: 13%; }
-.minigame .window-leak {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
-}
-.window-leak::before {
-  content: '';
-  width: 1.14rem;
-  height: .2rem;
-  border-radius: 50%;
-  background: #95e6ff;
-  box-shadow: 0 0 .6rem #b9f3ff;
-}
-.window-leak i {
-  position: absolute;
-  top: 53%;
-  width: .37rem;
-  height: .74rem;
-  border-radius: 68% 45% 78% 33%;
-  background: #93dcff;
-  animation: window-drip 1.25s ease-in infinite;
-}
-.window-leak.sealed::before {
-  width: 2rem;
-  height: .36rem;
-  border-radius: .18rem;
-  background: #253736;
-  box-shadow: 0 0 .4rem #ffe19a77;
-}
-.window-leak.sealed i { display: none; }
-@keyframes window-drip {
-  from { opacity: .95; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(3.4rem); }
-}
-.minigame .window-strip {
-  position: absolute;
-  width: clamp(44px, 15%, 95px);
-  aspect-ratio: 1.6;
-  top: 76%;
-  left: 10%;
-  transform: translate(-50%, -50%);
-  cursor: grab;
-}
-
 .plant-rescue {
   background: linear-gradient(#203c3994,#1729259c), url('../greenhouse/art/minigame-window.webp') center / cover;
 }
@@ -347,6 +296,6 @@ dialog .minigame-title {
 .light-aligned .exhibit-glow { box-shadow: 0 0 2rem 1rem #ffc87188; background: #ffc8711c; }
 .exhibit-ready .exhibit-beam { background: linear-gradient(90deg,#ffe3a955,#ffe5a5bd); }
 @media (prefers-reduced-motion: reduce) {
-  .window-leak i, .rescue-plant.fragile img { animation: none; }
+  .rescue-plant.fragile img { animation: none; }
   .minigame * { transition-duration: 0s !important; }
 }
