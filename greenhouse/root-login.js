@@ -4,7 +4,7 @@ const compact = (pinyin) => pinyin.toLowerCase().replace(/\s+/g, '').normalize('
 const withoutTones = (pinyin) => pinyin.normalize('NFD').replace(/[\u0300\u0301\u0304\u030c]/g, '');
 
 export function rootLogin(words, play, onFinish) {
-  const instructions = '输入拼音，不加声调。';
+  const instructions = '输入上方词语的拼音，不加声调。';
   const game = makeMinigame('根系观察仪 · 登录', instructions, play, onFinish);
   game.root.classList.add('root-login');
   const monitor = prop(new URL('./art/screen-roots.webp', import.meta.url).href, 'root-login-monitor');

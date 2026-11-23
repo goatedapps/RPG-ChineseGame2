@@ -25,7 +25,7 @@ const tracks = {
   title: { duration: 19.2, volume: .38 },
   comic: { duration: 9.6, volume: .44 },
   game: { duration: 24, volume: .24 },
-  minigame: { volume: .36 },
+  minigame: { volume: .60 },
 };
 
 const universeAudio = { ding: 'Ding', bounce: 'bounce', minigame: 'game-music' };

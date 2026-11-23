@@ -1,5 +1,5 @@
 #workbench .window-match { width: min(100%, 32rem, 52dvh); }
-.window-match :is(.minigame-title, .minigame-status) {
+.window-match .minigame-title {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -8,6 +8,7 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+.window-match .minigame-status { text-align: center; }
 .window-match .minigame-stage {
   display: block;
   aspect-ratio: auto;

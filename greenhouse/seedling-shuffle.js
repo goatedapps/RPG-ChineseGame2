@@ -65,7 +65,7 @@ export function supportSeedling(play, onFinish) {
     phase = 'cover';
     stage.dataset.phase = phase;
     pots.forEach(({ button }) => button.setAttribute('aria-label', '盖着罩子的花盆'));
-    game.status.textContent = '看好花盆的位置。';
+    game.status.textContent = '花盆换位后，点选茎弯的幼苗所在的盆。';
     if (!animated()) {
       game.after(280, shufflePots);
       return;

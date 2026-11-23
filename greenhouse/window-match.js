@@ -10,7 +10,7 @@ function shuffle(items) {
 }
 
 export function sealWindow(vocabulary, play, onFinish) {
-  const game = makeMinigame('西窗', '', play, onFinish);
+  const game = makeMinigame('西窗', '把写着词语的密封条贴到对应的英文释义上。', play, onFinish);
   game.root.classList.add('window-match');
   const frame = element('div', 'match-window');
   const warmth = element('div', 'window-warmth');
