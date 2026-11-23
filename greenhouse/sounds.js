@@ -25,19 +25,27 @@ const clips = {
 const tracks = {
   title: { duration: 19.2, volume: .38 },
   comic: { duration: 9.6, volume: .44 },
+  prelude: { volume: .44 },
+  epilogue: { volume: .44 },
   game: { duration: 24, volume: .24 },
   minigame: { volume: .60 },
 };
 
-const universeAudio = { 'answer-correct': 'correct', ding: 'Ding', bounce: 'bounce', minigame: 'game-music' };
+const universeAudio = {
+  'answer-correct': 'correct', ding: 'Ding', bounce: 'bounce',
+  minigame: 'game-music', prelude: 'prelude', epilogue: 'epilogue',
+};
 
 const rainFile = 'rain-window';
 const musicLoopStart = .145;
 const comicClips = ['page', 'storm'];
+const comicEffects = ['ui', 'notification', ...comicClips];
 const trialClips = ['lever', 'wheels', 'jolt', 'impact'];
 const sceneClips = {
   title: ['ui', 'correct'],
-  comic: ['ui', 'notification', ...comicClips],
+  comic: comicEffects,
+  prelude: comicEffects,
+  epilogue: comicEffects,
   game: Object.keys(clips).filter((name) => name !== 'radio' && !comicClips.includes(name) && !trialClips.includes(name)),
 };
 const maxEffects = 7;
@@ -357,6 +365,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   return {
     start,
     prepareGameplay,
+    get musicUnlocked() { return context?.state === 'running' || hasRun; },
     setEnabled(value) {
       enabled = Boolean(value);
       if (enabled && (musicScene || context || ambience)) prepareSceneEffects();

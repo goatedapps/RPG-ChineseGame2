@@ -1,6 +1,6 @@
 import { createHintPortal } from '../shared/hint-portal.js';
 import { art, arrival, objects } from './story.js?v=market-games';
-import { buildArchitecture, roofCorridorPosts, roofHeight } from './architecture.js';
+import { buildArchitecture, roofCorridorPosts, roofHeight, squareLanternPosts, squareStallZ } from './architecture.js?v=districts';
 
 export const checkpoints = [
   arrival, { x: 0, z: -10.4 }, { x: 0, z: -17.5 },
@@ -9,9 +9,9 @@ export const checkpoints = [
 ];
 
 const districts = [
-  { width: 17, depth: 18, x: 0, z: 0, color: '#85809a' },
+  { width: 17, depth: 18, x: 0, z: 0, color: '#dfae8d', paving: 'square-paving' },
   { width: 6, depth: 20, x: 0, z: -19, color: '#636c8e' },
-  { width: 20, depth: 22, x: 0, z: -40, color: '#92808c' },
+  { width: 20, depth: 22, x: 0, z: -40, color: '#92bbb1', paving: 'market-paving' },
   { width: 24, depth: 16, x: 29, y: roofHeight, z: -42, color: '#93818e' },
 ];
 const ramp = { width: 7, depth: 6, x: 13.5, z: -44 };
@@ -97,10 +97,12 @@ export function buildShadowMarket(THREE, resume = 0) {
     roofTile: standard('#9ca0bc', 'world-tile'),
     plaster: standard('#afa9c5', 'world-plaster'),
     lattice: standard('#bd99a4', 'world-lattice', { emissive: '#4e2520', emissiveIntensity: .25 }),
-    cloth: standard('#b399a7', 'world-cloth', { side: THREE.DoubleSide }),
+    squareSilk: standard('#ffb898', 'square-silk', { side: THREE.DoubleSide, emissive: '#491a10', emissiveIntensity: .32 }),
+    marketCloth: standard('#91c2ad', 'market-canopy', { side: THREE.DoubleSide, emissive: '#14342d', emissiveIntensity: .31 }),
     brick: standard('#a2a1ba', 'world-brick'),
     lantern: standard('#ffd58d', 'world-cloth', { emissive: '#e98938', emissiveIntensity: 1.65 }),
     violet: standard('#b4c6ff', 'world-plaster', { emissive: '#666bff', emissiveIntensity: 1.32 }),
+    jade: standard('#b7ffe0', 'market-canopy', { emissive: '#72dfae', emissiveIntensity: 1.31 }),
   };
   const anchors = buildArchitecture(THREE, scene, materials);
   function box(w, h, d, x, y, z, material) {
@@ -109,13 +111,12 @@ export function buildShadowMarket(THREE, resume = 0) {
     scene.add(mesh);
     return mesh;
   }
-  const stone = texture(art('stone'));
-  stone.wrapS = stone.wrapT = THREE.RepeatWrapping;
-  districts.forEach(({ width, depth, x, y = 0, z, color }) => {
-    const tiles = stone.clone();
+  districts.forEach(({ width, depth, x, y = 0, z, color, paving = 'stone' }) => {
+    const tiles = texture(art(paving)).clone();
+    tiles.wrapS = tiles.wrapT = THREE.RepeatWrapping;
     tiles.repeat.set(width / 3.9, depth / 3.9);
-    const paving = new THREE.MeshStandardMaterial({ color, map: tiles, roughness: .64, metalness: .16 });
-    box(width, .3, depth, x, y - .15, z, paving);
+    const surface = new THREE.MeshStandardMaterial({ color, map: tiles, roughness: .64, metalness: .16 });
+    box(width, .3, depth, x, y - .15, z, surface);
   });
   const rampAngle = Math.atan2(roofHeight, ramp.width);
   box(Math.hypot(ramp.width, roofHeight), .2, ramp.depth, ramp.x,
@@ -135,7 +136,7 @@ export function buildShadowMarket(THREE, resume = 0) {
   }
   const block = (x, z, width, depth) => colliders.push(limits({ x, z, width, depth }));
   for (const side of [-1, 1]) {
-    for (const z of [-6.02, -.42, 5.28]) block(side * 6, z, 1.72, 2.56);
+    block(side * 6, squareStallZ, 1.72, 2.56);
     for (const z of [-33.15, -39.75, -46.25]) {
       if (side === -1 || z !== -46.25) block(side * 7, z, 1.72, 3.22);
     }
@@ -144,6 +145,7 @@ export function buildShadowMarket(THREE, resume = 0) {
   block(0, 2.78, 1.48, 1.04);
   block(3.6, 1.26, 1.82, 1.31);
   block(1.95, -39.19, 3.6, 1.25);
+  for (const [x, z] of squareLanternPosts) block(x, z, .77, .77);
   for (const [x, z] of roofCorridorPosts) block(x, z, .47, .47);
 
   const stepStone = standard('#70759b', 'world-brick');
@@ -192,7 +194,17 @@ export function buildShadowMarket(THREE, resume = 0) {
   const permanent = colliders.length;
   const moon = new THREE.DirectionalLight('#aabaff', 1.34);
   moon.position.set(-9, 14, -7);
-  scene.add(new THREE.HemisphereLight('#c0c3e8', '#7d5e70', 1.82), moon);
+  const ambient = new THREE.HemisphereLight('#c0c3e8', '#7d5e70', 1.82);
+  scene.add(ambient, moon);
+  const palettes = [
+    ['#ffe0c0', '#956247', '#f8cfa9', 2.12, 1.33],
+    ['#aebfff', '#615a8b', '#9badff', 1.53, 1.38],
+    ['#bbdfce', '#527a6d', '#aac7c1', 1.57, .93],
+    ['#d9c1e0', '#9b6a70', '#fac1b0', 1.84, 1.54],
+  ].map(([sky, ground, direct, fill, key]) => ({
+    sky: new THREE.Color(sky), ground: new THREE.Color(ground), direct: new THREE.Color(direct), fill, key,
+  }));
+  const lightColors = { amber: '#ffc080', blue: '#798fff', jade: '#91e2b5' };
   const localLights = Array.from({ length: 4 }, () => {
     const lamp = new THREE.PointLight('#ffd397', 11, 7.4);
     scene.add(lamp);
@@ -209,7 +221,7 @@ export function buildShadowMarket(THREE, resume = 0) {
     localLights.forEach((lamp, index) => {
       const anchor = nearest[index];
       lamp.position.set(anchor.x, anchor.y - .16, anchor.z);
-      lamp.color.set(anchor.color === 'blue' ? '#798fff' : '#ffc07a');
+      lamp.color.set(lightColors[anchor.color]);
     });
   }
   const reunionLight = new THREE.PointLight('#ffd088', 7, 5);
@@ -251,6 +263,13 @@ export function buildShadowMarket(THREE, resume = 0) {
     runner.position.z = -21.6 - (state.reducedMotion ? 0 : 6.1 * hop);
     sky.position.copy(camera.position);
     sky.material.uniforms.dawn.value = THREE.MathUtils.clamp((x - 9) / 15, 0, 1);
+    const palette = palettes[x >= 17 ? 3 : z < -29 ? 2 : z < -9 ? 1 : 0];
+    const blend = 1 - Math.exp(-dt * 4);
+    ambient.color.lerp(palette.sky, blend);
+    ambient.groundColor.lerp(palette.ground, blend);
+    moon.color.lerp(palette.direct, blend);
+    ambient.intensity = THREE.MathUtils.lerp(ambient.intensity, palette.fill, blend);
+    moon.intensity = THREE.MathUtils.lerp(moon.intensity, palette.key, blend);
     lightScene(x, z);
     showHint(state.hint, camera, time, !state.reducedMotion);
   }

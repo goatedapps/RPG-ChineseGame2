@@ -28,7 +28,7 @@ function balloon(className, [x, y, width]) {
 export function playLessonComic(
   container,
   onFinish,
-  { panels, titleText, lastLabel, onPage = () => {}, ending = false },
+  { panels, titleText, lastLabel, onPage = () => {}, ending = false, startLabel },
 ) {
   const title = element('h2', 'comic-hidden', titleText);
   title.id = 'comic-title';
@@ -40,6 +40,8 @@ export function playLessonComic(
   progress.append(...dots);
   const rail = element('div', 'comic-rail');
   rail.append(progress);
+  const startHint = startLabel ? element('p', 'comic-start-hint', startLabel) : null;
+  if (startHint) rail.append(startHint);
   const announcement = element('p', 'comic-hidden');
   announcement.setAttribute('role', 'status');
 
@@ -55,6 +57,7 @@ export function playLessonComic(
   let activeScene;
   let transition;
   let finished = false;
+  let awaitingStart = Boolean(startHint);
 
   container.classList.add('comic-screen');
   container.setAttribute('role', 'dialog');
@@ -126,7 +129,7 @@ export function playLessonComic(
     );
     hit.setAttribute(
       'aria-label',
-      page === panels.length - 1 ? lastLabel : '继续看漫画',
+      awaitingStart ? startLabel : page === panels.length - 1 ? lastLabel : '继续看漫画',
     );
   }
 
@@ -214,6 +217,12 @@ export function playLessonComic(
   }
 
   function advance() {
+    if (awaitingStart) {
+      awaitingStart = false;
+      startHint.remove();
+      announce(index);
+      return;
+    }
     if (index !== shownPage) return;
     if (index === panels.length - 1) {
       finish();
@@ -250,7 +259,7 @@ export function playLessonComic(
 
   container.addEventListener('keydown', onKey);
   hit.addEventListener('click', advance);
-  hit.setAttribute('aria-label', '继续看漫画');
+  hit.setAttribute('aria-label', startLabel || '继续看漫画');
   render(1);
   hit.focus({ preventScroll: true });
 

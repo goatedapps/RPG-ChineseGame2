@@ -1,11 +1,13 @@
 export const roofHeight = 3.15;
+export const squareStallZ = -3.9;
+export const squareLanternPosts = [-4.25, 4.25].map((x) => [x, -6.38]);
 const roofColumns = [19.7, 24.05, 28.4, 32.75];
 const roofSides = [-47.4, -39.45];
 export const roofCorridorPosts = roofColumns.flatMap((x) => roofSides.map((z) => [x, z]));
 
 // Fixed architectural meshes share a unit box and are drawn in material batches.
 export function buildArchitecture(THREE, scene, materials) {
-  const { timber, roofTile, plaster, lattice, cloth, brick, lantern, violet } = materials;
+  const { timber, roofTile, plaster, lattice, squareSilk, marketCloth, brick, lantern, violet, jade } = materials;
   const batches = new Map();
   const transform = new THREE.Object3D();
   const unit = new THREE.BoxGeometry(1, 1, 1);
@@ -83,7 +85,7 @@ export function buildArchitecture(THREE, scene, materials) {
     roof(x, floor + 3.58, z, width + 1.58, 2.05, turn);
   }
 
-  function stall(x, z, width, facing = 0) {
+  function stall(x, z, width, facing, market = false) {
     const sin = Math.sin(facing);
     const cos = Math.cos(facing);
     const local = (material, u, y, v, w, h, d) =>
@@ -95,9 +97,17 @@ export function buildArchitecture(THREE, scene, materials) {
       for (const depth of [-.68, .67]) local(timber, side * width * .47, 1.39, depth, .15, 2.78, .15);
       local(timber, side * width * .47, 2.62, 0, .12, .18, 1.67);
     }
-    local(cloth, 0, 2.55, .82, width + .2, .28, .055);
-    roof(x, 2.74, z, width + .29, 1.97, facing, cloth);
-    light(x + .61 * cos + .81 * sin, 2.23, z - .61 * sin + .81 * cos, 'amber', .76);
+    const fabric = market ? marketCloth : squareSilk;
+    local(fabric, 0, 2.55, .82, width + .2, .28, .055);
+    roof(x, 2.74, z, width + .29, 1.97, facing, fabric);
+    light(x + .61 * cos + .81 * sin, 2.23, z - .61 * sin + .81 * cos, market ? 'jade' : 'amber', .76);
+    if (!market) return;
+    for (const shelf of [1.15, 1.65]) {
+      local(timber, 0, shelf, -.52, width * .85, .11, .38);
+      for (const offset of [-.29, -.05, .21]) {
+        local(offset < 0 ? lattice : timber, offset * width, shelf + .17, -.48, .36, .27, .29);
+      }
+    }
   }
 
   function table(x, z, width, depth) {
@@ -120,25 +130,39 @@ export function buildArchitecture(THREE, scene, materials) {
       const segment = span / pieces;
       const x = start + (i + .5) * segment;
       box(timber, x, (y1 + y2) / 2, z, Math.hypot(segment, y2 - y1) + .015, .026, .026, Math.atan2(y2 - y1, segment));
-      if (i % 2 === 0) light(x, (y1 + y2) / 2 - .43, z, 'amber', .71 + (i % 3) * .08);
+      if (i % 2 === 0) light(x, (y1 + y2) / 2 - .43, z, 'amber', .85 + (i % 3) * .11);
+      else box(squareSilk, x, (y1 + y2) / 2 - .32, z, .43, .65, .035, Math.atan2(y2 - y1, segment));
     }
   }
 
-  // The square is open to the sky, enclosed by shop fronts and timber stalls.
+  // The open festival square has clear sightlines between its lantern standards.
   for (const side of [-1, 1]) {
     for (const z of [-6.1, -.5, 5.2]) {
       pavilion(side * 10.4, 0, z, 3.95, 5.24, 4.4);
-      stall(side * 6, z + .08, 2.56, -side * Math.PI / 2);
     }
+    stall(side * 6, squareStallZ, 2.56, -side * Math.PI / 2);
     pavilion(side * 6, 0, -10.3, 5.1, 3.4, 3.33);
     pavilion(side * 5.95, 0, 9.75, 5.3, 2.5, 3.85);
+  }
+  for (const [x, z] of squareLanternPosts) {
+    box(brick, x, .18, z, .77, .36, .77);
+    box(timber, x, 1.62, z, .23, 3.1, .25);
+    box(timber, x, 2.92, z, 1.27, .12, .14);
+    box(squareSilk, x, 2.1, z + .14, .6, 1.4, .045);
+    light(x - .54, 2.58, z, 'amber', 1.02);
+    light(x + .54, 2.58, z, 'amber', 1.02);
   }
   arch(0, 0, 8.56, 5.1);
   arch(0, 0, -8.63, 5.25, 0, true);
   stringLights(3.3, -8.7, 8.7, 4.43);
   stringLights(-3.6, -8.7, 8.7, 4.35);
   table(0, 2.78, 1.48, 1.04);
-  table(3.6, 1.26, 1.82, 1.31);
+  const reunionTable = new THREE.Mesh(new THREE.CylinderGeometry(.93, .93, .16, 24), timber);
+  reunionTable.position.set(3.6, .84, 1.26);
+  reunionTable.scale.z = .72;
+  scene.add(reunionTable);
+  box(timber, 3.6, .42, 1.26, .36, .84, .36);
+  box(brick, 3.6, .08, 1.26, .64, .16, .64);
 
   // The blue alley has deep piers and inset windows along both sides.
   for (const side of [-1, 1]) {
@@ -158,22 +182,25 @@ export function buildArchitecture(THREE, scene, materials) {
   for (const side of [-1, 1]) {
     for (const z of [-33.4, -40, -46.5]) {
       if (side === -1 || z !== -46.5) pavilion(side * 10.9, 0, z, 2.8, 6.25, 4.1);
-      if (side === -1 || z !== -46.5) stall(side * 7, z + .25, 3.22, -side * Math.PI / 2);
+      if (side === -1 || z !== -46.5) stall(side * 7, z + .25, 3.22, -side * Math.PI / 2, true);
     }
     for (const z of [-31, -38, -44.6, -49.45]) {
-      box(timber, side * 4.5, 2.42, z, .26, 4.85, .27);
+      box(timber, side * 4.5, 1.97, z, .26, 3.9, .27);
       box(brick, side * 4.5, .25, z, .49, .5, .49);
-      light(side * 3.98, 3.7, z, 'amber', 1.05);
+      box(marketCloth, side * 4.46, 3.35, z, .045, .75, .60);
+      light(side * 3.98, 3.04, z, 'jade', 1.05);
     }
     pavilion(side * 5.9, 0, -52.25, 6.25, 2.35, 5);
   }
-  for (const z of [-31, -38, -44.6, -49.45]) box(timber, 0, 4.73, z, 9.3, .25, .31);
+  for (const z of [-31, -38, -44.6, -49.45]) box(timber, 0, 3.82, z, 9.3, .25, .31);
   for (const [z, width] of [[-33.95, 9.4], [-41.3, 9.4], [-47.05, 9.4]]) {
-    roof(0, 4.94, z, width, 7.2);
+    roof(0, 3.96, z, width, 7.2, 0, marketCloth);
   }
   arch(0, 0, -50.38, 4.1);
   pavilion(0, 0, -54.7, 4.3, 4.1, 4.15);
   table(1.95, -39.19, 3.6, 1.25);
+  box(timber, 2.6, 3.52, -38.85, 4.0, .16, .16);
+  light(1.74, 2.92, -38.85, 'amber', .83);
   arch(10, 0, -44, 5.35, Math.PI / 2);
 
   // The ramp climbs from the market to a genuinely elevated roof terrace.
@@ -237,7 +264,7 @@ export function buildArchitecture(THREE, scene, materials) {
     scene.add(mesh);
   }
   const paper = new THREE.SphereGeometry(1, 12, 8);
-  for (const [color, material] of [['amber', lantern], ['blue', violet]]) {
+  for (const [color, material] of [['amber', lantern], ['blue', violet], ['jade', jade]]) {
     const lights = hangingLanterns.filter((item) => item.color === color);
     const globes = new THREE.InstancedMesh(paper, material, lights.length);
     lights.forEach(({ x, y, z, size }, index) => {

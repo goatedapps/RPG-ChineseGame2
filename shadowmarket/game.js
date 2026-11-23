@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=correct-answer';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=comic-score';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
@@ -12,9 +12,9 @@ import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-task
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { playLessonComic } from '../shared/comic.js';
+import { playLessonComic } from '../shared/comic.js?v=comic-score';
 import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
-import { buildShadowMarket, checkpoints } from './world.js?v=spatial-market';
+import { buildShadowMarket, checkpoints } from './world.js?v=districts';
 import { marketMinigames } from './minigames.js?v=cord-motion';
 
 const $ = (id) => document.getElementById(id);
@@ -524,16 +524,21 @@ function showTest(mode) {
 function showComic(isEnding) {
   wrapUp();
   $('splash').hidden = true;
-  audio.setMusic('comic');
+  audio.setMusic(isEnding ? 'epilogue' : 'prelude');
+  const awaitingAudio = state.music && !audio.musicUnlocked && navigator.userActivation?.hasBeenActive === false;
   playLessonComic($('comic-overlay'), () => {
     state.phase = isEnding ? 'final' : 'world';
     save();
     if (isEnding) showTest('final');
-    else void startWorld();
+    else {
+      audio.setMusic(null);
+      void startWorld();
+    }
   }, {
     titleText: isEnding ? '影子集市 · 尾声' : '影子集市 · 序幕',
     panels: isEnding ? ending : opening, ending: isEnding,
     lastLabel: isEnding ? '开始课末测试' : '走进灯笼广场',
+    startLabel: awaitingAudio ? '轻触播放音乐' : undefined,
     onPage: () => play('page'),
   });
 }
