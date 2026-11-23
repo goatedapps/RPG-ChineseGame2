@@ -10,7 +10,8 @@ const clips = {
   impact: { files: ['moonbridge-trial-impact'], volume: .88, cooldown: .2 },
   seal: { files: ['seal-press'], volume: .50, cooldown: .22 },
   drip: { files: ['window-drip'], volume: .23, cooldown: .3 },
-  correct: { files: ['correct'], volume: .31, cooldown: .14 },
+  correct: { files: ['answer-correct'], volume: .31, cooldown: .14 },
+  interaction: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
   ding: { files: ['ding'], volume: .56, cooldown: 0 },
   bounce: { files: ['bounce'], volume: .54, cooldown: 0 },
@@ -28,14 +29,14 @@ const tracks = {
   minigame: { volume: .60 },
 };
 
-const universeAudio = { ding: 'Ding', bounce: 'bounce', minigame: 'game-music' };
+const universeAudio = { 'answer-correct': 'correct', ding: 'Ding', bounce: 'bounce', minigame: 'game-music' };
 
 const rainFile = 'rain-window';
 const musicLoopStart = .145;
 const comicClips = ['page', 'storm'];
 const trialClips = ['lever', 'wheels', 'jolt', 'impact'];
 const sceneClips = {
-  title: ['ui'],
+  title: ['ui', 'correct'],
   comic: ['ui', 'notification', ...comicClips],
   game: Object.keys(clips).filter((name) => name !== 'radio' && !comicClips.includes(name) && !trialClips.includes(name)),
 };

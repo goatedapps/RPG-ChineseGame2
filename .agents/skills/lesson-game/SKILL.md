@@ -37,6 +37,7 @@ Open the [P6 Lesson 1 guide](../../../greenhouse/LESSON.md) and [gameplay screen
 Use ImageGen for player-facing artwork as described in `AGENTS.md`. For close-ups, think through what the player does to the object. Use page edges, pictured controls, and tap-outside dismissal where appropriate. Avoid use of buttons UI, including 'X' button to close a screen. Make actionable areas easy to spot and operable by keyboard / tablet. For sound, reuse suitable footsteps and interaction cues, connect music and effects to their settings, and check that speech stays clear against the music. For recorded helper dialogue, keep filenames tied to stable message IDs and verify playback from the helper interface using the [P3 clip mapping](../../../moonbridge/radio-messages.js) as a reference.
 
 - Loop [game-music.mp3](../../../universe/audio/game-music.mp3) while a minigame is in progress. Use the shared audio mixer so the music setting, speech ducking, and recovery after interruptions also apply. Restore the current scene’s music when the player completes or leaves the minigame.
+- Use the shared `correct` cue for successful comprehension, dictation and practice answers, including the final test. It plays [correct.mp3](../../../universe/audio/correct.mp3).
 - Play [whoosh.mp3](../../../universe/audio/whoosh.mp3) when an available world opens from the star map, including with reduced motion enabled.
 
 ## 3. Playtest the affected flow

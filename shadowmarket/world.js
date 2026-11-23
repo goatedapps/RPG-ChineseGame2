@@ -1,5 +1,6 @@
 import { createHintPortal } from '../shared/hint-portal.js';
 import { art, arrival, objects } from './story.js?v=market-games';
+import { buildArchitecture, roofCorridorPosts, roofHeight } from './architecture.js';
 
 export const checkpoints = [
   arrival, { x: 0, z: -10.4 }, { x: 0, z: -17.5 },
@@ -8,25 +9,69 @@ export const checkpoints = [
 ];
 
 const districts = [
-  { width: 17, depth: 18, x: 0, z: 0, image: 'square', paving: '#716063', trim: '#733737' },
-  { width: 6, depth: 20, x: 0, z: -19, image: 'alley', paving: '#435267', trim: '#344163' },
-  { width: 20, depth: 22, x: 0, z: -40, image: 'market', paving: '#674b59', trim: '#513250' },
-  { width: 24, depth: 16, x: 29, z: -42, image: 'roofs', paving: '#6b596b', trim: '#523b59' },
+  { width: 17, depth: 18, x: 0, z: 0, color: '#85809a' },
+  { width: 6, depth: 20, x: 0, z: -19, color: '#636c8e' },
+  { width: 20, depth: 22, x: 0, z: -40, color: '#92808c' },
+  { width: 24, depth: 16, x: 29, y: roofHeight, z: -42, color: '#93818e' },
 ];
-const roofPassage = { width: 8, depth: 6, x: 13, z: -44 };
+const ramp = { width: 7, depth: 6, x: 13.5, z: -44 };
 function limits({ width, depth, x, z }) {
   return { minX: x - width / 2, maxX: x + width / 2, minZ: z - depth / 2, maxZ: z + depth / 2 };
 }
 function within(rect, x, z) {
   return x >= rect.minX && x <= rect.maxX && z >= rect.minZ && z <= rect.maxZ;
 }
-const walkways = [...districts, roofPassage].map(limits);
+const walkways = [...districts, ramp].map(limits);
+function groundHeight(x, z) {
+  if (x >= 17) return roofHeight;
+  return z >= -47 && z <= -41 ? Math.max(0, x - 10) * roofHeight / 7 : 0;
+}
+
+function makeSky(THREE) {
+  const material = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    depthWrite: false,
+    uniforms: {
+      dawn: { value: 0 },
+      upper: { value: new THREE.Color('#171932') },
+      horizon: { value: new THREE.Color('#565078') },
+      sunrise: { value: new THREE.Color('#b26868') },
+    },
+    vertexShader: `
+      varying vec3 direction;
+      void main() {
+        direction = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 direction;
+      uniform vec3 upper, horizon, sunrise;
+      uniform float dawn;
+      void main() {
+        vec3 dir = normalize(direction);
+        float height = smoothstep(-0.04, 0.67, dir.y);
+        float morning = dawn * pow(max(0.0, dot(dir, normalize(vec3(1.0,0.12,-0.4)))), 3.0);
+        vec3 color = mix(mix(horizon, sunrise, morning), upper, height);
+        float moon = 1.0 - smoothstep(0.014, 0.017, distance(dir, normalize(vec3(-.29,.44,-.8))));
+        color += moon * vec3(.80,.71,.54) * (1.0 - .4 * dawn);
+        gl_FragColor = vec4(color, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+  });
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(75, 32, 22), material);
+  mesh.renderOrder = -10;
+  mesh.raycast = () => {};
+  return mesh;
+}
 
 export function buildShadowMarket(THREE, resume = 0) {
   const scene = new THREE.Scene();
-  const sky = new THREE.Color('#22213b');
-  scene.background = sky;
-  scene.fog = new THREE.FogExp2('#41415e', .021);
+  const sky = makeSky(THREE);
+  scene.add(sky);
+  scene.fog = new THREE.FogExp2('#4b4462', .0215);
   const loader = new THREE.TextureLoader();
   const loads = [];
   const textures = new Map();
@@ -43,96 +88,77 @@ export function buildShadowMarket(THREE, resume = 0) {
     }
     return textures.get(url);
   }
-  const backdrops = districts.map(({ image }) => texture(art(image)));
-  const stone = texture(art('stone'));
-  stone.wrapS = stone.wrapT = THREE.RepeatWrapping;
-  stone.repeat.set(6, 6);
-  const materials = districts.map(({ paving, trim, width, depth }) => {
-    const tiles = stone.clone();
-    tiles.repeat.set(width / 4, depth / 4);
-    return {
-      floor: new THREE.MeshStandardMaterial({ color: paving, map: tiles, roughness: .85 }),
-      wall: new THREE.MeshStandardMaterial({ color: trim, map: stone, roughness: .92 }),
-    };
+
+  const standard = (color, source, extra = {}) => new THREE.MeshStandardMaterial({
+    color, map: texture(art(source)), roughness: .86, ...extra,
   });
-  const lantern = new THREE.MeshStandardMaterial({ color: '#ffda86', emissive: '#e58c41', emissiveIntensity: 1.3 });
-  const violet = new THREE.MeshStandardMaterial({ color: '#cdb7fb', emissive: '#8155db', emissiveIntensity: 1.5 });
-  const metal = new THREE.MeshStandardMaterial({ color: '#644555', roughness: .62 });
+  const materials = {
+    timber: standard('#bda0a3', 'world-timber'),
+    roofTile: standard('#9ca0bc', 'world-tile'),
+    plaster: standard('#afa9c5', 'world-plaster'),
+    lattice: standard('#bd99a4', 'world-lattice', { emissive: '#4e2520', emissiveIntensity: .25 }),
+    cloth: standard('#b399a7', 'world-cloth', { side: THREE.DoubleSide }),
+    brick: standard('#a2a1ba', 'world-brick'),
+    lantern: standard('#ffd58d', 'world-cloth', { emissive: '#e98938', emissiveIntensity: 1.65 }),
+    violet: standard('#b4c6ff', 'world-plaster', { emissive: '#666bff', emissiveIntensity: 1.32 }),
+  };
+  const anchors = buildArchitecture(THREE, scene, materials);
   function box(w, h, d, x, y, z, material) {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
     mesh.position.set(x, y, z);
     scene.add(mesh);
     return mesh;
   }
-
-  districts.forEach(({ width, depth, x, z }, index) => {
-    box(width, .14, depth, x, -.071, z, materials[index].floor);
+  const stone = texture(art('stone'));
+  stone.wrapS = stone.wrapT = THREE.RepeatWrapping;
+  districts.forEach(({ width, depth, x, y = 0, z, color }) => {
+    const tiles = stone.clone();
+    tiles.repeat.set(width / 3.9, depth / 3.9);
+    const paving = new THREE.MeshStandardMaterial({ color, map: tiles, roughness: .64, metalness: .16 });
+    box(width, .3, depth, x, y - .15, z, paving);
   });
-  box(8, .14, 6, 13, -.071, -44, materials[3].floor);
+  const rampAngle = Math.atan2(roofHeight, ramp.width);
+  box(Math.hypot(ramp.width, roofHeight), .2, ramp.depth, ramp.x,
+    roofHeight / 2 - .1 / Math.cos(rampAngle), ramp.z, materials.timber).rotation.z = rampAngle;
+  box(95, .55, 106, 18, -5.3, -34, materials.brick);
+
+  const colliders = [];
   const xs = [...new Set([-15, 46, ...walkways.flatMap(({ minX, maxX }) => [minX, maxX])])].sort((a,b) => a-b);
   const zs = [...new Set([-57, 15, ...walkways.flatMap(({ minZ, maxZ }) => [minZ, maxZ])])].sort((a,b) => a-b);
-  const colliders = [];
   for (let i = 1; i < xs.length; i++) {
     for (let j = 1; j < zs.length; j++) {
-      const [minX, maxX, minZ, maxZ] = [xs[i-1], xs[i], zs[j-1], zs[j]];
+      const [minX, maxX, minZ, maxZ] = [xs[i - 1], xs[i], zs[j - 1], zs[j]];
       if (!walkways.some((rect) => within(rect, (minX + maxX) / 2, (minZ + maxZ) / 2))) {
         colliders.push({ minX, maxX, minZ, maxZ });
       }
     }
   }
+  const block = (x, z, width, depth) => colliders.push(limits({ x, z, width, depth }));
+  for (const side of [-1, 1]) {
+    for (const z of [-6.02, -.42, 5.28]) block(side * 6, z, 1.72, 2.56);
+    for (const z of [-33.15, -39.75, -46.25]) {
+      if (side === -1 || z !== -46.25) block(side * 7, z, 1.72, 3.22);
+    }
+    for (const z of [-31, -38, -44.6, -49.45]) block(side * 4.5, z, .35, .35);
+  }
+  block(0, 2.78, 1.48, 1.04);
+  block(3.6, 1.26, 1.82, 1.31);
+  block(1.95, -39.19, 3.6, 1.25);
+  for (const [x, z] of roofCorridorPosts) block(x, z, .47, .47);
 
-  function stall(x, z, material, width = 2.65) {
-    box(width, .17, 1.56, x, .79, z, material);
-    for (const offset of [-width / 2 + .13, width / 2 - .13]) {
-      box(.14, 2.85, .14, x + offset, 1.42, z - .65, metal);
-    }
-    box(width + .25, .22, 1.83, x, 2.85, z, material);
-    artProp('festival-lantern', x + width / 3, 2.15, z + .52, .62);
-    colliders.push({ minX: x - width / 2, maxX: x + width / 2, minZ: z - .77, maxZ: z + .77 });
-  }
-  for (const z of [2, -2, -6]) {
-    stall(-6, z, materials[0].wall);
-    stall(6, z, materials[0].wall);
-  }
-  for (const [x, z] of [[-7,-33],[7,-33],[-7,-40],[7,-40],[-7,-47]]) stall(x, z, materials[2].wall);
-  for (const x of [-2.91, 2.91]) {
-    box(.23, 3.3, 19, x, 1.65, -19, materials[1].wall);
-    for (const z of [-12.8, -18, -24.2]) {
-      box(.18, .44, .4, x * .94, 2.24, z, violet);
-    }
-  }
+  const stepStone = standard('#70759b', 'world-brick');
+  const litStone = standard('#b5c4f4', 'world-brick', { emissive: '#6d91dc', emissiveIntensity: .48 });
   const steps = [];
-  const litStone = new THREE.MeshStandardMaterial({ color: '#8379b0', map: stone, emissive: '#6d91dc', emissiveIntensity: .25 });
   for (let z = -18; z > -27; z -= 1.4) {
-    steps.push(box(2.05, .028, .91, Math.sin(z) * .21, .012, z, materials[1].wall));
+    steps.push(box(2.05, .085, 1.09, Math.sin(z) * .21, .042, z, stepStone));
   }
-  for (const z of [-49.8, -34.2]) {
-    box(23.4, .68, .32, 29, .34, z, materials[3].wall);
-  }
-  for (const x of [18.5, 23.4, 29.2, 34.5, 39]) {
-    box(.28, 1.55, .28, x, .775, -46.6, metal);
-    artProp('festival-lantern', x, 1.35, -46.6, .66, -.6);
-  }
-  for (const [x, z, width] of [[0,-8.8,5.5],[0,-29,5.6]]) {
-    for (const side of [-1, 1]) {
-      box(.5, 3.15, .64, x + side * width / 2, 1.575, z, metal);
-      box(.33, .47, .33, x + side * (width / 2 - .4), 2.53, z, z < -10 ? violet : lantern);
-    }
-    box(width + .55, .38, .8, x, 3.12, z, metal);
-  }
-  box(1.48, .91, 1.04, 0, .455, 2.78, materials[0].wall);
-  box(1.82, .83, 1.31, 3.6, .415, 1.26, materials[0].wall);
-  box(3.6, .83, 1.25, 1.95, .415, -39.19, materials[2].wall);
-  colliders.push({ minX: -.74, maxX: .74, minZ: 2.26, maxZ: 3.3 },
-    { minX: 2.69, maxX: 4.51, minZ: .61, maxZ: 1.92 },
-    { minX: .15, maxX: 3.75, minZ: -39.81, maxZ: -38.56 });
 
   function artProp(name, x, y, z, height, yaw = 0) {
-    const width = { phone: .53, mirror: .71, shadow: .43, 'festival-lantern': .53, keepsake: .66, 'painted-lantern': .44, grandma: .57, vendor: .63, 'lantern-keeper': .36 }[name];
-    const map = texture(art(name));
-    const material = new THREE.MeshStandardMaterial({
-      map, alphaTest: .24, transparent: true, side: THREE.DoubleSide, roughness: .84,
-      emissive: name === 'shadow' ? '#30194a' : '#654438', emissiveIntensity: .37,
+    const width = { phone: .53, mirror: .71, shadow: .43, 'festival-lantern': .53, keepsake: .66,
+      'painted-lantern': .44, grandma: .57, vendor: .63, 'lantern-keeper': .36 }[name];
+    const material = standard('#ffffff', name, {
+      alphaTest: .23, transparent: true, side: THREE.DoubleSide,
+      emissive: name === 'shadow' ? '#30194a' : '#654438', emissiveIntensity: .36,
     });
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(height * width, height), material);
     mesh.position.set(x, y + height / 2, z);
@@ -143,51 +169,78 @@ export function buildShadowMarket(THREE, resume = 0) {
   }
   const targets = new Map(Object.entries(objects).map(([id, { name, art: image, at, base = 0, height }]) => {
     const [x, z] = at;
-    return [id, { label: name, object: artProp(image, x, base, z, height, id === 'rooftop' ? -Math.PI / 2 : 0) }];
+    const facing = id === 'rooftop' ? -Math.PI / 2 : 0;
+    const object = artProp(image, x, groundHeight(x, z) + base, z, height, facing);
+    return [id, { label: name, object }];
   }));
-  artProp('painted-lantern', 2.65, .86, -39, .96);
-  artProp('festival-lantern', .55, .86, -39, .85);
+  artProp('painted-lantern', 2.65, .92, -39, .96);
+  artProp('festival-lantern', .55, .92, -39, .85);
   artProp('grandma', 4.9, 0, .92, 1.58);
   artProp('vendor', 1.85, 0, -40.75, 1.85);
   artProp('mirror', 2.65, 0, -19.7, 1.7, -.45);
   artProp('mirror', -2.65, 0, -23.3, 1.72, .55);
   const runner = artProp('shadow', .4, 0, -21.6, 1.45);
-  const reunionLight = new THREE.PointLight('#ffd088', 7, 5);
-  reunionLight.position.set(3.6, 1.95, 1.4);
-  scene.add(reunionLight);
 
-  // Doorways open only when the story has sent the player to the next area.
   const gates = [
     { after: 0, x: 0, z: -9, width: 6, depth: .25 },
     { after: 2, x: 0, z: -29, width: 6, depth: .25 },
     { after: 3, x: 10, z: -44, width: .25, depth: 6 },
   ].map(({ after, x, z, width, depth }) => ({
-    after, mesh: box(width, 2.6, depth, x, 1.3, z, metal),
+    after, mesh: box(width, 2.75, depth, x, 1.375, z, materials.lattice),
     collider: limits({ width, depth, x, z }),
   }));
   const permanent = colliders.length;
-  const skyLight = new THREE.HemisphereLight('#dbcdef', '#695166', 2.1);
-  const sun = new THREE.DirectionalLight('#faddb7', 2.3);
-  sun.position.set(-8, 9, 4);
-  scene.add(skyLight, sun);
+  const moon = new THREE.DirectionalLight('#aabaff', 1.34);
+  moon.position.set(-9, 14, -7);
+  scene.add(new THREE.HemisphereLight('#c0c3e8', '#7d5e70', 1.82), moon);
+  const localLights = Array.from({ length: 4 }, () => {
+    const lamp = new THREE.PointLight('#ffd397', 11, 7.4);
+    scene.add(lamp);
+    return lamp;
+  });
+  let lightX = Infinity;
+  let lightZ = Infinity;
+  function lightScene(x, z) {
+    if (Math.hypot(lightX - x, lightZ - z) < .8) return;
+    lightX = x;
+    lightZ = z;
+    const nearest = anchors.map((item) => ({ ...item, distance: (item.x - x) ** 2 + (item.z - z) ** 2 }));
+    nearest.sort((a, b) => a.distance - b.distance);
+    localLights.forEach((lamp, index) => {
+      const anchor = nearest[index];
+      lamp.position.set(anchor.x, anchor.y - .16, anchor.z);
+      lamp.color.set(anchor.color === 'blue' ? '#798fff' : '#ffc07a');
+    });
+  }
+  const reunionLight = new THREE.PointLight('#ffd088', 7, 5);
+  reunionLight.position.set(3.6, 1.95, 1.4);
+  scene.add(reunionLight);
+
   const showHint = createHintPortal(THREE, scene, targets);
   let time = 0;
   let crossingTime = 0;
+  let previousIndex = -1;
+  let previousStep;
   function update(dt, state, camera) {
     const index = state.index ?? resume;
-    colliders.length = permanent;
-    for (const gate of gates) {
-      gate.mesh.visible = index <= gate.after;
-      if (gate.mesh.visible) colliders.push(gate.collider);
+    if (index !== previousIndex || state.step !== previousStep) {
+      previousIndex = index;
+      previousStep = state.step;
+      colliders.length = permanent;
+      for (const gate of gates) {
+        gate.mesh.visible = index <= gate.after;
+        if (gate.mesh.visible) colliders.push(gate.collider);
+      }
+      const mirrorReady = index > 1 || (index === 1 && ['check', 'writing'].includes(state.step));
+      targets.get('mirror').object.rotation.z = mirrorReady ? 0 : -.15;
+      for (const step of steps) step.material = mirrorReady ? litStone : stepStone;
+      targets.get('trail').object.visible = index === 0;
+      targets.get('rooftop').object.visible = index === 4;
+      targets.get('reunion').object.visible = index >= 5;
+      targets.get('keepsake').object.visible = index <= 3;
+      reunionLight.visible = index === 5 && state.step !== 'seek';
     }
     targets.get('phone').object.visible = !state.phone;
-    targets.get('trail').object.visible = index === 0;
-    targets.get('rooftop').object.visible = index === 4;
-    targets.get('reunion').object.visible = index >= 5;
-    const mirrorReady = index > 1 || (index === 1 && ['check', 'writing'].includes(state.step));
-    targets.get('mirror').object.rotation.z = mirrorReady ? 0 : -.15;
-    for (const step of steps) step.material = mirrorReady ? litStone : materials[1].wall;
-    targets.get('keepsake').object.visible = index <= 3;
     if (!state.reducedMotion) time += dt;
     const { x, z } = camera.position;
     if (index !== 2) crossingTime = 0;
@@ -196,19 +249,10 @@ export function buildShadowMarket(THREE, resume = 0) {
     runner.visible = index === 2 && state.step === 'seek' && hop < 1;
     runner.position.y = .725 + (state.reducedMotion ? 0 : .55 * Math.sin(hop * Math.PI));
     runner.position.z = -21.6 - (state.reducedMotion ? 0 : 6.1 * hop);
-    reunionLight.visible = index === 5 && state.step !== 'seek';
-    const area = x > 10 ? 3 : z < -29 ? 2 : z < -9 ? 1 : 0;
-    const backdrop = backdrops[area];
-    if (backdrop.image) {
-      const ratio = camera.aspect * backdrop.image.height / backdrop.image.width;
-      backdrop.repeat.set(Math.min(1, ratio), Math.min(1, 1 / ratio));
-      backdrop.offset.set(
-        (1 - backdrop.repeat.x) * (.5 - Math.sin(camera.rotation.y) * .34),
-        (1 - backdrop.repeat.y) * (.5 - Math.sin(camera.rotation.x) * .34),
-      );
-    }
-    scene.background = backdrop.image ? backdrop : sky;
+    sky.position.copy(camera.position);
+    sky.material.uniforms.dawn.value = THREE.MathUtils.clamp((x - 9) / 15, 0, 1);
+    lightScene(x, z);
     showHint(state.hint, camera, time, !state.reducedMotion);
   }
-  return { scene, spawn: checkpoints[Math.min(resume, 5)], targets, colliders, ready: Promise.all(loads), update };
+  return { scene, spawn: checkpoints[Math.min(resume, 5)], targets, colliders, ready: Promise.all(loads), update, groundHeight };
 }

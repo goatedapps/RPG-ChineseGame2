@@ -178,6 +178,12 @@
   box-shadow: 0 2px 3px #2d131c;
 }
 .cord-loop:hover:enabled i { border-color: #ffe0a1; }
+.cord-loop[data-loose] i {
+  outline: 2px solid #ffd889;
+  outline-offset: 3px;
+  filter: drop-shadow(0 0 6px #ffcf65);
+}
+.minigame .cord-loop[data-held] { cursor: grabbing; }
 .cord-loop[data-free] i { opacity: .68; }
 
 .rooftop-game .minigame-stage {

@@ -113,9 +113,9 @@ function fixMirror(play, finish) {
 // The cord starts at the lantern, runs around the middle, left and right
 // hooks, and ends at the tassel. Only the loop nearest the free end lifts.
 const hooks = [
-  { x: 210, y: 83, label: '中间的绳圈', tip: [215, 157] },
-  { x: 96, y: 83, label: '左边的绳圈', tip: [72, 164] },
-  { x: 322, y: 83, label: '右边的绳圈', tip: [355, 160] },
+  { x: 210, y: 83, label: '中间的绳圈' },
+  { x: 96, y: 83, label: '左边的绳圈' },
+  { x: 322, y: 83, label: '右边的绳圈' },
 ];
 const cordRoutes = [
   'M200 180 Q185 129 210 98 Q234 74 212 69 Q196 72 193 94 Q155 123 112 95 Q95 83 96 68 Q77 70 82 93 Q105 153 222 130 Q274 121 307 98 Q330 77 322 69 Q303 70 305 95 Q324 129 355 160',
@@ -126,7 +126,7 @@ const cordRoutes = [
 const svg = (tag) => document.createElementNS('http://www.w3.org/2000/svg', tag);
 
 function untangleLantern(play, finish) {
-  const game = makeMinigame('解开灯绳', '顺着金色绳头找过去，把绳圈从挂钩上抬下来。', play, finish);
+  const game = makeMinigame('解开灯绳', '把亮起的绳圈往上抬。', play, finish);
   const { root, stage, status } = game;
   const { animate, activate } = motionFor(game);
   root.classList.add('cord-game');
@@ -154,55 +154,145 @@ function untangleLantern(play, finish) {
   ropes.append(left, right, cord, tassel);
 
   let count = 0;
+  let pointer;
+  let settling = false;
+  const routeSamples = [];
   const loops = hooks.map((hook, index) => {
     const loop = control(hook.label, 'cord-loop');
     loop.style.left = hook.x / 4 + '%';
     loop.style.top = hook.y / 3.2 + '%';
     loop.append(element('i'));
-    dragPiece(loop, (event) => {
-      const rect = stage.getBoundingClientRect();
-      if (event.clientY < rect.top + rect.height * hook.y / 320 - 10) lift(index);
-      else status.textContent = '把绳圈往上抬，离开挂钩。';
-    }, () => lift(index));
+    loop.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || pointer || settling) return;
+      const bounds = stage.getBoundingClientRect();
+      pointer = { id: event.pointerId, index, x: event.clientX, y: event.clientY, bounds, dx: 0, dy: 0 };
+      loop.setPointerCapture(event.pointerId);
+      loop.dataset.held = '';
+    });
+    loop.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== pointer?.id) return;
+      pointer.dx = event.clientX - pointer.x;
+      pointer.dy = event.clientY - pointer.y;
+      const [x, y] = cordOffset(pointer);
+      draw(deform(index, x, y), count);
+    });
+    loop.addEventListener('pointerup', (event) => {
+      if (event.pointerId !== pointer?.id) return;
+      const attempt = pointer;
+      pointer = undefined;
+      delete loop.dataset.held;
+      if (Math.hypot(attempt.dx, attempt.dy) < 9 || attempt.dy < -12) lift(index, attempt);
+      else reject(index, attempt, '把绳圈往上抬，离开挂钩。');
+    });
+    loop.addEventListener('lostpointercapture', (event) => {
+      if (event.pointerId !== pointer?.id) return;
+      const attempt = pointer;
+      pointer = undefined;
+      delete loop.dataset.held;
+      settle(deform(index, ...cordOffset(attempt)), count);
+    });
+    loop.addEventListener('click', (event) => {
+      if (event.detail === 0 && !settling) lift(index);
+    });
     return loop;
   });
 
-  function draw() {
-    cord.setAttribute('d', cordRoutes[count]);
-    const tip = hooks[hooks.length - 1 - count]?.tip;
-    tassel.style.display = tip ? '' : 'none';
-    if (tip) {
-      tassel.setAttribute('cx', tip[0]);
-      tassel.setAttribute('cy', tip[1]);
-    }
+  function cordOffset(attempt) {
+    if (!attempt) return [0, 0];
+    const max = currentLoop() === attempt.index ? 55 : 15;
+    return [
+      Math.max(-max, Math.min(max, attempt.dx * 400 / attempt.bounds.width)),
+      Math.max(-max, Math.min(max, attempt.dy * 320 / attempt.bounds.height)),
+    ];
   }
 
-  function lift(index) {
-    if (loops[index].disabled) return;
-    if (index !== hooks.length - 1 - count) {
-      status.textContent = '绳子还卡着。从金色绳头找起。';
-      play('bounce');
-      animate(() => window.gsap.fromTo(take, { rotation: -4 }, { rotation: 0, duration: .6, ease: 'elastic.out(1,.45)', overwrite: true, clearProps: 'transform' }));
-      return;
-    }
-    const loop = loops[index];
-    loop.disabled = true;
-    loop.dataset.free = '';
-    count++;
-    draw();
-    play('ding');
-    animate(() => {
-      window.gsap.fromTo(cord, { opacity: .42 }, { opacity: 1, duration: .28, clearProps: 'opacity' });
-      window.gsap.fromTo(take, { rotation: 3 }, { rotation: 0, duration: .48, ease: 'elastic.out(1,.5)', overwrite: true, clearProps: 'transform' });
+  function currentLoop() {
+    return hooks.length - 1 - count;
+  }
+
+  function deform(index, dx, dy) {
+    const { x, y } = hooks[index];
+    return routeSamples[count].map((point) => {
+      const distance = Math.hypot(point.x - x, point.y - y);
+      const weight = Math.max(0, 1 - distance / 52);
+      return { x: point.x + dx * weight, y: point.y + dy * weight };
     });
+  }
+
+  function draw(points, state) {
+    cord.setAttribute('d', points.map(({ x, y }, i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)).join(' '));
+    const end = points.at(-1);
+    tassel.setAttribute('cx', end.x);
+    tassel.setAttribute('cy', end.y);
+    tassel.style.display = state < hooks.length ? '' : 'none';
+  }
+
+  function updateLoops() {
+    loops.forEach((loop, i) => { loop.toggleAttribute('data-loose', i === currentLoop()); });
     if (count === hooks.length) {
       take.disabled = false;
       take.focus({ preventScroll: true });
-      status.textContent = '灯绳松开了。拿起旧灯笼。';
-    } else {
-      status.textContent = '再顺着绳头找下一处。';
-      loops.find(button => !button.disabled)?.focus({ preventScroll: true });
+      status.textContent = '灯绳松开了。轻触旧灯笼，把它拿走。';
     }
+  }
+
+  function settle(from, next) {
+    const to = routeSamples[next];
+    settling = Boolean(window.gsap) && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!settling) {
+      draw(to, next);
+      updateLoops();
+      return;
+    }
+    const blend = { progress: 0 };
+    animate(() => window.gsap.to(blend, {
+      progress: 1,
+      duration: .34,
+      ease: 'power2.out',
+      onUpdate: () => {
+        const t = blend.progress;
+        draw(from.map(({ x, y }, i) => ({ x: x + (to[i].x - x) * t, y: y + (to[i].y - y) * t })), Math.min(next, hooks.length - 1));
+      },
+      onComplete: () => {
+        settling = false;
+        draw(to, next);
+        updateLoops();
+      },
+    }));
+  }
+
+  function swing(direction) {
+    animate(() => window.gsap.timeline({ defaults: { overwrite: 'auto' } })
+      .to(take, { rotation: direction * 4, duration: .13, ease: 'power1.out' })
+      .to(take, { rotation: 0, duration: .56, ease: 'elastic.out(1,.42)', clearProps: 'transform' }));
+  }
+
+  function reject(index, attempt, message) {
+    status.textContent = message;
+    play('bounce');
+    const from = deform(index, ...(attempt ? cordOffset(attempt) : [0, -12]));
+    draw(from, count);
+    settle(from, count);
+    swing(-1);
+  }
+
+  function lift(index, attempt) {
+    if (loops[index].disabled || settling) return;
+    if (index !== currentLoop()) {
+      reject(index, attempt, '这圈还压着。先松开金色绳头旁的绳圈。');
+      return;
+    }
+    const from = deform(index, ...(attempt ? cordOffset(attempt) : [0, -29]));
+    const loop = loops[index];
+    loop.disabled = true;
+    loop.dataset.free = '';
+    delete loop.dataset.loose;
+    count++;
+    if (count < hooks.length) status.textContent = '顺着松开的绳头找下一圈。';
+    play('ding');
+    settle(from, count);
+    swing(1);
+    if (count < hooks.length) loops[currentLoop()].focus({ preventScroll: true });
   }
 
   take.onclick = () => {
@@ -210,9 +300,20 @@ function untangleLantern(play, finish) {
     animate(() => window.gsap.to(take, { yPercent: -15, scale: 1.08, duration: .38, ease: 'power2.out' }));
     game.finish('旧灯笼拿到了。', null, 'pickup');
   };
-  draw();
   stage.append(rack, ...decorations, take, ropes, ...loops);
-  return { ...game, focusTarget: game.heading, activate };
+  return {
+    ...game, focusTarget: game.heading,
+    activate() {
+      activate();
+      for (const route of cordRoutes) {
+        cord.setAttribute('d', route);
+        const length = cord.getTotalLength();
+        routeSamples.push(Array.from({ length: 80 }, (_, index) => cord.getPointAtLength(length * index / 79)));
+      }
+      draw(routeSamples[0], 0);
+      updateLoops();
+    },
+  };
 }
 
 const actions = {

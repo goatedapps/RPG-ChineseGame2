@@ -1,6 +1,6 @@
-import { createEngine } from '../greenhouse/engine.js?v=shadow-market';
+import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=minigame-volume';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=correct-answer';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
@@ -14,8 +14,8 @@ import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
 import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
-import { buildShadowMarket, checkpoints } from './world.js?v=market-games';
-import { marketMinigames } from './minigames.js?v=market-games';
+import { buildShadowMarket, checkpoints } from './world.js?v=spatial-market';
+import { marketMinigames } from './minigames.js?v=cord-motion';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.shadowmarket';

@@ -67,7 +67,7 @@ export function createEngine({
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.18;
 
-  const { scene, targets, colliders, spawn, update, ready } = worldFactory(THREE);
+  const { scene, targets, colliders, spawn, update, ready, groundHeight = () => 0 } = worldFactory(THREE);
   const camera = new THREE.PerspectiveCamera(65, 1, .065, 110);
   const raycaster = new THREE.Raycaster();
   raycaster.far = REACH;
@@ -116,7 +116,7 @@ export function createEngine({
     pitch = nextSpawn.pitch ?? -.022;
     stride = 0;
     bob = 0;
-    camera.position.set(nextSpawn.x, EYE_HEIGHT, nextSpawn.z);
+    camera.position.set(nextSpawn.x, groundHeight(nextSpawn.x, nextSpawn.z) + EYE_HEIGHT, nextSpawn.z);
     applyView();
     choose(null);
     nextRay = 0;
@@ -267,7 +267,7 @@ export function createEngine({
     }
     const bobTarget = quiet ? 0 : Math.sin(stride * 6.5) * Math.min(.018, distance * .33);
     bob = quiet ? 0 : THREE.MathUtils.lerp(bob, bobTarget, damp);
-    camera.position.y = EYE_HEIGHT + bob;
+    camera.position.y = groundHeight(camera.position.x, camera.position.z) + EYE_HEIGHT + bob;
   }
 
   let width = 0;

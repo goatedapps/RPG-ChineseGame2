@@ -5,7 +5,7 @@ import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=minigame-volume';
+import { createGreenhouseAudio } from './sounds.js?v=correct-answer';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
@@ -602,7 +602,7 @@ function completeObject(target, inspected = false) {
   }
   save();
   if (target.id !== 'westNote') sendStep(mission, state.action);
-  if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'correct'));
+  if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'interaction'));
   if (target.id === 'soilPot') response(action.resultCN, true);
   else hideResponse();
   objective();
