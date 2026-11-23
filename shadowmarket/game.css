@@ -32,12 +32,87 @@
 .market-review summary { cursor: pointer; }
 .market-review p { margin-block-start: .4rem; line-height: 1.6; }
 #workbench.artifact-inspection::backdrop { background: #140d25ad; backdrop-filter: blur(6px); }
-.market-clue { width: min(100%, 35rem); text-align: center; }
-.market-clue h2 { color: var(--sun); }
-.clue-touch { display: inline-grid; justify-items: center; margin-block: .2rem; padding: .4rem; background: none; border: 0; }
-.clue-touch span { min-height: 44px; display: grid; align-items: center; text-decoration: underline; text-underline-offset: .25em; }
-.clue-object { display: block; width: auto; max-width: 80vw; height: min(34dvh, 16rem); object-fit: contain; filter: drop-shadow(0 .6rem 1rem #0d0b19af); }
-.clue-copy { padding: .75rem .95rem; border: 1px solid var(--line); border-radius: .5rem; color: var(--cream); background: #22192fe8; line-height: 1.72; text-align: start; }
+.market-encounter { position: relative; width: min(100%, 34rem); }
+.encounter-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.encounter-tap {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  align-items: end;
+  gap: .85rem;
+  padding: 0;
+  color: var(--cream);
+  background: none;
+  border: 0;
+  border-radius: .75rem;
+}
+.encounter-object {
+  display: block;
+  width: auto;
+  max-width: 88%;
+  height: min(43dvh, 22rem);
+  object-fit: contain;
+  filter: drop-shadow(0 .6rem 1rem #0d0b19af);
+}
+.encounter-copy {
+  display: grid;
+  width: 100%;
+  padding: .72rem 3.3rem .9rem 1rem;
+  text-align: start;
+  min-height: 8.2rem;
+  align-content: start;
+  background: #231a30f5;
+  border: 1px solid #b795747d;
+  border-radius: .7rem;
+  box-shadow: 0 .45rem 1.4rem #0d0b19b0;
+}
+.encounter-speaker { margin-bottom: .32rem; color: var(--sun); font-size: .86rem; font-weight: 700; }
+.encounter-line {
+  display: grid;
+  font-size: clamp(1.08rem, 4.9vw, 1.38rem);
+  line-height: 1.62;
+  overflow-wrap: anywhere;
+}
+.encounter-line span { grid-area: 1 / 1; }
+.encounter-full { opacity: 0; }
+.line-ready .encounter-full { opacity: 1; }
+.encounter-next {
+  position: absolute;
+  bottom: .55rem;
+  right: 1rem;
+  color: var(--sun);
+  opacity: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.line-ready .encounter-next { opacity: 1; }
+.market-encounter > .clue-speaker {
+  position: absolute;
+  right: .45rem;
+  bottom: 2.45rem;
+  width: 44px;
+  height: 44px;
+}
+.encounter-note {
+  min-height: 11rem;
+  align-content: center;
+  padding-left: 1.2rem;
+  background: #e9d7b4 url('../greenhouse/art/paper-crumpled.webp') center / 100% 100%;
+  color: #30261e;
+}
+.encounter-note :is(.encounter-speaker,.encounter-next) { color: #633a28; }
+.market-encounter:has(.encounter-note) > .clue-speaker {
+  color: #633a28;
+  border-color: #9b744d;
+  background: #efdfba;
+}
 @media (max-width: 450px) {
   .identity div span { white-space: nowrap; }
   .identity .emblem-plant { display: none; }

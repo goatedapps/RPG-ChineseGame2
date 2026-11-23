@@ -1,5 +1,5 @@
 import { createHintPortal } from '../shared/hint-portal.js';
-import { art, arrival, objects } from './story.js';
+import { art, arrival, objects } from './story.js?v=encounters';
 
 export const checkpoints = [
   arrival, { x: 0, z: -10.4 }, { x: 0, z: -17.5 },
@@ -128,7 +128,7 @@ export function buildShadowMarket(THREE, resume = 0) {
     { minX: .15, maxX: 3.75, minZ: -39.81, maxZ: -38.56 });
 
   function artProp(name, x, y, z, height, yaw = 0) {
-    const width = { phone: .53, mirror: .71, shadow: .43, 'festival-lantern': .53, keepsake: .66, 'painted-lantern': .44, grandma: .57, vendor: .63 }[name];
+    const width = { phone: .53, mirror: .71, shadow: .43, 'festival-lantern': .53, keepsake: .66, 'painted-lantern': .44, grandma: .57, vendor: .63, 'lantern-keeper': .36 }[name];
     const map = texture(art(name));
     const material = new THREE.MeshStandardMaterial({
       map, alphaTest: .24, transparent: true, side: THREE.DoubleSide, roughness: .84,
@@ -151,6 +151,10 @@ export function buildShadowMarket(THREE, resume = 0) {
   artProp('vendor', 1.85, 0, -40.75, 1.85);
   artProp('mirror', 2.65, 0, -19.7, 1.7, -.45);
   artProp('mirror', -2.65, 0, -23.3, 1.72, .55);
+  const runner = artProp('shadow', .4, 0, -21.6, 1.45);
+  const reunionLight = new THREE.PointLight('#ffd088', 7, 5);
+  reunionLight.position.set(3.6, 1.95, 1.4);
+  scene.add(reunionLight);
 
   // Doorways open only when the story has sent the player to the next area.
   const gates = [
@@ -168,6 +172,7 @@ export function buildShadowMarket(THREE, resume = 0) {
   scene.add(skyLight, sun);
   const showHint = createHintPortal(THREE, scene, targets);
   let time = 0;
+  let crossingTime = 0;
   function update(dt, state, camera) {
     const index = state.index ?? resume;
     colliders.length = permanent;
@@ -179,12 +184,19 @@ export function buildShadowMarket(THREE, resume = 0) {
     targets.get('trail').object.visible = index === 0;
     targets.get('rooftop').object.visible = index === 4;
     targets.get('reunion').object.visible = index >= 5;
-    const mirrorReady = index > 1 || (index === 1 && state.step !== 'seek');
+    const mirrorReady = index > 1 || (index === 1 && (state.beat >= 2 || ['check', 'writing'].includes(state.step)));
     targets.get('mirror').object.rotation.z = mirrorReady ? 0 : -.15;
     for (const step of steps) step.material = mirrorReady ? litStone : materials[1].wall;
     targets.get('keepsake').object.visible = index <= 3;
     if (!state.reducedMotion) time += dt;
     const { x, z } = camera.position;
+    if (index !== 2) crossingTime = 0;
+    if (index === 2 && z < -17.2) crossingTime += dt;
+    const hop = Math.min(crossingTime / 1.5, 1);
+    runner.visible = index === 2 && state.step === 'seek' && hop < 1;
+    runner.position.y = .725 + (state.reducedMotion ? 0 : .55 * Math.sin(hop * Math.PI));
+    runner.position.z = -21.6 - (state.reducedMotion ? 0 : 6.1 * hop);
+    reunionLight.visible = index === 5 && state.step !== 'seek';
     const area = x > 10 ? 3 : z < -29 ? 2 : z < -9 ? 1 : 0;
     const backdrop = backdrops[area];
     if (backdrop.image) {

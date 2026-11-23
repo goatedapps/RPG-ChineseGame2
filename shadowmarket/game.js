@@ -13,8 +13,8 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock'
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
-import { art, arrival, chapters, ending, objects, opening } from './story.js?v=mission-context';
-import { buildShadowMarket, checkpoints } from './world.js';
+import { art, arrival, chapters, ending, objects, opening } from './story.js?v=encounters';
+import { buildShadowMarket, checkpoints } from './world.js?v=encounters';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.shadowmarket';
@@ -29,7 +29,7 @@ const canvas = $('scene');
 const map = () => location.assign('./?level=p6');
 const defaultState = () => ({
   phase: 'prelude', index: 0, phone: false, called: false, briefing: '',
-  step: 'seek', question: 0, writing: 0, known: [], passed: false, final: null, practice: null,
+  step: 'seek', beat: 0, question: 0, writing: 0, known: [], passed: false, final: null, practice: null,
   effects: true, music: true,
 });
 function load() {
@@ -97,7 +97,7 @@ function cueRead(force = false) {
 }
 
 function worldState() {
-  engine?.setGameState({ index: state.index, step: state.step, phone: state.phone, hint });
+  engine?.setGameState({ index: state.index, step: state.step, beat: state.beat, phone: state.phone, hint });
 }
 function renderTarget(next) {
   target = next;
@@ -116,7 +116,7 @@ function refresh() {
   currentCue = !state.phone ? '看看灯笼广场，拿起前面矮桌上的智能手机。'
     : !state.called ? '打开手机，拨打阿岚的号码。'
       : waiting() ? '打开手机，先看看阿岚说了什么。'
-        : state.step === 'seek' ? task?.cue : '再查看' + (objects[task?.id]?.name ?? '线索') + '，完成记录和听写。';
+        : state.step === 'seek' || state.step === 'clue' ? task?.cue : '回到刚才的地点，继续完成记录和听写。';
   $('cue-text').textContent = currentCue ?? '';
   $('replay-cue').disabled = Boolean(waiting());
   const holdingLantern = state.index === 4 || (state.index === 5 && state.step === 'seek');
@@ -203,7 +203,7 @@ function advance() {
   state.index++;
   if (state.index === 5) engine?.reset(checkpoints[5]);
   state.step = 'seek';
-  state.question = state.writing = 0;
+  state.beat = state.question = state.writing = 0;
   hint = undefined;
   if (state.index === chapters.length) {
     state.phase = 'epilogue';
@@ -224,28 +224,79 @@ function study(task) {
     showCheck(task);
     return;
   }
-  const object = objects[task.id];
-  const heading = element('h2', '', object.name);
+  showEncounter(task);
+}
+
+function showEncounter(task) {
+  const turn = task.beats[state.beat] ? Number(state.beat) : 0;
+  const [speaker, text, image = objects[task.id].art] = task.beats[turn];
+  const last = turn === task.beats.length - 1;
+  const sheet = element('article', 'market-encounter');
+  const heading = element('h2', 'encounter-heading', task.title);
   heading.id = 'panel-title';
-  const picture = element('img', 'clue-object');
-  picture.src = art(object.art);
-  picture.alt = '';
-  picture.draggable = false;
-  const read = button('', () => {
-    state.step = 'check';
+  const copy = element('span', 'encounter-copy');
+  const label = element('span', 'encounter-speaker', speaker);
+  const line = element('span', 'encounter-line');
+  const full = element('span', 'encounter-full', text);
+  const typed = element('span', 'encounter-typed');
+  typed.setAttribute('aria-hidden', 'true');
+  line.append(full, typed);
+  const next = element('span', 'encounter-next', '⌄');
+  next.setAttribute('aria-hidden', 'true');
+  copy.append(label, line, next);
+
+  const playback = clueReader(task.id + ':' + turn, text);
+  const advanceLine = button('', () => {
+    if (!copy.classList.contains('line-ready')) {
+      showFullLine();
+      return;
+    }
+    if (last) state.step = 'check';
+    else state.beat = turn + 1;
     save();
-    showCheck(task);
-  }, 'clue-touch');
-  read.setAttribute('aria-label', '读完线索，继续');
-  read.append(picture, element('span', '', '轻触物件继续'));
-  const sheet = element('article', 'market-clue');
-  const copy = element('div', 'clue-copy');
-  const playback = clueReader(task.id, task.clue);
-  copy.append(element('p', '', task.clue), playback.button);
-  sheet.append(heading, read, copy);
-  showPanel(sheet, read, true);
+    worldState();
+    study(task);
+  }, 'encounter-tap');
+  label.id = 'encounter-speaker';
+  line.id = 'encounter-line';
+  advanceLine.setAttribute('aria-label', '显示整句话');
+  advanceLine.setAttribute('aria-describedby', label.id + ' ' + line.id);
+  if (image) {
+    const picture = element('img', 'encounter-object');
+    picture.src = art(image);
+    picture.alt = '';
+    picture.draggable = false;
+    advanceLine.append(picture);
+  } else copy.classList.add('encounter-note');
+  advanceLine.append(copy);
+  sheet.append(heading, advanceLine, playback.button);
+  showPanel(sheet, advanceLine, true);
   playback.reveal();
-  play(task.id === 'mirror' ? 'seal' : 'paper');
+  if (turn === 2 && task.id === 'mirror') play('seal');
+  if (turn === 0 && task.id === 'reunion') play('finish');
+
+  function showFullLine() {
+    copy.classList.add('line-ready');
+    typed.textContent = '';
+    advanceLine.setAttribute('aria-label', last ? '继续任务' : '继续对话');
+  }
+
+  if (motion.matches) {
+    showFullLine();
+    return;
+  }
+  const characters = [...text];
+  const start = performance.now();
+  function type(now) {
+    if (!sheet.isConnected || !desk.open || copy.classList.contains('line-ready')) return;
+    const count = Math.floor((now - start) / 32) + 1;
+    if (count >= characters.length || motion.matches) showFullLine();
+    else {
+      typed.textContent = characters.slice(0, count).join('');
+      requestAnimationFrame(type);
+    }
+  }
+  requestAnimationFrame(type);
 }
 
 function showCheck(task) {
@@ -267,7 +318,7 @@ function showCheck(task) {
     const index = (n + start) % check.choices.length;
     const option = button(check.choices[index], () => {
       if (index !== check.answer) {
-        status.textContent = '再想一想。可以回看刚才的记录。';
+        status.textContent = '再想一想。可以回看刚才的线索。';
         play('wrong');
         return;
       }
@@ -282,11 +333,15 @@ function showCheck(task) {
   }
   const review = element('details', 'market-review');
   review.append(element('summary', '', '回看线索'));
-  const playback = clueReader(task.id, task.clue);
-  review.append(element('p', '', task.clue), playback.button);
+  const playback = clueReader(task.id + ':review', task.beats.map(([, line]) => line).join(''));
+  for (const [speaker, line] of task.beats) {
+    const item = element('p');
+    item.append(element('strong', '', speaker + '：'), document.createTextNode(line));
+    review.append(item);
+  }
+  review.append(playback.button);
   review.addEventListener('toggle', () => {
     if (!review.open) playback.stop();
-    else if (review.isConnected && desk.open) playback.reveal();
   });
   sheet.append(choices, review);
 }
@@ -525,7 +580,7 @@ const dev = createDeveloperMode({
     testCleanup?.();
     testCleanup = undefined;
     $('lesson-test').hidden = true;
-    Object.assign(state, { phase: 'world', index, phone: true, called: true, briefing: '', step: 'seek', question: 0, writing: 0 });
+    Object.assign(state, { phase: 'world', index, phone: true, called: true, briefing: '', step: 'seek', beat: 0, question: 0, writing: 0 });
     phone.reset();
     hint = undefined;
     lastRead = undefined;
