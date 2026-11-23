@@ -23,6 +23,10 @@ function settingsForTab() {
   }
 }
 
+export function developerSkipEnabled() {
+  return settingsForTab().skip;
+}
+
 export function createDeveloperMode({ panel, openPanel, taskCount, canJump, currentTask, onJump, onSkipDictation, onClose }) {
   const settings = settingsForTab();
   function persist() {

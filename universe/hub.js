@@ -1,6 +1,7 @@
 import { bindJoystick } from '../shared/joystick.js';
-import { lessonCompleted } from '../shared/lesson-progress.js';
-import { getWorlds, levels } from './catalog.js?v=shadow-market';
+import { lessonCompleted, lessonReachedFinal } from '../shared/lesson-progress.js?v=developer-unlock';
+import { developerSkipEnabled } from '../shared/developer-mode.js?v=developer-unlock';
+import { getWorlds, levels } from './catalog.js?v=developer-unlock';
 
 const $ = (id) => document.getElementById(id);
 const gradeKeys = Object.keys(levels);
@@ -100,7 +101,7 @@ function mapStatus(text = '', duration = 0) {
   if (duration) statusTimer = setTimeout(mapStatus, duration);
 }
 function refreshWorlds(level) {
-  worlds = getWorlds(level, lessonCompleted);
+  worlds = getWorlds(level, lessonCompleted, developerSkipEnabled() ? lessonReachedFinal : undefined);
   const completed = worlds.filter(({ status }) => status === 'complete').length;
   $('completion').textContent =
     '已完成 ' + completed + ' / ' + worlds.length + ' 课';

@@ -7,7 +7,7 @@ export function showSkippedFinal(host, { cardClass, headingId, onExit, onResume,
   heading.tabIndex = -1;
   heading.textContent = 'Final test skipped';
   const message = document.createElement('p');
-  message.textContent = 'Developer mode kept your saved test progress.';
+  message.textContent = 'Your test progress is saved. The next available lesson opens on the star map while skipping is on in this tab.';
   const actions = document.createElement('div');
   actions.className = 'button-row buttons';
   for (const [label, action] of [['Return to star map', onExit], ['Turn off skipping and take the test', onResume], ['Developer mode', onDeveloper]]) {

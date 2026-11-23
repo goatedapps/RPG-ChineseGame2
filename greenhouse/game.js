@@ -10,7 +10,7 @@ import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
-import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';

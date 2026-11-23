@@ -64,6 +64,7 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 - Let developers jump to a numbered task using the same numbers as the lesson HUD. Let them skip mission dictation and the final test with one switch that stays on in the current tab until turned off. Make Developer mode available from an in-progress or skipped final test.
 - Advance the scene and story together when skipping, and award handwriting credit only for work the player completes.
 - Preserve unfinished assessment progress when a developer skips the final test. Leave practice tests and normal completion credit on the regular assessment flow.
+- When a developer reaches the final test with skipping enabled, let them enter the next published lesson from the star map in the same tab. Keep this access tied to the skip switch.
 
 ## Assets and delivery
 

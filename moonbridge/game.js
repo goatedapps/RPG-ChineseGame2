@@ -17,7 +17,7 @@ import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
 import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=minigame-volume';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
-import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 
 import { playLessonComic } from '../shared/comic.js';
 import { bindJoystick } from '../shared/joystick.js';

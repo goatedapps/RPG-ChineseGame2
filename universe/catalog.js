@@ -42,7 +42,7 @@ export const chineseLesson = (number) => {
   );
 };
 
-export function getWorlds(level, isComplete) {
+export function getWorlds(level, isComplete, canSkipFinal = () => false) {
   const { count } = levels[level];
   let prerequisite = true;
   return Array.from({ length: count }, (_, index) => {
@@ -59,7 +59,7 @@ export function getWorlds(level, isComplete) {
             ? 'complete'
             : 'building'
         : 'locked';
-    prerequisite = prerequisite && complete;
+    prerequisite = prerequisite && (complete || canSkipFinal(level, number));
     return {
       number,
       lesson: chineseLesson(number),

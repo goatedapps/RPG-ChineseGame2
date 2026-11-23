@@ -19,6 +19,7 @@ Start with [AGENTS.md](../../../AGENTS.md) for the current project rules. Use th
 - Automatically read each new task instruction aloud in Mandarin when it appears on the HUD. For tasks with an English briefing, wait until the player has finished with it. Keep the Mandarin replay control available for the active task.
 - Automatically read the body of each Chinese clue aloud in Mandarin when the player first picks it up or opens it, including new pages of an in-world book. Speak the clue message only. Leave out headers, labels, signatures, and interaction instructions. Put the small [shared speaker control](../../../shared/speaker.js) beside the clue, including in review views. A tap while reading stops playback. A tap at rest reads from the beginning. Stop when the player closes, hides, or replaces the clue, turns the page, or leaves the screen.
 - Keep the shared Developer mode interface in English and let the developer jump to the task numbers shown on the HUD. The skip-dictation switch applies to task dictation and the final test and stays on in the tab until switched off.
+- After a developer reaches a lesson’s final test with skipping on, let them enter the next published world from the star map in that tab. Keep saved test progress and award completion credit when the final test is passed.
 
 ## 2. Reuse the reference lesson and shared components
 

@@ -9,7 +9,7 @@ import { bindJoystick } from '../shared/joystick.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
-import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
+import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
