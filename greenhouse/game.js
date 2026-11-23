@@ -1,11 +1,11 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { missions, objects, tutorial } from './story.js?v=seedling-shuffle';
+import { missions, objects, tutorial } from './story.js?v=root-login';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=minigame-music';
+import { createGreenhouseAudio } from './sounds.js?v=root-login';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
@@ -14,11 +14,12 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
-import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=mission-context';
+import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=root-login';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
-import { prepareExhibit, readRootFootage } from './minigames.js?v=seedling-shuffle';
+import { prepareExhibit } from './minigames.js?v=root-login';
 import { sealWindow } from './window-match.js';
 import { supportSeedling } from './seedling-shuffle.js';
+import { rootLogin } from './root-login.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
@@ -38,7 +39,7 @@ const hintDelay = 30000;
 const actionWords = [
   [['每逢', '暴雨', '恶劣', '缝'], [], []],
   [['耀眼'], ['鲜艳'], ['严格', '托']],
-  [['产生'], ['柔弱'], ['埋'], ['扎根']],
+  [['产生'], ['柔弱'], ['埋', '扎根'], []],
   [['梦'], ['锻炼'], ['测验', '临时抱佛脚'], []],
   [['优雅', '懒惰', '榜样'], [], ['凭']],
   [['克服'], ['坚强', '意志', '不屈不挠']],
@@ -85,7 +86,7 @@ function load() {
       held: Object.hasOwn(objects, data.held) ? data.held : null,
       notePending: data.notePending === true && data.mission === 0 && action === 1 && phase === 'explore',
       noteAnswer: typeof data.noteAnswer === 'string' ? data.noteAnswer.slice(0, 180) : '',
-      unlocked: unlocked.filter((id) => Object.hasOwn(screenChecks, id)),
+      unlocked: unlocked.filter((id) => id === 'rootCam' || Object.hasOwn(screenChecks, id)),
       endingSeen, lessonComplete, finalStarted,
       finalPassed: finalStarted && lessonComplete && data.finalPassed === true,
       finalTest: data.finalTest ?? null,
@@ -602,7 +603,8 @@ function completeObject(target, inspected = false) {
   save();
   if (target.id !== 'westNote') sendStep(mission, state.action);
   if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'correct'));
-  hideResponse();
+  if (target.id === 'soilPot') response(action.resultCN, true);
+  else hideResponse();
   objective();
 }
 
@@ -715,11 +717,7 @@ function playCloseup(build, next, showResult) {
   game.activate?.();
 }
 
-function showEvidence(id, next, recorded = false) {
-  if (id === 'rootCam' && next && !recorded) {
-    playCloseup(readRootFootage, next, () => showEvidence(id, next, true));
-    return;
-  }
+function showEvidence(id, next) {
   const item = evidence[id];
   const sheet = node('article', '', 'artifact-sheet artifact-' + item.kind);
   sheet.tabIndex = -1;
@@ -753,6 +751,25 @@ function showEvidence(id, next, recorded = false) {
 
 function inspectEvidence(target, next) {
   const { id } = target;
+  if (id === 'rootCam' && next) {
+    const words = missions[state.mission].dictation.map(({ word }) => ({ word, pinyin: lexicon[word].pinyin }));
+    function unlock() {
+      if (state.unlocked.includes(id)) return;
+      state.unlocked.push(id);
+      save();
+      worldState();
+    }
+    playCloseup(
+      (play, finish) => rootLogin(words, play, finish),
+      () => { unlock(); next(); },
+      () => { unlock(); showEvidence(id, next); },
+    );
+    return;
+  }
+  if (id === 'rootCam' && state.mission <= 2 && !state.unlocked.includes(id)) {
+    response('根系观察仪还没解锁。先安顿好幼苗。');
+    return;
+  }
   if (!screenChecks[id] || state.unlocked.includes(id)) {
     showEvidence(id, next);
     return;
@@ -1338,7 +1355,7 @@ audio.setMusicEnabled(musicEnabled);
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const button = event.target.closest('button');
-  if (button && !button.matches('.comic-hit,#interact,.choice,.seedling-shell')) audio.cue('ui');
+  if (button && !button.matches('.comic-hit,#interact,.choice,.seedling-shell,.root-login-enter')) audio.cue('ui');
 }, true);
 
 $('#retry-entry').onclick = () => location.reload();

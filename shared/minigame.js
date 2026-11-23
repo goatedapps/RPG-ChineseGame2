@@ -46,12 +46,12 @@ export function makeMinigame(title, instruction, play, onFinish) {
       { scale: '1' },
     ], { duration: strong ? 290 : 180, easing: 'cubic-bezier(.18,.78,.28,1)' }));
   }
-  function finish(message, node = null) {
+  function finish(message, node = null, cue = 'relay') {
     if (finished || !live()) return;
     finished = true;
     root.dataset.complete = '';
     status.textContent = message;
-    feedback(node, 'relay', true);
+    feedback(node, cue, true);
     const dialog = root.closest('dialog');
     const completeOnClose = () => {
       clearTimeout(timer);

@@ -9,7 +9,7 @@ The mission follows a student preparing the school science exhibition after a do
 - The tutorial introduces walking, looking around, picking up the phone, and opening its chat.
 - The phone lifts from the table into the bottom-right dock, then expands when opened.
 - Ah Ning sends casual written English messages in the phone chat, with a ringtone and vibration for new messages.
-- The player inspects the west-window note and replies in Chinese with Hanzi Writer, and later answers quizzes to unlock monitors.
+- The player inspects the west-window note and replies in Chinese with Hanzi Writer. The root camera asks for the seedling task’s vocabulary as tone-free pinyin passwords before revealing the footage. A comprehension question unlocks the rehearsal monitor.
 - The phone offers a contextual hint after a delay, then lets the player reveal a glowing golden portal at the target.
 - The closing comic leads to Ah Ning's final message, and dismissing that message opens the final test.
 

@@ -186,45 +186,6 @@ dialog .minigame-title {
 }
 .moon-beam.aligned { opacity: .95; }
 
-.root-monitor {
-  grid-template-rows: 1fr auto auto;
-  gap: .25rem;
-  padding: .25rem .7rem .65rem;
-  background: linear-gradient(155deg,#183b36,#0b201e);
-}
-.minigame .root-frame {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  border: 1px inset #69a488 !important;
-  background: radial-gradient(#375145, #071a15) !important;
-  box-shadow: inset 0 0 1.2rem #0009;
-}
-.root-frame img { padding: .15rem; max-height: 32dvh; }
-.root-day { color: #ffd786; font-size: .85rem; }
-.root-timeline {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
-  color: #fbeac8;
-  font-size: clamp(.61rem, 2.6vw, .9rem);
-  border-radius: .3rem;
-  padding: 0 .22rem;
-  border: 1px solid #77988e;
-  background: linear-gradient(90deg,#486152aa,#253a41aa);
-}
-.root-playhead {
-  position: absolute;
-  inset-block: 0;
-  width: .17rem;
-  background: #ffd287;
-  box-shadow: 0 0 .55rem #ffc86a;
-  pointer-events: none;
-}
-
 .exhibit-puzzle {
   background: linear-gradient(#172f32a6,#0a1c16cc), url('../greenhouse/art/minigame-window.webp') center / cover;
 }

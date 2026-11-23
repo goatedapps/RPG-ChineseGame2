@@ -20,7 +20,7 @@ export const phoneStory = {
       fan: 'We’ve got what we need to move the pot. Before we do, let’s make sure our bean can stand upright for the fair. I can see the fan blowing straight at the seedlings. Could you turn it away?',
       weakPlant: 'That’s better. One of those three seedlings still has a bent stem and needs shelter. Watch which pot it starts in so you can pick it out after the pots move.',
       soilPot: 'Our bean’s out of the draft. For the fair, I want to show how a bean grows from a seed. Could you plant the spare seed the way we planted this one? I can show visitors where it all starts.',
-      rootCam: 'Thanks! Nothing will sprout before the fair opens, but we filmed the bean we planted last week. Check the root camera so we can show visitors what happens under the soil.',
+      rootCam: 'We filmed last week’s bean taking root. Let’s show visitors what happens under the soil. Our root camera uses the words we’ve just learnt as passwords. Type their pinyin without tone marks to open the recording.',
     },
     checkpoint: 'That footage will be great for the fair. Can you log what we changed to protect today’s plant?',
   },
@@ -56,18 +56,6 @@ export const noteReply = {
 };
 
 export const screenChecks = {
-  rootCam: {
-    cn: '“埋种子”是什么意思？',
-    en: 'What does “bury the seed” mean?',
-    choices: [
-      { cn: '把种子放在桌上。', en: 'Put the seed on the table.' },
-      { cn: '把种子放进土里，再盖上泥土。', en: 'Put the seed in the soil and cover it.' },
-      { cn: '把花盆举起来。', en: 'Lift the pot.' },
-    ],
-    answer: 1,
-    feedbackCN: '你打开了根系录像。',
-    feedbackEN: 'You unlocked the root recording.',
-  },
   rehearsalScreen: {
     cn: '哪一件事表示提早做好了准备？',
     en: 'Which action shows someone prepared ahead of time?',

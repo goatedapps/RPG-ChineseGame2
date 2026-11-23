@@ -1,0 +1,75 @@
+#workbench .root-login {
+  position: relative;
+  width: min(100%, 35rem);
+  container-type: inline-size;
+}
+.root-login h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.root-login .root-login-monitor { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+.root-login-screen {
+  position: absolute;
+  inset: 6% 3.1% 5.5%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr auto auto;
+  align-items: center;
+  column-gap: .55rem;
+  padding: max(.42rem, 2cqi) 4.5cqi;
+  border-radius: .38rem;
+  color: #eaffec;
+  background: radial-gradient(ellipse at 50% 5%, #1d5146, #0b2725 70%);
+  box-shadow: inset 0 0 2rem #031714a8;
+}
+.root-login-title { color: #b6e3c9; font-size: clamp(.7rem, 3.2cqi, 1rem); }
+.root-login-progress { width: clamp(2.6rem, 15cqi, 5rem); height: .37rem; accent-color: #adf0b6; }
+.root-login-word {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: clamp(1.55rem, 10cqi, 3.5rem);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.root-login-field {
+  grid-column: 1 / -1;
+  display: flex;
+  width: min(100%, 21rem);
+  margin-inline: auto;
+  background: #051c1a;
+  border: 1px solid #75b69d;
+  border-radius: .35rem;
+}
+.root-login-input {
+  min-width: 0;
+  flex: 1;
+  padding: .35rem .65rem;
+  border: 0;
+  border-radius: .35rem 0 0 .35rem;
+  color: #eaffec;
+  background: transparent;
+  font: 1rem ui-monospace, monospace;
+}
+.root-login-input:focus { outline: 2px solid #aeecc3; outline-offset: -2px; }
+.root-login-field:has([aria-invalid='true']) { border-color: #ffaf91; }
+.minigame .root-login-enter,
+.minigame .root-login-enter:hover:enabled {
+  border-inline-start: 1px solid #75b69d;
+  border-radius: 0 .35rem .35rem 0;
+  background: #194d40;
+  color: #d0f5d4;
+  font-size: 1.25rem;
+}
+.root-login .minigame-status {
+  grid-column: 1 / -1;
+  min-height: 0;
+  margin: max(.2rem, 1.4cqi) 0 0;
+  text-align: center;
+  color: #cae8d9;
+  font-size: clamp(.68rem, 3.2cqi, .93rem);
+}
+.root-login-screen:has([aria-invalid='true']) .minigame-status { color: #ffbc9f; }

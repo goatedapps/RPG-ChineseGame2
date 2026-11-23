@@ -6,45 +6,6 @@ const at = (event, node, margin = .1) => {
   return x >= -margin && x <= 1 + margin && y >= -margin && y <= 1 + margin;
 };
 
-export function readRootFootage(play, onFinish) {
-  const game = makeMinigame('幼苗救援 · 根系观察', '拖动录像进度，找出幼苗开始在土里扎根的那一天。', play, onFinish);
-  const { stage } = game;
-  stage.classList.add('root-monitor');
-  const screen = control('记录这一帧的生长情况', 'root-frame');
-  const frame = prop(art('minigame-root-0'));
-  screen.append(frame);
-  const timeline = element('div', 'root-timeline');
-  const head = element('i', 'root-playhead');
-  const day = element('span', 'root-day');
-  const days = ['第一天', '第三天', '第五天', '第七天'];
-  let index = 0;
-  timeline.append(head);
-  for (const label of days) timeline.append(element('span', '', label));
-  scrub(timeline, '查看生长录像', 0, (value) => {
-    const previous = index;
-    index = Math.round(value * 3 / 100);
-    head.style.left = value + '%';
-    day.textContent = days[index];
-    frame.src = art('minigame-root-' + index);
-    timeline.setAttribute('aria-valuetext', days[index]);
-    if (index !== previous) game.feedback(day, 'ui');
-  });
-  screen.onclick = () => {
-    if (index === 2) {
-      screen.disabled = true;
-      game.finish('第五天，细根伸进土里，幼苗开始扎根了。', screen);
-    } else {
-      game.feedback(screen, 'wrong');
-      game.status.textContent = index < 2
-        ? '根还没有伸展开。再往后看看。'
-        : '根已经很多了。往前找找第一次扎根的画面。';
-    }
-  };
-  stage.append(screen, day, timeline);
-  game.status.textContent += ' 找到后轻触屏幕记录。';
-  return { ...game, focusTarget: timeline };
-}
-
 export function prepareExhibit(play, onFinish) {
   const game = makeMinigame('科学展开幕', '按布置图摆放：花盆放中央，标签朝前，展灯照着叶子。', play, onFinish);
   const { stage } = game;
