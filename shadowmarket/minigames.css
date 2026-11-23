@@ -1,0 +1,247 @@
+#workbench .mirror-game,
+#workbench .cord-game,
+#workbench .rooftop-game { width: min(100%, 38rem); }
+
+:where(.mirror-game, .cord-game, .rooftop-game) .minigame-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+:where(.mirror-game, .cord-game, .rooftop-game) .minigame-status {
+  text-align: center;
+  line-height: 1.55;
+  color: #f3dfbd;
+}
+.mirror-game .minigame-stage {
+  display: grid;
+  aspect-ratio: auto;
+  max-height: none;
+  gap: .45rem;
+  padding: clamp(.5rem, 2.5vw, 1rem);
+  background: linear-gradient(#201b35b0, #191225dc), url('art/alley.webp') center / cover;
+}
+.mirror-work {
+  --tilt: -12deg;
+  position: relative;
+  height: min(18dvh, 8.5rem);
+  width: 100%;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.mirror-work .mirror-object {
+  position: absolute;
+  top: 5%;
+  height: 88%;
+  width: min(33%, 8rem);
+  rotate: var(--tilt);
+  translate: 0 -4px;
+  transform-origin: 50% 92%;
+  transition: rotate .32s, translate .26s, filter .3s;
+}
+.mirror-settled .mirror-object { translate: 0 0; }
+.mirror-braced .mirror-object { filter: drop-shadow(0 3px 7px #ffcd767d); }
+.mirror-work::after {
+  content: '';
+  position: absolute;
+  left: 57%;
+  bottom: 7%;
+  width: clamp(.23rem, 1.4vw, .55rem);
+  height: 32%;
+  rotate: -31deg;
+  border: 1px solid #ac7752;
+  border-radius: 2px;
+  background: #986946 url('../greenhouse/art/lab/honey-oak.webp') center / cover;
+  box-shadow: 2px 2px 3px #160d1b;
+  opacity: 0;
+  pointer-events: none;
+}
+.mirror-work.mirror-braced::after { opacity: 1; }
+.mirror-light {
+  position: absolute;
+  top: 26%;
+  right: 3%;
+  width: 56%;
+  height: 47%;
+  pointer-events: none;
+  background: linear-gradient(90deg, #d1f4ffdb, #9397f055, transparent);
+  clip-path: polygon(0 44%, 100% 0, 100% 80%, 0 58%);
+  opacity: 0;
+  transform-origin: left center;
+}
+.mirror-lit .mirror-light { opacity: 1; }
+.mirror-diagram {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.35rem, 1.4vw, .65rem);
+  width: min(100%, 30rem);
+}
+.minigame .mirror-slot {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  gap: .12rem;
+  overflow: hidden;
+  color: #3b261e;
+  background: #e9d5b5;
+  border: 1px solid #d5a971;
+  border-radius: .28rem;
+  box-shadow: 0 3px 8px #170c196e;
+  text-shadow: none;
+  cursor: pointer;
+}
+.minigame .mirror-slot:hover:enabled { background: #f2dbb5; color: #3b261e; }
+.mirror-slot img { height: clamp(3.25rem, 13dvh, 6.2rem); }
+.mirror-slot span { padding: .12rem .2rem .32rem; font-size: clamp(.69rem, 3.4vw, .99rem); font-weight: 700; }
+.minigame .mirror-slot[data-matched] { background: #e2e2b0; border-color: #a8bf8a; }
+.mirror-words {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .35rem;
+  width: min(100%, 27rem);
+  padding-top: .17rem;
+}
+.minigame .mirror-word,
+.minigame .mirror-word:hover:enabled {
+  position: relative;
+  background: #eed9ab url('../greenhouse/art/window-tape.webp') center / 100% 100%;
+  color: #3b261e;
+  border-radius: .28rem;
+  text-shadow: none;
+  font-weight: 800;
+  cursor: grab;
+}
+.minigame .mirror-word[aria-pressed='true'] { outline: 2px solid #ffdb92; outline-offset: 2px; }
+.mirror-word[data-dragging] { pointer-events: none; }
+.minigame .mirror-word:disabled { visibility: hidden; }
+
+.cord-game .minigame-stage {
+  display: block;
+  aspect-ratio: 5 / 4;
+  max-height: none;
+  background: linear-gradient(#1c1225a3, #2a192956 46%, #211323bc), url('art/market.webp') center / cover;
+}
+.lantern-rail {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 18%;
+  height: 7%;
+  border: 1px solid #a77355;
+  box-shadow: 0 7px 12px #160a11c9;
+  border-radius: .2rem;
+  background: linear-gradient(#704432, #43271f);
+}
+.minigame .side-lantern,
+.minigame .take-lantern {
+  position: absolute;
+  top: 51%;
+  width: 29%;
+  height: 44%;
+}
+.minigame .side-lantern { opacity: .68; top: 53%; }
+.side-lantern.left { left: 3%; rotate: 5deg; }
+.side-lantern.right { right: 3%; rotate: -5deg; }
+.minigame .take-lantern { left: 35.5%; transform-origin: 50% 9%; }
+.take-lantern:enabled { cursor: pointer; filter: drop-shadow(0 0 13px #ffc76f); }
+.lantern-cords {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.lantern-cords path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.neighbor-cord { stroke: #9d716d; stroke-width: 3; }
+.main-cord { stroke: #ffd68e; stroke-width: 3.6; filter: drop-shadow(0 2px 1px #352016); }
+.cord-tip { fill: #ffdc8f; stroke: #a3612e; stroke-width: 1.5; filter: drop-shadow(0 0 5px #ffb95c); }
+.minigame .cord-loop {
+  position: absolute;
+  width: 14%;
+  height: 18%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  cursor: grab;
+}
+.cord-loop[data-free] { pointer-events: none; }
+.cord-loop i {
+  width: clamp(12px, 3.3vw, 20px);
+  height: clamp(16px, 4.4vw, 25px);
+  border: 3px solid #b47a4e;
+  border-right-color: #e7b47e;
+  border-radius: 30% 14% 65% 55%;
+  box-shadow: 0 2px 3px #2d131c;
+}
+.cord-loop:hover:enabled i { border-color: #ffe0a1; }
+.cord-loop[data-free] i { opacity: .68; }
+
+.rooftop-game .minigame-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  gap: .55rem;
+  width: 100%;
+  min-width: 0;
+  height: clamp(17rem, 48dvh, 27rem);
+  aspect-ratio: auto;
+  max-height: none;
+  padding: .5rem clamp(.35rem, 2vw, .9rem) 1rem;
+  background: linear-gradient(#1d132b26, #1c1228d9 76%), url('art/roofs.webp') center / cover;
+}
+.rooftop-lantern { position: relative; height: clamp(5rem, 15dvh, 9rem); aspect-ratio: 1; }
+.rooftop-lantern img { filter: drop-shadow(0 0 20px #e9a956ca); }
+.rooftop-word {
+  position: absolute;
+  inset: 44% auto auto 50%;
+  translate: -50% -50%;
+  width: max-content;
+  max-width: 135%;
+  padding: .12rem .35rem;
+  background: #3a211bea;
+  border: 1px solid #edbf7c;
+  border-radius: .28rem;
+  color: #fff1b3;
+  font-size: clamp(1.33rem, 6vw, 2.3rem);
+  font-weight: 800;
+}
+.rooftop-path { display: flex; gap: .35rem; }
+.rooftop-path i { width: .44rem; height: .44rem; border: 1px solid #edd0a9; border-radius: 50%; }
+.rooftop-path .lit { background: #ffcd6e; box-shadow: 0 0 8px #ffa750; }
+.rooftop-actions, .rooftop-result { grid-row: 3; grid-column: 1; }
+.rooftop-actions {
+  display: flex;
+  width: 100%;
+  align-self: end;
+  justify-content: center;
+  gap: clamp(.24rem, 1.4vw, .65rem);
+}
+.rooftop-actions[hidden], .rooftop-result[hidden] { display: none; }
+.minigame .rooftop-action,
+.minigame .rooftop-action:hover:enabled {
+  width: min(32%, 10.4rem);
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #392333;
+  border: 1px solid #deaf78;
+  border-radius: .42rem;
+  box-shadow: 0 5px 13px #110d22ba;
+  cursor: pointer;
+}
+.minigame .rooftop-action:is(:hover,:focus-visible) { border-color: #fff2ac; box-shadow: 0 0 13px #f0b56f74; }
+.rooftop-result { max-width: 100%; height: clamp(6.5rem, 24dvh, 12rem); align-self: end; }
+.rooftop-result img { border-radius: .45rem; filter: drop-shadow(0 5px 8px #120c1ab0); }
+
+@media (max-height: 460px) and (orientation: landscape) {
+  #workbench .mirror-game, #workbench .cord-game, #workbench .rooftop-game { width: min(100%, 26rem); }
+  #workbench .cord-game { width: min(100%, 76dvh); }
+  .mirror-work { height: 12dvh; }
+  .mirror-slot img { height: 9dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mirror-work .mirror-object { transition: none; }
+}

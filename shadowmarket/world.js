@@ -1,5 +1,5 @@
 import { createHintPortal } from '../shared/hint-portal.js';
-import { art, arrival, objects } from './story.js?v=encounters';
+import { art, arrival, objects } from './story.js?v=market-games';
 
 export const checkpoints = [
   arrival, { x: 0, z: -10.4 }, { x: 0, z: -17.5 },
@@ -184,7 +184,7 @@ export function buildShadowMarket(THREE, resume = 0) {
     targets.get('trail').object.visible = index === 0;
     targets.get('rooftop').object.visible = index === 4;
     targets.get('reunion').object.visible = index >= 5;
-    const mirrorReady = index > 1 || (index === 1 && (state.beat >= 2 || ['check', 'writing'].includes(state.step)));
+    const mirrorReady = index > 1 || (index === 1 && ['check', 'writing'].includes(state.step));
     targets.get('mirror').object.rotation.z = mirrorReady ? 0 : -.15;
     for (const step of steps) step.material = mirrorReady ? litStone : materials[1].wall;
     targets.get('keepsake').object.visible = index <= 3;

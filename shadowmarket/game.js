@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=shadow-market';
 import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=minigame-volume';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
@@ -13,8 +13,9 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock'
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
-import { art, arrival, chapters, ending, objects, opening } from './story.js?v=encounters';
-import { buildShadowMarket, checkpoints } from './world.js?v=encounters';
+import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
+import { buildShadowMarket, checkpoints } from './world.js?v=market-games';
+import { marketMinigames } from './minigames.js?v=market-games';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.shadowmarket';
@@ -116,7 +117,8 @@ function refresh() {
   currentCue = !state.phone ? '看看灯笼广场，拿起前面矮桌上的智能手机。'
     : !state.called ? '打开手机，拨打阿岚的号码。'
       : waiting() ? '打开手机，先看看阿岚说了什么。'
-        : state.step === 'seek' || state.step === 'clue' ? task?.cue : '回到刚才的地点，继续完成记录和听写。';
+        : state.step === 'check' || state.step === 'writing'
+          ? '回到刚才的地点，继续完成记录和听写。' : task?.cue;
   $('cue-text').textContent = currentCue ?? '';
   $('replay-cue').disabled = Boolean(waiting());
   const holdingLantern = state.index === 4 || (state.index === 5 && state.step === 'seek');
@@ -147,6 +149,7 @@ function callLan() {
 
 function showPanel(content, focus, inspection = false) {
   voice.stop();
+  audio.setMinigame(content.classList.contains('minigame'));
   desk.lang = 'zh-Hans';
   writingCleanup();
   writingCleanup = () => {};
@@ -178,6 +181,7 @@ desk.addEventListener('click', (event) => {
 desk.addEventListener('cancel', () => voice.stop());
 desk.addEventListener('close', () => {
   if (desk.open) return;
+  audio.setMinigame(false);
   writingCleanup();
   writingCleanup = () => {};
   voice.stop();
@@ -224,6 +228,17 @@ function study(task) {
     showCheck(task);
     return;
   }
+  if (state.step === 'minigame') {
+    const game = marketMinigames[task.id](play, (stillOpen) => {
+      state.step = 'check';
+      save();
+      refresh();
+      if (stillOpen) showCheck(task);
+    });
+    showPanel(game.root, game.focusTarget, true);
+    game.activate();
+    return;
+  }
   showEncounter(task);
 }
 
@@ -251,7 +266,7 @@ function showEncounter(task) {
       showFullLine();
       return;
     }
-    if (last) state.step = 'check';
+    if (last) state.step = marketMinigames[task.id] ? 'minigame' : 'check';
     else state.beat = turn + 1;
     save();
     worldState();
@@ -272,7 +287,6 @@ function showEncounter(task) {
   sheet.append(heading, advanceLine, playback.button);
   showPanel(sheet, advanceLine, true);
   playback.reveal();
-  if (turn === 2 && task.id === 'mirror') play('seal');
   if (turn === 0 && task.id === 'reunion') play('finish');
 
   function showFullLine() {
@@ -551,6 +565,7 @@ async function startWorld() {
   $('splash').hidden = true;
   $('toolbar').hidden = $('mission-ui').hidden = $('play-controls').hidden = $('reticle').hidden = false;
   audio.setMusic('game');
+  audio.prepareGameplay();
   engine.show();
   engine.setActive(true);
   refresh();
