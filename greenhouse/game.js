@@ -1,11 +1,11 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { missions, objects, tutorial } from './story.js?v=window-match';
+import { missions, objects, tutorial } from './story.js?v=seedling-shuffle';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=effect-recovery';
+import { createGreenhouseAudio } from './sounds.js?v=minigame-music';
 import { playComic } from './comic.js';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
@@ -14,10 +14,11 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
-import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=window-match';
+import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=mission-context';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
-import { prepareExhibit, readRootFootage, supportSeedling } from './minigames.js?v=window-match';
+import { prepareExhibit, readRootFootage } from './minigames.js?v=seedling-shuffle';
 import { sealWindow } from './window-match.js';
+import { supportSeedling } from './seedling-shuffle.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#scene');
@@ -614,6 +615,7 @@ function clearPanel() {
 
 function presentPanel(content, focusTarget, inspection = false) {
   clearPanel();
+  audio.setMinigame(content.classList.contains('minigame'));
   desk.lang = 'zh-Hans';
   delete desk.dataset.practice;
   desk.classList.toggle('artifact-inspection', inspection);
@@ -667,6 +669,7 @@ desk.addEventListener('pointercancel', (event) => {
 
 desk.addEventListener('close', () => {
   if (desk.open) return;
+  audio.setMinigame(false);
   backdropPointer = null;
   desk.classList.remove('artifact-inspection');
   clearPanel();
@@ -1285,6 +1288,7 @@ function begin(spawn) {
   started = true;
   audio.setMusic('game');
   audio.setAmbience(true);
+  audio.prepareGameplay();
   $('#splash').hidden = true;
   $('#toolbar').hidden = false;
   $('#mission-ui').hidden = false;
@@ -1334,7 +1338,7 @@ audio.setMusicEnabled(musicEnabled);
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const button = event.target.closest('button');
-  if (button && !button.matches('.comic-hit,#interact,.choice')) audio.cue('ui');
+  if (button && !button.matches('.comic-hit,#interact,.choice,.seedling-shell')) audio.cue('ui');
 }, true);
 
 $('#retry-entry').onclick = () => location.reload();

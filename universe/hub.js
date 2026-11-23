@@ -7,6 +7,7 @@ const gradeKeys = Object.keys(levels);
 const dialog = $('world-directory');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const music = $('hub-music');
+const whoosh = $('hub-whoosh');
 const musicControls = document.querySelectorAll('.hub-music');
 const musicKey = 'rpg-chinese.hub-music';
 const statusText = {
@@ -61,7 +62,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) music.pause();
   else startMusic();
 });
-window.addEventListener('pagehide', () => music.pause());
+window.addEventListener('pagehide', () => { music.pause(); whoosh.pause(); });
 
 function add(tag, text, className) {
   const element = document.createElement(tag);
@@ -204,6 +205,9 @@ function enterWorld(world) {
     return;
   }
   leaving = true;
+  music.pause();
+  whoosh.currentTime = 0;
+  void whoosh.play().catch(() => {});
   $('map').inert = true;
   $('warp-kicker').textContent =
     levels[currentLevel].label + ' · ' + world.lesson;
@@ -218,12 +222,10 @@ function enterWorld(world) {
     '--destination',
     'url("' + linkAsset(world.art) + '")',
   );
-  const navigate = () => {
-    music.pause();
-    location.assign(new URL(world.href, document.baseURI));
-  };
+  const navigate = () => location.assign(new URL(world.href, document.baseURI));
   if (motion.matches || !window.gsap) {
-    navigate();
+    warp.hidden = false;
+    window.setTimeout(navigate, 900);
     return;
   }
   universe?.warp(world.number);

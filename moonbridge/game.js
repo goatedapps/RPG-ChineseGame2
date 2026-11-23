@@ -14,7 +14,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=effect-recovery';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=minigame-music';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
@@ -241,6 +241,7 @@ setAudio();
 function setView(next) {
   view = next;
   if (next !== 'hud') {
+    audio.setMinigame(false);
     stopMeiClip();
     voice.stop();
   }
@@ -298,6 +299,7 @@ function showComic(content, title, onFinish) {
 let dismissInspection;
 
 function showPanel(appearance, title, language = 'zh-Hans') {
+  audio.setMinigame(driving || appearance === 'trial-controls');
   if (appearance !== 'radio') stopMeiClip();
   dismissInspection = undefined;
   dialog.dataset.appearance = appearance ?? 'panel';
@@ -331,6 +333,7 @@ dialog.addEventListener('click', (event) => {
 });
 dialog.addEventListener('close', () => {
   if (dialog.open) return;
+  audio.setMinigame(driving || testing);
   const onDismiss = dismissInspection;
   dismissInspection = undefined;
   voice.stop();
@@ -507,6 +510,7 @@ function worldEvent(event) {
 }
 function endRace(first) {
   driving = false;
+  audio.setMinigame(false);
   save.won = first;
   go(12);
   play('finish');
@@ -529,6 +533,7 @@ function startWorld() {
     persist();
   }
   driving = false;
+  audio.setMinigame(false);
   practicePassed = false;
   practiceSpeed = 68;
   moveStart = null;
@@ -859,6 +864,7 @@ function choosePart() {
 function runTrial(success, power, onResult) {
   if (testing) return;
   testing = true;
+  audio.setMinigame(true);
   closePanel();
   $('hud').classList.add('trial-playing');
   world.startTrial({
@@ -867,6 +873,7 @@ function runTrial(success, power, onResult) {
     play,
     complete() {
       testing = false;
+      audio.setMinigame(false);
       $('hud').classList.remove('trial-playing');
       onResult();
     },
@@ -1040,6 +1047,7 @@ function playCloseup(build, complete) {
   const game = build(play, complete);
   showPanel('artifact', game.heading.textContent);
   body.append(game.root);
+  audio.setMinigame(true);
   game.focusTarget.focus({ preventScroll: true });
 }
 
@@ -1179,6 +1187,7 @@ function finishFieldwork(field) {
 function enterRace() {
   if (driving || save.stage !== 11) return;
   driving = true;
+  audio.setMinigame(true);
   raceStarted = false;
   $('hud').classList.add('is-driving');
   $('reticle').hidden = true;

@@ -186,33 +186,6 @@ dialog .minigame-title {
 }
 .moon-beam.aligned { opacity: .95; }
 
-.plant-rescue {
-  background: linear-gradient(#203c3994,#1729259c), url('../greenhouse/art/minigame-window.webp') center / cover;
-}
-.minigame .rescue-plant, .minigame .rescue-hands, .minigame .rescue-base {
-  position: absolute;
-  cursor: grab;
-}
-.rescue-plant { width: 28%; height: 61%; bottom: 23%; }
-.rescue-plant.sturdy { left: 14%; }
-.rescue-plant.fragile { right: 14%; }
-.rescue-plant img { transform-origin: center bottom; }
-.rescue-plant.fragile img { animation: wind-bend 1.65s ease-in-out alternate infinite; }
-@keyframes wind-bend { from { transform: rotate(-5deg); } to { transform: rotate(9deg); } }
-.rescue-base {
-  right: 18%;
-  bottom: 18%;
-  width: 20%;
-  height: 12%;
-  border: 1px dashed #ffe29d !important;
-  border-radius: 50%;
-  background: #facc761c !important;
-}
-.rescue-hands { width: 25%; height: 25%; left: 39%; bottom: 2%; }
-.seedling-safe .rescue-hands { left: auto; right: 14%; bottom: 9%; transition: bottom .24s ease-out; }
-.seedling-safe .fragile { bottom: 27%; transition: bottom .24s ease-out; }
-.seedling-safe .fragile img { animation: none; }
-
 .root-monitor {
   grid-template-rows: 1fr auto auto;
   gap: .25rem;
@@ -296,6 +269,5 @@ dialog .minigame-title {
 .light-aligned .exhibit-glow { box-shadow: 0 0 2rem 1rem #ffc87188; background: #ffc8711c; }
 .exhibit-ready .exhibit-beam { background: linear-gradient(90deg,#ffe3a955,#ffe5a5bd); }
 @media (prefers-reduced-motion: reduce) {
-  .rescue-plant.fragile img { animation: none; }
   .minigame * { transition-duration: 0s !important; }
 }

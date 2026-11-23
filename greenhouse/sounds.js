@@ -12,6 +12,8 @@ const clips = {
   drip: { files: ['window-drip'], volume: .23, cooldown: .3 },
   correct: { files: ['correct'], volume: .31, cooldown: .14 },
   wrong: { files: ['try-again'], volume: .24, cooldown: .23 },
+  ding: { files: ['ding'], volume: .56, cooldown: .1 },
+  bounce: { files: ['bounce'], volume: .54, cooldown: .1 },
   relay: { files: ['continue'], volume: .35, cooldown: .38 },
   finish: { files: ['exhibit-ready'], volume: .46, cooldown: .85 },
   ui: { files: ['ui-click'], volume: .29, cooldown: .075 },
@@ -23,7 +25,10 @@ const tracks = {
   title: { duration: 19.2, volume: .38 },
   comic: { duration: 9.6, volume: .44 },
   game: { duration: 24, volume: .24 },
+  minigame: { volume: .36 },
 };
+
+const universeAudio = { ding: 'Ding', bounce: 'bounce', minigame: 'game-music' };
 
 const rainFile = 'rain-window';
 const musicLoopStart = .145;
@@ -39,6 +44,7 @@ const maxCueDelay = 650;
 const resumeTimeout = 750;
 
 function fileURL(category, name) {
+  if (Object.hasOwn(universeAudio, name)) return new URL('../universe/audio/' + universeAudio[name] + '.mp3', import.meta.url);
   return new URL(`./audio/${category}/${name}.mp3`, import.meta.url);
 }
 
@@ -51,6 +57,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   let rain;
   let musicVoice;
   let musicScene = null;
+  let playingMinigame = false;
   let rainStopTimer;
   let enabling;
   let enabled = false;
@@ -66,6 +73,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   const musicBuffers = new Map();
   const voices = new Map();
   const lastCue = new Map();
+  const currentMusic = () => playingMinigame ? 'minigame' : musicScene;
 
   function audible() {
     return !document.hidden && context?.state === 'running';
@@ -109,7 +117,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function refreshMusic(active) {
-    const next = active && musicEnabled ? musicScene : null;
+    const next = active && musicEnabled ? currentMusic() : null;
     const buffer = musicBuffers.get(next);
     if (musicVoice?.name === next || (next && !buffer)) return;
 
@@ -126,8 +134,8 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     source.buffer = buffer;
     source.loop = true;
     // The encoded clip includes margins so the musical repeat stays away from MP3 priming and padding.
-    source.loopStart = musicLoopStart;
-    source.loopEnd = musicLoopStart + duration;
+    source.loopStart = duration ? musicLoopStart : 0;
+    source.loopEnd = duration ? musicLoopStart + duration : buffer.duration;
     gain.gain.value = 0;
     source.connect(gain);
     gain.connect(music);
@@ -194,6 +202,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function prepareGameplay() {
+    if (musicEnabled) prepareMusic('minigame');
     if (!enabled) return;
     for (const file of [rainFile, ...clips.step.files, ...clips.pickup.files]) prepareEffect(file);
   }
@@ -221,9 +230,9 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     if (!context || entry.decoding) return;
     entry.decoding = true;
     void entry.data.then(async (data) => {
-      if (!data || name !== musicScene) return;
+      if (!data) return;
       const buffer = await context.decodeAudioData(data);
-      if (name === musicScene) musicBuffers.set(name, buffer);
+      if (name === 'minigame' || name === musicScene) musicBuffers.set(name, buffer);
     }).catch(() => {}).finally(() => {
       pendingMusic.delete(name);
       refreshMix();
@@ -231,7 +240,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function unlock() {
-    if ((!enabled && !(musicEnabled && musicScene)) || document.hidden || !context ||
+    if ((!enabled && !(musicEnabled && currentMusic())) || document.hidden || !context ||
         context.state === 'running' || context.state === 'closed' || enabling) return;
     // An interrupted context can leave resume() pending. Allow a later input to retry.
     let timer;
@@ -269,12 +278,12 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     window.addEventListener('focus', restoreAudio);
     context.addEventListener('statechange', restoreAudio);
     prepareSceneEffects();
-    if (musicEnabled) prepareMusic(musicScene);
+    if (musicEnabled) prepareMusic(currentMusic());
     return true;
   }
 
   function start(interactive = true) {
-    if (!enabled && !(musicEnabled && musicScene)) return false;
+    if (!enabled && !(musicEnabled && currentMusic())) return false;
     if (!context) {
       try {
         if (!initialize()) return false;
@@ -354,7 +363,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     },
     setMusicEnabled(value) {
       musicEnabled = Boolean(value);
-      if (musicEnabled) prepareMusic(musicScene);
+      if (musicEnabled) prepareMusic(currentMusic());
       refreshMix();
     },
     setMusic(name) {
@@ -366,6 +375,16 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
       prepareSceneEffects();
       // Preload on entry. Wait for input to unlock the graph for the first time.
       if (next) start(false);
+      refreshMix();
+    },
+    setMinigame(active) {
+      if (playingMinigame === active) return;
+      playingMinigame = active;
+      if (musicEnabled) prepareMusic(currentMusic());
+      if (active && enabled) {
+        prepareEffect('ding');
+        prepareEffect('bounce');
+      }
       refreshMix();
     },
     setAmbience(active) {

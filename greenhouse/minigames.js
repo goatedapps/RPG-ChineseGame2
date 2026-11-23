@@ -6,54 +6,6 @@ const at = (event, node, margin = .1) => {
   return x >= -margin && x <= 1 + margin && y >= -margin && y <= 1 + margin;
 };
 
-export function supportSeedling(play, onFinish) {
-  const game = makeMinigame('幼苗救援', '看看风吹过时，哪一株幼苗更柔弱？', play, onFinish);
-  const { stage } = game;
-  stage.classList.add('plant-rescue');
-  const sturdy = control('选择左边的幼苗', 'rescue-plant sturdy');
-  const fragile = control('选择右边的幼苗', 'rescue-plant fragile');
-  sturdy.append(prop(art('minigame-pot')));
-  fragile.append(prop(art('minigame-fragile')));
-  const hands = control('选择双手', 'rescue-hands');
-  hands.append(prop(art('minigame-hands')));
-  hands.hidden = true;
-  const base = control('从盆底托住幼苗', 'rescue-base');
-  base.hidden = true;
-  let selected = false;
-  sturdy.onclick = () => {
-    game.feedback(sturdy, 'wrong');
-    game.status.textContent = '这一株的茎还很直。看看哪一株被风吹弯了。';
-  };
-  fragile.onclick = () => {
-    fragile.disabled = true;
-    sturdy.disabled = true;
-    base.hidden = false;
-    hands.hidden = false;
-    game.feedback(fragile, 'pickup');
-    game.status.textContent = '它的茎很柔弱。把双手拖到盆底，从下面托住它。';
-    hands.focus();
-  };
-  function lift() {
-    if (hands.disabled) return;
-    base.hidden = true;
-    hands.disabled = true;
-    stage.classList.add('seedling-safe');
-    game.finish('你从盆底托住了柔弱的幼苗。', fragile);
-  }
-  function pickUpHands() {
-    selected = true;
-    hands.setAttribute('aria-pressed', 'true');
-    base.focus();
-  }
-  base.onclick = () => {
-    if (selected) lift();
-    else hands.focus();
-  };
-  dragPiece(hands, (event) => { if (at(event, base, .32)) lift(); }, pickUpHands);
-  stage.append(sturdy, fragile, base, hands);
-  return { ...game, focusTarget: sturdy };
-}
-
 export function readRootFootage(play, onFinish) {
   const game = makeMinigame('幼苗救援 · 根系观察', '拖动录像进度，找出幼苗开始在土里扎根的那一天。', play, onFinish);
   const { stage } = game;

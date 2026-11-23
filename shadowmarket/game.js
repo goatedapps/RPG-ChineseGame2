@@ -13,7 +13,7 @@ import { showSkippedFinal } from '../shared/skipped-final.js?v=numbered-tasks';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js';
-import { art, arrival, chapters, ending, objects, opening } from './story.js';
+import { art, arrival, chapters, ending, objects, opening } from './story.js?v=mission-context';
 import { buildShadowMarket, checkpoints } from './world.js';
 
 const $ = (id) => document.getElementById(id);

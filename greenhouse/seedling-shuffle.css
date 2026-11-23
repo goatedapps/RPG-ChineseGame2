@@ -1,0 +1,87 @@
+.seedling-shuffle .minigame-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.minigame .seedling-stage {
+  aspect-ratio: 4 / 3;
+  grid-template-rows: 1fr;
+  background: linear-gradient(#192f2b54, #26382c76 73%, #12241b),
+    url('art/minigame-window.webp') center / cover;
+}
+.seedling-stage::before {
+  content: '';
+  position: absolute;
+  inset: 75% 0 0;
+  background: linear-gradient(155deg, #405448, #202f29 32%, #172822);
+  border-top: 2px solid #ad95735e;
+  pointer-events: none;
+}
+.seedling-round {
+  position: absolute;
+  z-index: 2;
+  inset: .6rem auto auto .6rem;
+  padding: .24rem .62rem;
+  border-radius: 999px;
+  background: #132a22db;
+  border: 1px solid #d3bf8e8c;
+  color: #fff0ca;
+  font-weight: 650;
+  font-size: .87rem;
+}
+.minigame .seedling-shell,
+.minigame .seedling-shell:hover:enabled {
+  position: absolute;
+  left: 35%;
+  bottom: 20%;
+  width: 30%;
+  height: 60%;
+  isolation: isolate;
+  outline-offset: 2px;
+}
+.seedling-shell::before {
+  position: absolute;
+  inset: auto 15% 0;
+  height: 7%;
+  content: '';
+  border-radius: 50%;
+  background: #090e0cd4;
+  filter: blur(5px);
+}
+.seedling-stage .seedling-pot,
+.seedling-stage .seedling-cover {
+  position: absolute;
+  left: 0;
+  bottom: 2%;
+  width: 100%;
+  height: 94%;
+  object-position: center bottom;
+  pointer-events: none;
+}
+.seedling-stage .seedling-cover {
+  z-index: 1;
+  filter: drop-shadow(0 6px 8px #090f0ab3);
+}
+.seedling-stage .seedling-pot { padding-inline: 19%; height: 83%; }
+.seedling-stage[data-phase='preview'] .seedling-cover,
+.seedling-shell[data-result] .seedling-cover { opacity: 0; }
+.seedling-stage:is([data-phase='shuffle'], [data-phase='pick'], [data-phase='result']) .seedling-shell:not([data-result]) .seedling-pot {
+  visibility: hidden;
+}
+.seedling-stage[data-phase='pick'] .seedling-shell { cursor: pointer; }
+.seedling-stage[data-phase='pick'] .seedling-shell:focus-visible { outline: 2px solid #ffdf96; }
+@media (hover: hover) {
+  .seedling-stage[data-phase='pick'] .seedling-shell:hover .seedling-cover {
+    filter: drop-shadow(0 0 9px #ffdb84bc);
+  }
+}
+.seedling-shell[data-swap='first'] .seedling-cover { filter: drop-shadow(0 0 10px #ffce78); }
+.seedling-shell[data-swap='second'] .seedling-cover { filter: drop-shadow(0 0 10px #8adef6); }
+.seedling-shell[data-result='right'] .seedling-pot { filter: drop-shadow(0 0 10px #ffcf72ac); }
+.seedling-shell[data-result='wrong'] .seedling-pot { filter: drop-shadow(0 0 7px #ff96697a); }
+.seedling-shuffle .minigame-status {
+  margin-top: .48rem;
+  text-align: center;
+}
