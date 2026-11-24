@@ -1,12 +1,13 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=ah-ning-voice';
 import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=speech-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=mandarin-story';
+import { storyRecordingFor } from './story-recordings.js';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
 import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.js';
 import { bindJoystick } from '../shared/joystick.js';
-import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=mandarin-story';
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
@@ -52,7 +53,7 @@ const helper = createHelperPlayback({
   save,
   setDucked: audio.setDucked,
 });
-const voice = createVoice((status) => helper.setSpeaking(status === 'playing'));
+const voice = createVoice((status) => helper.setSpeaking(status === 'playing'), storyRecordingFor);
 const clueReader = createClueReader(voice);
 let words, bank, engine, active, target, hint, lastRead, currentCue, testCleanup;
 let writingCleanup = () => {};
@@ -364,7 +365,7 @@ function showCheck(task) {
   }
   const review = element('details', 'market-review');
   review.append(element('summary', '', '回看线索'));
-  const playback = clueReader(task.id + ':review', task.beats.map(([, line]) => line).join(''));
+  const playback = clueReader(task.id + ':review', task.beats.map(([, line]) => line));
   for (const [speaker, line] of task.beats) {
     const item = element('p');
     item.append(element('strong', '', speaker + '：'), document.createTextNode(line));

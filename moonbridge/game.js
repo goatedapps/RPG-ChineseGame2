@@ -11,11 +11,12 @@ import { words, bank } from './curriculum.js';
 import { fieldwork, workshopWriting } from './fieldwork.js?v=story-minigames';
 import { mei } from './radio-messages.js';
 import { vocabularyList } from '../shared/vocabulary.js';
-import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=mandarin-story';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
 import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=speech-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=mandarin-story';
+import { storyRecordingFor } from './story-recordings.js';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 
@@ -139,7 +140,7 @@ const voice = createVoice((status) => {
   mandarinPlaying = status === 'playing';
   if (mandarinPlaying) stopMeiClip();
   updateSpeechMix();
-});
+}, storyRecordingFor);
 let view = 'home';
 let world;
 let radioBuzz;

@@ -18,7 +18,7 @@ export function speakerButton(click, label) {
 }
 
 
-function playbackControl(voice, text, onState, subject) {
+function playbackControl(voice, text, onState, subject, speak = voice.speak) {
   const button = speakerButton(null, '播放' + subject);
   const icon = button.querySelector('path');
   const speaker = icon.getAttribute('d');
@@ -31,7 +31,7 @@ function playbackControl(voice, text, onState, subject) {
     icon.setAttribute('d', playing ? 'M6 6h12v12H6z' : speaker);
     onState?.(state);
   }
-  const start = () => voice.speak(text, .85, render);
+  const start = () => speak(text, .85, render);
   const stop = () => { if (playing) voice.stop(); };
   button.onclick = () => playing ? stop() : start();
   return { button, start, stop };
@@ -46,7 +46,7 @@ export function dictationButton(voice, text, onState, { autoplay = false } = {})
 export function createClueReader(voice) {
   const presented = new Set();
   return (id, text) => {
-    const control = playbackControl(voice, text, null, '线索');
+    const control = playbackControl(voice, text, null, '线索', voice.speakClue);
     control.button.classList.add('clue-speaker');
     return {
       ...control,

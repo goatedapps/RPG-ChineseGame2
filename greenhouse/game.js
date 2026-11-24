@@ -1,10 +1,11 @@
 import { vocabularyList } from '../shared/vocabulary.js';
-import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
+import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=mandarin-story';
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { createHelperPlayback } from '../shared/helper-playback.js';
 import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
-import { createVoice } from './voice.js?v=speech-recovery';
+import { createVoice } from './voice.js?v=mandarin-story';
+import { storyRecordingFor } from './story-recordings.js';
 import { createWriting } from './writing.js';
 import { bindButtonAudio, createGreenhouseAudio } from './sounds.js?v=speech-recovery';
 import { playComic } from './comic.js?v=shared-comic-score';
@@ -240,7 +241,7 @@ const voice = createVoice((status) => {
     panelVoiceStatus.textContent = status === 'unavailable' ? message : '';
     panelVoiceStatus.hidden = status !== 'unavailable';
   }
-});
+}, storyRecordingFor);
 const clueReader = createClueReader(voice);
 
 function discovered() {
