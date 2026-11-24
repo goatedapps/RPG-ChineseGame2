@@ -3,6 +3,7 @@ const keyFor = (level, lesson) =>
 const lessonSaves = {
   p3: {
     1: { key: 'rpg-chinese.p3.l1.moonbridge', passed: 'passed', reachedFinal: (save) => save.storyFinished === true },
+    2: { key: 'rpg-chinese.p3.l2.rivertheatre', passed: 'passed', reachedFinal: (save) => save.phase === 'final' },
   },
   p6: {
     1: { key: 'greenhouse-p6-lesson1-v1', passed: 'lessonComplete', reachedFinal: (save) => save.finalStarted === true },

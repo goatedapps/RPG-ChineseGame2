@@ -13,6 +13,12 @@ const playable = {
       art: '../moonbridge/art/cover.webp',
       transition: '穿过月光，驶向月桥。',
     },
+    2: {
+      title: '追上漂走的剧场',
+      href: 'p3-lesson2.html',
+      art: '../rivertheatre/art/cover.webp',
+      transition: '顺着河风，赶往码头广场。',
+    },
   },
   p6: {
     1: {
