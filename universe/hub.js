@@ -1,5 +1,5 @@
 import { bindJoystick } from '../shared/joystick.js';
-import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { lessonCompleted, lessonReachedFinal } from '../shared/lesson-progress.js?v=developer-unlock';
 import { createDeveloperMode, developerSkipEnabled, developerWorldsEnabled } from '../shared/developer-mode.js?v=hub-developer';
 import { getWorlds, levels } from './catalog.js?v=hub-developer';
@@ -60,7 +60,7 @@ for (const control of musicControls) {
 }
 music.addEventListener('playing', updateMusicControls);
 music.addEventListener('pause', updateMusicControls);
-for (const type of ['click', 'pointerup', 'keydown']) {
+for (const type of ['click', 'pointerup', 'touchend', 'keydown']) {
   document.addEventListener(type, (event) => {
     if (event.isTrusted && !event.target.closest?.('.hub-music')) startMusic();
   }, { capture: true, passive: true });

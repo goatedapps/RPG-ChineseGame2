@@ -50,7 +50,7 @@ Serve the repository over HTTP with `python -m http.server 8000`. Open the lesso
 1. Enter from the star map on a fresh visit, play through the prelude, and return with saved progress. Confirm the map points to the correct lesson.
 2. On desktop, check mouse capture, free look, interaction, and cursor release. On touch, check the joystick, drag-to-look, close-up gestures, and small-screen readability.
 3. Run through a helper briefing and hint, a clue, a comprehension check, dictation, and the vocabulary notebook. Verify that the new task is spoken in Mandarin after the briefing and the hint points to the right object. Check that the clue reads only its body when first opened, the speaker stops and restarts it from the beginning, and leaving the clue cancels playback.
-4. Check music and effects with the browser's first-interaction restriction, confirm sound follows the settings, and verify any recorded helper lines open and stop at the expected moments.
+4. Enter from the star map with autoplay restricted. Verify that the first tap on the comic enables sound and keeps the opening panel in view, then check that gameplay music, footsteps, and interaction sounds play in the world. Switch away and back to check recovery. Confirm sound follows the settings, and verify any recorded helper lines open and stop at the expected moments.
 5. Check the epilogue, final test, interrupted-test resume, completion and world unlock, and replay confirmation. For a full review, compare the shipped activities with the word coverage from step 1.
 
 Use Developer mode to reach checkpoints when helpful. Exercise the normal player flow for any progression you change. After an authorized deployment, check that the live entry page and changed assets load from GitHub Pages.

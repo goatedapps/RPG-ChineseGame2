@@ -1,6 +1,6 @@
 const clips = {
-  step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .42, cooldown: .28 },
-  pickup: { files: ['earn'], volume: .43, cooldown: 0 },
+  step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .56, cooldown: .28 },
+  pickup: { files: ['earn'], volume: .65, cooldown: 0 },
   dew: { files: ['pickup'], volume: .38, cooldown: .12 },
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
   notification: { files: ['phone-notification'], volume: .45, cooldown: .65 },
@@ -18,7 +18,7 @@ const clips = {
   bounce: { files: ['bounce'], volume: .54, cooldown: 0 },
   relay: { files: ['continue'], volume: .35, cooldown: .38 },
   finish: { files: ['exhibit-ready'], volume: .46, cooldown: .85 },
-  ui: { files: ['Diuup'], volume: .34, cooldown: 0 },
+  ui: { files: ['Diuup'], volume: .58, cooldown: 0 },
   page: { files: ['comic-snap'], volume: .37, cooldown: .15 },
   storm: { files: ['storm-hit'], volume: .42, cooldown: .55 },
 };
@@ -28,7 +28,7 @@ const tracks = {
   comic: { duration: 9.6, volume: .44 },
   prelude: { volume: .44 },
   epilogue: { volume: .44 },
-  game: { duration: 24, volume: .24 },
+  game: { duration: 24, volume: .40 },
   minigame: { volume: .60 },
 };
 
@@ -87,6 +87,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   let ambience = false;
   let ducked = false;
   let hasRun = false;
+  let pageActive = true;
   let stepIndex = 0;
   const buffers = new Map();
   const pendingEffects = new Map();
@@ -96,9 +97,11 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   const voices = new Map();
   const lastCue = new Map();
   const currentMusic = () => playingMinigame ? 'minigame' : musicScene;
+  const wantsAudio = () => enabled || (musicEnabled && currentMusic());
+  const pageVisible = () => pageActive && !document.hidden;
 
   function audible() {
-    return !document.hidden && context?.state === 'running';
+    return pageVisible() && context?.state === 'running';
   }
 
   function ramp(param, amount, time = .035) {
@@ -224,7 +227,10 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   }
 
   function prepareGameplay() {
-    if (musicEnabled) prepareMusic('minigame');
+    if (musicEnabled) {
+      prepareMusic('game');
+      prepareMusic('minigame');
+    }
     if (!enabled) return;
     for (const file of [rainFile, ...clips.step.files, ...clips.pickup.files]) prepareEffect(file);
   }
@@ -233,7 +239,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     const alreadyPending = pendingCues.has(name);
     pendingCues.set(name, { scene: musicScene, time: performance.now() });
     if (alreadyPending) return;
-    void Promise.all([prepareEffect(file), enabling]).then(([buffer]) => {
+    void Promise.all([prepareEffect(file), enabling?.done]).then(([buffer]) => {
       const request = pendingCues.get(name);
       pendingCues.delete(name);
       const current = request && (name === 'ui' || request.scene === musicScene);
@@ -254,35 +260,53 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     void entry.data.then(async (data) => {
       if (!data) return;
       const buffer = await context.decodeAudioData(data);
-      if (name === 'minigame' || name === musicScene) musicBuffers.set(name, buffer);
+      if (name === 'minigame' || name === 'game' || name === musicScene) musicBuffers.set(name, buffer);
     }).catch(() => {}).finally(() => {
       pendingMusic.delete(name);
       refreshMix();
     });
   }
 
-  function unlock() {
-    if ((!enabled && !(musicEnabled && currentMusic())) || document.hidden || !context ||
-        context.state === 'running' || context.state === 'closed' || enabling) return;
-    // An interrupted context can leave resume() pending. Allow a later input to retry.
+  function unlock(gesture) {
+    if (!wantsAudio() || !pageVisible() || context.state === 'running' || context.state === 'closed') return;
+    // Autoplay resume can stay pending. A real gesture must get its own attempt immediately.
+    if (enabling && (!gesture || enabling.gesture)) return;
+    const attempt = { gesture };
+    enabling = attempt;
+    if (gesture) {
+      // Start a silent sample synchronously for WebKit's gesture-based audio unlock.
+      const primer = context.createBufferSource();
+      primer.buffer = context.createBuffer(1, 1, context.sampleRate);
+      primer.connect(master);
+      primer.onended = () => primer.disconnect();
+      primer.start();
+    }
     let timer;
     const timeout = new Promise((resolve) => { timer = setTimeout(resolve, resumeTimeout); });
-    enabling = Promise.race([context.resume().catch(() => {}), timeout]).finally(() => {
+    attempt.done = Promise.race([context.resume().catch(() => {}), timeout]).finally(() => {
       clearTimeout(timer);
-      enabling = undefined;
+      if (enabling === attempt) enabling = undefined;
       refreshMix();
     });
   }
 
   function restoreAudio() {
     if (context.state === 'running') hasRun = true;
-    else if (hasRun) unlock();
+    else if (hasRun) unlock(false);
     refreshMix();
   }
 
   function initialize() {
     const Audio = window.AudioContext ?? window.webkitAudioContext;
     if (!Audio) return false;
+    // Match the hub's media playback routing when the browser exposes an audio session.
+    if (navigator.audioSession) {
+      try {
+        navigator.audioSession.type = 'playback';
+      } catch {
+        // Older implementations may leave the session under browser control.
+      }
+    }
     context = new Audio();
     master = context.createGain();
     effects = context.createGain();
@@ -296,7 +320,14 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     music.connect(master);
     hasRun = context.state === 'running';
     document.addEventListener('visibilitychange', restoreAudio);
-    window.addEventListener('pageshow', restoreAudio);
+    window.addEventListener('pagehide', () => {
+      pageActive = false;
+      refreshMix();
+    });
+    window.addEventListener('pageshow', () => {
+      pageActive = true;
+      restoreAudio();
+    });
     window.addEventListener('focus', restoreAudio);
     context.addEventListener('statechange', restoreAudio);
     prepareSceneEffects();
@@ -304,8 +335,8 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     return true;
   }
 
-  function start(interactive = true) {
-    if (!enabled && !(musicEnabled && currentMusic())) return false;
+  function start(gesture = navigator.userActivation?.isActive === true) {
+    if (!wantsAudio()) return false;
     if (!context) {
       try {
         if (!initialize()) return false;
@@ -313,13 +344,13 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
         return false;
       }
     }
-    if (interactive) unlock();
+    unlock(gesture);
     refreshMix();
     return true;
   }
 
   function startFromInput(event) {
-    if (event.isTrusted) start();
+    if (event.isTrusted) start(navigator.userActivation?.isActive !== false);
   }
 
   // Lesson entry follows a page navigation. Catch the first interaction with the
@@ -328,14 +359,16 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   window.addEventListener('pointerdown', (event) => {
     if (event.pointerType === 'mouse') startFromInput(event);
   }, inputOptions);
-  window.addEventListener('pointerup', startFromInput, inputOptions);
+  window.addEventListener('pointerup', (event) => {
+    if (event.pointerType !== 'touch') startFromInput(event);
+  }, inputOptions);
   window.addEventListener('touchend', startFromInput, inputOptions);
   window.addEventListener('keydown', startFromInput, inputOptions);
   window.addEventListener('click', startFromInput, inputOptions);
 
   function cue(name) {
     const clip = Object.hasOwn(clips, name) ? clips[name] : undefined;
-    if (!clip || !enabled || !context || document.hidden) return;
+    if (!clip || !enabled || !context || !pageVisible()) return;
     const now = context.currentTime;
     if (now - (lastCue.get(name) ?? -Infinity) < clip.cooldown) return;
     const nextFile = name === 'step' ? clip.files[stepIndex % clip.files.length] : clip.files[0];
@@ -377,11 +410,11 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   function setMusic(name) {
     const next = Object.hasOwn(tracks, name) ? name : null;
     if (musicScene === next) return;
-    musicBuffers.delete(musicScene);
+    if (musicScene !== 'game') musicBuffers.delete(musicScene);
     musicScene = next;
     if (musicEnabled) prepareMusic(next);
     prepareSceneEffects();
-    // Preload on entry. Wait for input to unlock the graph for the first time.
+    // Start immediately when autoplay is allowed, or prime the track for the first input.
     if (next) start(false);
     refreshMix();
   }
@@ -391,19 +424,21 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     prepareGameplay,
     startComic(ending = false) {
       setMusic(ending ? 'epilogue' : 'prelude');
-      if (musicEnabled && !hasRun && context?.state !== 'running' && navigator.userActivation?.hasBeenActive === false) {
-        return '轻触播放音乐';
+      if (wantsAudio() && context?.state !== 'running') {
+        return '轻触画面开启声音';
       }
     },
     setMusic,
     setEnabled(value) {
       enabled = Boolean(value);
       if (enabled && (musicScene || context || ambience)) prepareSceneEffects();
+      if (enabled && navigator.userActivation?.isActive) start();
       refreshMix();
     },
     setMusicEnabled(value) {
       musicEnabled = Boolean(value);
       if (musicEnabled) prepareMusic(currentMusic());
+      if (musicEnabled && navigator.userActivation?.isActive) start();
       refreshMix();
     },
     setMinigame(active) {
@@ -425,7 +460,8 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     setDucked(value) {
       if (ducked === Boolean(value)) return;
       ducked = Boolean(value);
-      refreshMix();
+      if (!ducked && context) restoreAudio();
+      else refreshMix();
     },
     cue,
   };

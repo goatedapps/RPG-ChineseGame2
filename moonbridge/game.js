@@ -14,7 +14,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
-import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';

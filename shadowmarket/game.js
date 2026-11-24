@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=interaction-cues';
-import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
