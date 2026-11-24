@@ -1,6 +1,7 @@
 import { createHintPortal } from '../shared/hint-portal.js';
 import { art, arrival, objects } from './story.js?v=market-games';
 import { buildArchitecture, roofCorridorPosts, roofHeight, squareLanternPosts, squareStallZ } from './architecture.js?v=districts';
+import { createMarketPeople } from './people.js';
 
 export const checkpoints = [
   arrival, { x: 0, z: -10.4 }, { x: 0, z: -17.5 },
@@ -145,6 +146,8 @@ export function buildShadowMarket(THREE, resume = 0) {
   block(0, 2.78, 1.48, 1.04);
   block(3.6, 1.26, 1.82, 1.31);
   block(1.95, -39.19, 3.6, 1.25);
+  block(4.9, .92, .57, .45);
+  block(1.85, -40.75, .61, .47);
   for (const [x, z] of squareLanternPosts) block(x, z, .77, .77);
   for (const [x, z] of roofCorridorPosts) block(x, z, .47, .47);
 
@@ -157,7 +160,7 @@ export function buildShadowMarket(THREE, resume = 0) {
 
   function artProp(name, x, y, z, height, yaw = 0) {
     const width = { phone: .53, mirror: .71, shadow: .43, 'festival-lantern': .53, keepsake: .66,
-      'painted-lantern': .44, grandma: .57, vendor: .63, 'lantern-keeper': .36 }[name];
+      'painted-lantern': .44 }[name];
     const material = standard('#ffffff', name, {
       alphaTest: .23, transparent: true, side: THREE.DoubleSide,
       emissive: name === 'shadow' ? '#30194a' : '#654438', emissiveIntensity: .36,
@@ -169,16 +172,21 @@ export function buildShadowMarket(THREE, resume = 0) {
     scene.add(mesh);
     return mesh;
   }
+  const people = createMarketPeople(THREE, scene, texture, loads, materials.lantern);
+  const [keeperX, keeperZ] = objects.trail.at;
+  const keeper = people.add('lantern-keeper', keeperX, keeperZ, objects.trail.height, .19);
+  people.giveLantern(keeper);
+  const keeperCollision = limits({ x: keeperX, z: keeperZ, width: .56, depth: .40 });
   const targets = new Map(Object.entries(objects).map(([id, { name, art: image, at, base = 0, height }]) => {
     const [x, z] = at;
     const facing = id === 'rooftop' ? -Math.PI / 2 : 0;
-    const object = artProp(image, x, groundHeight(x, z) + base, z, height, facing);
+    const object = id === 'trail' ? keeper : artProp(image, x, groundHeight(x, z) + base, z, height, facing);
     return [id, { label: name, object }];
   }));
   artProp('painted-lantern', 2.65, .92, -39, .96);
   artProp('festival-lantern', .55, .92, -39, .85);
-  artProp('grandma', 4.9, 0, .92, 1.58);
-  artProp('vendor', 1.85, 0, -40.75, 1.85);
+  people.add('grandma', 4.9, .92, 1.58, -.46);
+  people.add('vendor', 1.85, -40.75, 1.85, .12);
   artProp('mirror', 2.65, 0, -19.7, 1.7, -.45);
   artProp('mirror', -2.65, 0, -23.3, 1.72, .55);
   const runner = artProp('shadow', .4, 0, -21.6, 1.45);
@@ -247,6 +255,7 @@ export function buildShadowMarket(THREE, resume = 0) {
       targets.get('mirror').object.rotation.z = mirrorReady ? 0 : -.15;
       for (const step of steps) step.material = mirrorReady ? litStone : stepStone;
       targets.get('trail').object.visible = index === 0;
+      if (keeper.visible) colliders.push(keeperCollision);
       targets.get('rooftop').object.visible = index === 4;
       targets.get('reunion').object.visible = index >= 5;
       targets.get('keepsake').object.visible = index <= 3;
@@ -254,6 +263,7 @@ export function buildShadowMarket(THREE, resume = 0) {
     }
     targets.get('phone').object.visible = !state.phone;
     if (!state.reducedMotion) time += dt;
+    people.idle(time, state.reducedMotion);
     const { x, z } = camera.position;
     if (index !== 2) crossingTime = 0;
     if (index === 2 && z < -17.2) crossingTime += dt;

@@ -1,3 +1,5 @@
 # 影子集市美术
 
-ImageGen created the four district views, comic panels, stone paving texture, prop cutouts and character sprites for this lesson. Each image was cropped from its atlas and exported as WebP. The prop sprites retain transparency. The in-world props also appear in their close-ups.
+ImageGen created the district views, comic panels, surface textures, prop cutouts, and character portraits. The prop cutouts retain transparency and also appear in object close-ups.
+
+The `people/` assets pair indexed Three.js meshes with WebP texture sheets made from matching ImageGen front, profile, and back views. The character renderer projects those views onto the meshes and blends them around curved surfaces. The original portraits appear in the illustrated conversations.

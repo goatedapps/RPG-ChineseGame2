@@ -15,7 +15,7 @@ import { markLessonComplete } from '../shared/lesson-progress.js';
 import { createHelperPlayback } from '../shared/helper-playback.js';
 import { playLessonComic } from '../shared/comic.js?v=comic-score';
 import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
-import { buildShadowMarket, checkpoints } from './world.js?v=districts';
+import { buildShadowMarket, checkpoints } from './world.js?v=volumetric-people';
 import { marketMinigames } from './minigames.js?v=interaction-cues';
 import { phoneRecordings } from './phone-recordings.js?v=ah-lan-voice';
 
