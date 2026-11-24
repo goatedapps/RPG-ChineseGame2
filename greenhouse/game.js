@@ -1,6 +1,7 @@
 import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { markLessonComplete } from '../shared/lesson-progress.js';
+import { createHelperPlayback } from '../shared/helper-playback.js';
 import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=speech-recovery';
@@ -127,13 +128,17 @@ let responseSpeech;
 let voiceTween;
 let panelVoiceStatus;
 let backdropPointer = null;
-let mandarinPlaying = false;
-let phonePlayback;
+const helper = createHelperPlayback({
+  clipURL: (id) => new URL('./audio/ah-ning/' + id + '.mp3', import.meta.url),
+  getPlayed: () => state.playedPhoneClips,
+  save,
+  setDucked: audio.setDucked,
+});
 const phone = createPhone($('#phone'), {
   onToggle: togglePhone,
   onDismiss: () => audio.cue('ui'),
-  onReadMessage: playPhoneMessage,
-  onLeaveChat: stopPhoneMessage,
+  onReadMessage: (key) => helper.play(phoneRecordings[key]),
+  onLeaveChat: helper.stop,
   onNotify() {
     audio.cue('notification');
     releaseMouse();
@@ -198,42 +203,6 @@ function save() {
   }
 }
 
-function updateSpeechMix() {
-  audio.setDucked(mandarinPlaying || Boolean(phonePlayback?.playing));
-}
-
-function stopPhoneMessage() {
-  if (!phonePlayback) return;
-  const { clip } = phonePlayback;
-  phonePlayback = undefined;
-  clip.pause();
-  updateSpeechMix();
-}
-
-function playPhoneMessage(key) {
-  const id = phoneRecordings[key];
-  if (id && phonePlayback?.id === id) return;
-  stopPhoneMessage();
-  if (!id || state.playedPhoneClips.includes(id) || document.hidden) return;
-  const clip = new Audio(new URL('./audio/ah-ning/' + id + '.mp3', import.meta.url));
-  const playback = { id, clip, playing: false };
-  phonePlayback = playback;
-  clip.addEventListener('playing', () => {
-    if (phonePlayback !== playback) return;
-    playback.playing = true;
-    state.playedPhoneClips.push(id);
-    save();
-    updateSpeechMix();
-  }, { once: true });
-  const finish = () => { if (phonePlayback === playback) stopPhoneMessage(); };
-  clip.addEventListener('ended', finish, { once: true });
-  clip.addEventListener('error', finish, { once: true });
-  void clip.play().catch(finish);
-}
-
-window.addEventListener('pagehide', stopPhoneMessage);
-document.addEventListener('visibilitychange', () => { if (document.hidden) stopPhoneMessage(); });
-
 function node(tag, text, className) {
   const result = document.createElement(tag);
   if (text) result.textContent = text;
@@ -263,8 +232,7 @@ const voice = createVoice((status) => {
   if (status === 'playing' && window.gsap && !motion.matches) {
     voiceTween = window.gsap.to(bars, { scaleY: .33, stagger: .09, duration: .32, repeat: -1, yoyo: true, ease: 'sine.inOut' });
   }
-  mandarinPlaying = status === 'playing';
-  updateSpeechMix();
+  helper.setSpeaking(status === 'playing');
   const message = '暂时无法播放华语。你可以阅读中文提示，或再试一次。';
   $('#voice-status').textContent = status === 'unavailable' && !desk.open ? message : '';
   $('#voice-status').hidden = status !== 'unavailable' || desk.open;

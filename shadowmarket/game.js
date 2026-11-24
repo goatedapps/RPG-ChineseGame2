@@ -1,5 +1,5 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
-import { createPhone } from '../greenhouse/phone.js?v=interaction-cues';
+import { createPhone } from '../greenhouse/phone.js?v=ah-ning-voice';
 import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=speech-recovery';
 import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
@@ -12,17 +12,17 @@ import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-task
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { openGameSettings } from '../shared/settings.js';
 import { markLessonComplete } from '../shared/lesson-progress.js';
+import { createHelperPlayback } from '../shared/helper-playback.js';
 import { playLessonComic } from '../shared/comic.js?v=comic-score';
 import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
 import { buildShadowMarket, checkpoints } from './world.js?v=districts';
 import { marketMinigames } from './minigames.js?v=interaction-cues';
+import { phoneRecordings } from './phone-recordings.js?v=ah-lan-voice';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.shadowmarket';
 const strokeDataUrl = new URL('./stroke-data.json', import.meta.url);
 const audio = createGreenhouseAudio({ musicGain: .82 });
-const voice = createVoice((status) => audio.setDucked(status === 'playing'));
-const clueReader = createClueReader(voice);
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const desk = $('workbench');
 const panel = $('panel');
@@ -31,16 +31,29 @@ const map = () => location.assign('./?level=p6');
 const defaultState = () => ({
   phase: 'prelude', index: 0, phone: false, called: false, briefing: '',
   step: 'seek', beat: 0, question: 0, writing: 0, known: [], passed: false, final: null, practice: null,
-  effects: true, music: true,
+  effects: true, music: true, playedPhoneClips: [],
 });
 function load() {
-  try { return { ...defaultState(), ...JSON.parse(localStorage.getItem(key)) }; }
+  try {
+    const restored = { ...defaultState(), ...JSON.parse(localStorage.getItem(key)) };
+    restored.playedPhoneClips = Array.isArray(restored.playedPhoneClips)
+      ? restored.playedPhoneClips.filter((id) => typeof id === 'string') : [];
+    return restored;
+  }
   catch { return defaultState(); }
 }
 let state = load();
 function save() {
   try { localStorage.setItem(key, JSON.stringify(state)); } catch {}
 }
+const helper = createHelperPlayback({
+  clipURL: (id) => new URL('./audio/ah-lan/' + id + '.mp3', import.meta.url),
+  getPlayed: () => state.playedPhoneClips,
+  save,
+  setDucked: audio.setDucked,
+});
+const voice = createVoice((status) => helper.setSpeaking(status === 'playing'));
+const clueReader = createClueReader(voice);
 let words, bank, engine, active, target, hint, lastRead, currentCue, testCleanup;
 let writingCleanup = () => {};
 let distance = 0;
@@ -63,6 +76,8 @@ function phoneNotify() {
 const phone = createPhone($('phone'), {
   contactName: '阿岚', contactInitial: '岚', onNotify: phoneNotify,
   onDismiss: () => play('ui'),
+  onReadMessage: (key) => helper.play(phoneRecordings[key]),
+  onLeaveChat: helper.stop,
   onToggle(open) {
     if (!active) return;
     engine?.setActive(!open && !desk.open);
