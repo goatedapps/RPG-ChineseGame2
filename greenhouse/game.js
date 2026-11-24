@@ -15,7 +15,7 @@ import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=encounter-cues';
-import { phoneRecordings } from './phone-recordings.js?v=ah-ning-voice';
+import { phoneRecordings } from './phone-recordings.js?v=storm-voice';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
 import { prepareExhibit } from './minigames.js?v=root-login';
 import { sealWindow } from './window-match.js?v=interaction-cues';
