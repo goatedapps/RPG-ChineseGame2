@@ -14,7 +14,7 @@ function button(cls, text, label) {
   return node;
 }
 
-export function createPhone(host, { onToggle, onNotify, onDismiss, contactName = '阿宁', contactInitial = '宁' } = {}) {
+export function createPhone(host, { onToggle, onNotify, onDismiss, onReadMessage, onLeaveChat, contactName = '阿宁', contactInitial = '宁' } = {}) {
   host.classList.add('field-phone');
   host.lang = 'zh-Hans';
 
@@ -134,6 +134,7 @@ export function createPhone(host, { onToggle, onNotify, onDismiss, contactName =
   let buzz;
   let stopWriting;
   let writtenAnswer = '';
+  let latestIncoming;
 
   function time() {
     return timeFormat.format(new Date());
@@ -200,7 +201,10 @@ export function createPhone(host, { onToggle, onNotify, onDismiss, contactName =
     if (messages.length === 0) return;
     if (key) seen.add(key);
     for (const text of messages) appendMessage(text, direction === 'outgoing');
-    if (!expanded && ring && direction !== 'outgoing') {
+    if (direction === 'outgoing') return;
+    latestIncoming = key;
+    if (expanded && writing.hidden) onReadMessage?.(latestIncoming);
+    if (!expanded && ring) {
       unread += messages.length;
       updateDock();
       notify('message');
@@ -227,11 +231,13 @@ export function createPhone(host, { onToggle, onNotify, onDismiss, contactName =
       });
     }
     onToggle?.(true);
+    onReadMessage?.(latestIncoming);
   }
 
   function finishClose() {
     if (!expanded) return;
     expanded = false;
+    onLeaveChat?.();
     backToChat();
     viewport?.removeEventListener('resize', fitViewport);
     viewport?.removeEventListener('scroll', fitViewport);
@@ -379,6 +385,7 @@ export function createPhone(host, { onToggle, onNotify, onDismiss, contactName =
 
   function openWriting() {
     if (!expanded || !activeChallenge?.characters) return;
+    onLeaveChat?.();
     writing.hidden = false;
     sheet.classList.add('is-writing');
     scroll.hidden = true;
@@ -445,6 +452,7 @@ export function createPhone(host, { onToggle, onNotify, onDismiss, contactName =
   function reset() {
     close();
     seen.clear();
+    latestIncoming = undefined;
     inbox.replaceChildren();
     empty.hidden = false;
     unread = 0;

@@ -8,13 +8,14 @@ import { createWriting } from './writing.js';
 import { bindButtonAudio, createGreenhouseAudio } from './sounds.js?v=speech-recovery';
 import { playComic } from './comic.js?v=shared-comic-score';
 import { evidence } from './evidence.js?v=briefing-flow';
-import { createPhone } from './phone.js?v=interaction-cues';
+import { createPhone } from './phone.js?v=ah-ning-voice';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=encounter-cues';
+import { phoneRecordings } from './phone-recordings.js?v=ah-ning-voice';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
 import { prepareExhibit } from './minigames.js?v=root-login';
 import { sealWindow } from './window-match.js?v=interaction-cues';
@@ -49,7 +50,7 @@ function emptySave() {
   return {
     introSeen: false, tutorialStep: 0, tutorialDone: false, briefingSeen: null,
     mission: 0, action: 0, phase: 'explore', wordIndex: 0, held: null, written: {},
-    phonePicked: false, notePending: false, noteAnswer: '', unlocked: [], endingSeen: false,
+    phonePicked: false, notePending: false, noteAnswer: '', unlocked: [], endingSeen: false, playedPhoneClips: [],
     lessonComplete: false, finalStarted: false, finalPassed: false, finalTest: null, practiceTest: null,
   };
 }
@@ -88,6 +89,7 @@ function load() {
       noteAnswer: typeof data.noteAnswer === 'string' ? data.noteAnswer.slice(0, 180) : '',
       unlocked: unlocked.filter((id) => id === 'rootCam' || Object.hasOwn(screenChecks, id)),
       endingSeen, lessonComplete, finalStarted,
+      playedPhoneClips: Array.isArray(data.playedPhoneClips) ? data.playedPhoneClips.filter((id) => typeof id === 'string') : [],
       finalPassed: finalStarted && lessonComplete && data.finalPassed === true,
       finalTest: data.finalTest ?? null,
       practiceTest: lessonComplete ? data.practiceTest ?? null : null,
@@ -125,9 +127,13 @@ let responseSpeech;
 let voiceTween;
 let panelVoiceStatus;
 let backdropPointer = null;
+let mandarinPlaying = false;
+let phonePlayback;
 const phone = createPhone($('#phone'), {
   onToggle: togglePhone,
   onDismiss: () => audio.cue('ui'),
+  onReadMessage: playPhoneMessage,
+  onLeaveChat: stopPhoneMessage,
   onNotify() {
     audio.cue('notification');
     releaseMouse();
@@ -192,6 +198,42 @@ function save() {
   }
 }
 
+function updateSpeechMix() {
+  audio.setDucked(mandarinPlaying || Boolean(phonePlayback?.playing));
+}
+
+function stopPhoneMessage() {
+  if (!phonePlayback) return;
+  const { clip } = phonePlayback;
+  phonePlayback = undefined;
+  clip.pause();
+  updateSpeechMix();
+}
+
+function playPhoneMessage(key) {
+  const id = phoneRecordings[key];
+  if (id && phonePlayback?.id === id) return;
+  stopPhoneMessage();
+  if (!id || state.playedPhoneClips.includes(id) || document.hidden) return;
+  const clip = new Audio(new URL('./audio/ah-ning/' + id + '.mp3', import.meta.url));
+  const playback = { id, clip, playing: false };
+  phonePlayback = playback;
+  clip.addEventListener('playing', () => {
+    if (phonePlayback !== playback) return;
+    playback.playing = true;
+    state.playedPhoneClips.push(id);
+    save();
+    updateSpeechMix();
+  }, { once: true });
+  const finish = () => { if (phonePlayback === playback) stopPhoneMessage(); };
+  clip.addEventListener('ended', finish, { once: true });
+  clip.addEventListener('error', finish, { once: true });
+  void clip.play().catch(finish);
+}
+
+window.addEventListener('pagehide', stopPhoneMessage);
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopPhoneMessage(); });
+
 function node(tag, text, className) {
   const result = document.createElement(tag);
   if (text) result.textContent = text;
@@ -221,7 +263,8 @@ const voice = createVoice((status) => {
   if (status === 'playing' && window.gsap && !motion.matches) {
     voiceTween = window.gsap.to(bars, { scaleY: .33, stagger: .09, duration: .32, repeat: -1, yoyo: true, ease: 'sine.inOut' });
   }
-  audio.setDucked(status === 'playing');
+  mandarinPlaying = status === 'playing';
+  updateSpeechMix();
   const message = '暂时无法播放华语。你可以阅读中文提示，或再试一次。';
   $('#voice-status').textContent = status === 'unavailable' && !desk.open ? message : '';
   $('#voice-status').hidden = status !== 'unavailable' || desk.open;
