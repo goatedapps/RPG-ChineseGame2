@@ -96,7 +96,8 @@ p {
   background: #684b4744;
 }
 .hub-music,
-.map-header .hub-music {
+.hub-developer,
+.map-header :is(.hub-music, .hub-developer) {
   position: relative;
   display: grid;
   place-items: center;
@@ -106,6 +107,7 @@ p {
   color: var(--gold);
   font-size: 1.25rem;
 }
+.hub-developer, .map-header .hub-developer { font: 650 .86rem/1 ui-monospace, monospace; }
 .brand .hub-music { margin-left: auto; }
 .hub-music[aria-pressed='false']::after {
   content: '';
@@ -342,6 +344,14 @@ dialog {
 dialog::backdrop {
   background: #0b0a20bf;
 }
+#hub-developer-dialog {
+  --cream: var(--ink);
+  --jade: #d7beff;
+  --sun: var(--gold);
+  --night: var(--bg);
+  --deep: #1a1831;
+}
+#hub-developer-panel { margin-top: .9rem; }
 dialog header {
   display: flex;
   align-items: center;
@@ -434,9 +444,10 @@ dialog header button {
 }
 @media (max-width: 660px) {
   .map-tools {
-    flex-direction: column;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(2, 44px);
   }
+  .map-tools #directory { grid-column: 1 / -1; justify-self: stretch; }
   .choose {
     background-position: 56% 45%;
   }

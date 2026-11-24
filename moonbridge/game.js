@@ -14,12 +14,12 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=correct-answer';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=shared-comic-score';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 
-import { playLessonComic } from '../shared/comic.js';
+import { playLessonComic } from '../shared/comic.js?v=comic-score';
 import { bindJoystick } from '../shared/joystick.js';
 import { openGameSettings } from '../shared/settings.js?v=direct-entry';
 
@@ -250,15 +250,7 @@ function setView(next) {
   canvas.hidden = next !== 'hud';
   if (next !== 'hud') world?.pause();
   else if (!dialog.open) world?.resume();
-  audio.setMusic(
-    next === 'home'
-      ? 'title'
-      : next === 'comic'
-        ? 'comic'
-        : next === 'hud'
-          ? 'game'
-          : null,
-  );
+  if (next !== 'comic') audio.setMusic(next === 'home' ? 'title' : next === 'hud' ? 'game' : null);
 }
 function matchesTest(test) {
   return Array.isArray(test?.queue) && test.queue.length > 0;
@@ -279,7 +271,10 @@ function showComic(content, title, onFinish) {
     alt: description,
     caption,
   }));
-  playLessonComic($('comic'), onFinish, {
+  playLessonComic($('comic'), () => {
+    audio.setMusic(null);
+    onFinish();
+  }, {
     panels,
     titleText: title,
     lastLabel: closing
@@ -288,6 +283,7 @@ function showComic(content, title, onFinish) {
         : '开始课末测试'
       : '进入车站',
     ending: closing,
+    startLabel: audio.startComic(closing),
     onPage(page) {
       if (!closing && page === 1) audio.prepareGameplay();
       else if (!closing && page === 2) play('storm');

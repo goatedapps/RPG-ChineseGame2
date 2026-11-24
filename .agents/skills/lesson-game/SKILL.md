@@ -21,6 +21,7 @@ Start with [AGENTS.md](../../../AGENTS.md) for the current project rules. Use th
 - Automatically read the body of each Chinese clue aloud in Mandarin when the player first picks it up or opens it, including new pages of an in-world book. Speak the clue message only. Leave out headers, labels, signatures, and interaction instructions. Put the small [shared speaker control](../../../shared/speaker.js) beside the clue, including in review views. A tap while reading stops playback. A tap at rest reads from the beginning. Stop when the player closes, hides, or replaces the clue, turns the page, or leaves the screen.
 - Keep the shared Developer mode interface in English and let the developer jump to the task numbers shown on the HUD. The skip-dictation switch applies to task dictation and the final test and stays on in the tab until switched off.
 - After a developer reaches a lesson’s final test with skipping on, let them enter the next published world from the star map in that tab. Keep saved test progress and award completion credit when the final test is passed.
+- Use the shared Developer mode panel on the grade picker and star map. The **Unlock all lessons** switch opens all published worlds for the current tab and preserves normal completion records.
 
 ## 2. Reuse the reference lesson and shared components
 
@@ -37,6 +38,7 @@ Open the [P6 Lesson 1 guide](../../../greenhouse/LESSON.md) and [gameplay screen
 Use ImageGen for player-facing artwork as described in `AGENTS.md`. For close-ups, think through what the player does to the object. Use page edges, pictured controls, and tap-outside dismissal where appropriate. Avoid use of buttons UI, including 'X' button to close a screen. Make actionable areas easy to spot and operable by keyboard / tablet. For sound, reuse suitable footsteps and interaction cues, connect music and effects to their settings, and check that speech stays clear against the music. For recorded helper dialogue, keep filenames tied to stable message IDs and verify playback from the helper interface using the [P3 clip mapping](../../../moonbridge/radio-messages.js) as a reference.
 
 - Loop [game-music.mp3](../../../universe/audio/game-music.mp3) while a minigame is in progress. Use the shared audio mixer so the music setting, speech ducking, and recovery after interruptions also apply. Restore the current scene’s music when the player completes or leaves the minigame.
+- Use [prelude.mp3](../../../universe/audio/prelude.mp3) for every lesson’s opening comic and [epilogue.mp3](../../../universe/audio/epilogue.mp3) for its closing comic. Call the shared mixer’s `startComic` and pass its optional start hint to the comic player. Respect the music setting and switch tracks when the comic closes.
 - Use the shared `correct` cue for successful comprehension, dictation and practice answers, including the final test. It plays [correct.mp3](../../../universe/audio/correct.mp3).
 - Play [whoosh.mp3](../../../universe/audio/whoosh.mp3) when an available world opens from the star map, including with reduced motion enabled.
 

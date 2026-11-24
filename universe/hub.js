@@ -1,11 +1,12 @@
 import { bindJoystick } from '../shared/joystick.js';
 import { lessonCompleted, lessonReachedFinal } from '../shared/lesson-progress.js?v=developer-unlock';
-import { developerSkipEnabled } from '../shared/developer-mode.js?v=developer-unlock';
-import { getWorlds, levels } from './catalog.js?v=developer-unlock';
+import { createDeveloperMode, developerSkipEnabled, developerWorldsEnabled } from '../shared/developer-mode.js?v=hub-developer';
+import { getWorlds, levels } from './catalog.js?v=hub-developer';
 
 const $ = (id) => document.getElementById(id);
 const gradeKeys = Object.keys(levels);
 const dialog = $('world-directory');
+const developerDialog = $('hub-developer-dialog');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const music = $('hub-music');
 const whoosh = $('hub-whoosh');
@@ -101,7 +102,8 @@ function mapStatus(text = '', duration = 0) {
   if (duration) statusTimer = setTimeout(mapStatus, duration);
 }
 function refreshWorlds(level) {
-  worlds = getWorlds(level, lessonCompleted, developerSkipEnabled() ? lessonReachedFinal : undefined);
+  worlds = getWorlds(level, lessonCompleted, developerSkipEnabled() ? lessonReachedFinal : undefined, developerWorldsEnabled());
+  universe?.updateWorlds(worlds);
   const completed = worlds.filter(({ status }) => status === 'complete').length;
   $('completion').textContent =
     '已完成 ' + completed + ' / ' + worlds.length + ' 课';
@@ -135,7 +137,7 @@ async function openLevel(level) {
       { opacity: 1, duration: 0.36, clearProps: 'opacity' },
     );
   try {
-    const { createUniverse } = await import('./map.js?v=touch-controls');
+    const { createUniverse } = await import('./map.js?v=hub-developer');
     if (ticket !== generation) return;
     universe = createUniverse($('universe'), levels[level], worlds, {
       onNearby: (world) => { nearby = world; },
@@ -268,8 +270,26 @@ function enterWorld(world) {
 $('back').onclick = backToLevels;
 $('directory').onclick = openDirectory;
 $('close-directory').onclick = () => dialog.close();
+const refreshDeveloperAccess = () => {
+  if (currentLevel) refreshWorlds(currentLevel);
+};
+const developer = createDeveloperMode({
+  panel: $('hub-developer-panel'),
+  openPanel(title) {
+    if (!developerDialog.open) {
+      universe?.stopInput();
+      developerDialog.showModal();
+    }
+    $('hub-developer-title').textContent = title;
+    $('hub-developer-panel').replaceChildren();
+  },
+  onClose: () => developerDialog.close(),
+  onUnlockWorlds: refreshDeveloperAccess,
+  onSkipDictation: refreshDeveloperAccess,
+});
+for (const button of document.querySelectorAll('.hub-developer')) button.onclick = developer.open;
 window.addEventListener('keydown', (event) => {
-  if (event.code === 'KeyE' && currentLevel && !dialog.open && !event.repeat)
+  if (event.code === 'KeyE' && currentLevel && !dialog.open && !developerDialog.open && !event.repeat)
     enterWorld(nearby);
 });
 window.addEventListener('pageshow', (event) => {

@@ -362,10 +362,28 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     source.start();
   }
 
+  function setMusic(name) {
+    const next = Object.hasOwn(tracks, name) ? name : null;
+    if (musicScene === next) return;
+    musicBuffers.delete(musicScene);
+    musicScene = next;
+    if (musicEnabled) prepareMusic(next);
+    prepareSceneEffects();
+    // Preload on entry. Wait for input to unlock the graph for the first time.
+    if (next) start(false);
+    refreshMix();
+  }
+
   return {
     start,
     prepareGameplay,
-    get musicUnlocked() { return context?.state === 'running' || hasRun; },
+    startComic(ending = false) {
+      setMusic(ending ? 'epilogue' : 'prelude');
+      if (musicEnabled && !hasRun && context?.state !== 'running' && navigator.userActivation?.hasBeenActive === false) {
+        return '轻触播放音乐';
+      }
+    },
+    setMusic,
     setEnabled(value) {
       enabled = Boolean(value);
       if (enabled && (musicScene || context || ambience)) prepareSceneEffects();
@@ -374,17 +392,6 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     setMusicEnabled(value) {
       musicEnabled = Boolean(value);
       if (musicEnabled) prepareMusic(currentMusic());
-      refreshMix();
-    },
-    setMusic(name) {
-      const next = Object.hasOwn(tracks, name) ? name : null;
-      if (musicScene === next) return;
-      musicBuffers.delete(musicScene);
-      musicScene = next;
-      if (musicEnabled) prepareMusic(next);
-      prepareSceneEffects();
-      // Preload on entry. Wait for input to unlock the graph for the first time.
-      if (next) start(false);
       refreshMix();
     },
     setMinigame(active) {

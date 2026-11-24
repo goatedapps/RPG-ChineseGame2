@@ -186,7 +186,7 @@ export function createUniverse(
     label.scale.set(1.08, 0.54, 1);
     root.add(label);
     let name;
-    if (ready && world.href) {
+    if (world.href) {
       name = makeLabel(world.title, { height: 76, fontSize: 46 });
       const artwork = name.material.map.image;
       const scale = Math.min(1 / 155, (planet.scale.x * 0.65) / artwork.width);
@@ -431,6 +431,29 @@ export function createUniverse(
     }
   }
 
+  function updateWorlds(nextWorlds) {
+    for (const world of nextWorlds) {
+      const item = entries.get(world.number);
+      if (item.world.status === world.status) continue;
+      const ready = access(world);
+      item.world = world;
+      item.planet.material.color.setHex(ready ? 0xffffff : world.status === 'building' ? 0x9b899b : 0x6c6f97);
+      item.planet.material.opacity = ready ? 1 : .78;
+      item.ring.material.color.setHex(ready ? accent : 0x8179a5);
+      item.ring.material.opacity = ready ? .93 : .46;
+      item.orbit.material.opacity = ready ? .66 : .25;
+      item.ring.geometry.dispose();
+      item.ring.geometry = new T.TorusGeometry(world.number === 1 ? 2.32 : 1.86, ready ? .041 : .021, 6, 64);
+      const label = makeLabel(String(world.number).padStart(2, '0'), {
+        width: 128, height: 64, fontSize: 25, muted: world.status === 'locked',
+      });
+      item.label.material.map.dispose();
+      item.label.material.map = label.material.map;
+      label.material.dispose();
+    }
+    onNearby(entries.get(nearby)?.world);
+  }
+
   function frame(now) {
     const dt = Math.min(0.11, (now - (lastFrame || now)) / 1000);
     lastFrame = now;
@@ -498,11 +521,11 @@ export function createUniverse(
       !reduce.matches,
     );
     screenUp.copy(UP).applyQuaternion(camera.quaternion);
-    for (const [id, { planet, label, name }] of entries) {
+    for (const [id, { world, planet, label, name }] of entries) {
       label.position.copy(planet.position)
         .addScaledVector(screenUp, -(planet.scale.y / 2 + 0.24));
       if (name) {
-        name.visible = !leaving && id === nearby;
+        name.visible = !leaving && id === nearby && access(world);
         if (name.visible) {
           name.position.copy(planet.position)
             .addScaledVector(screenUp, planet.scale.y * 0.18);
@@ -516,6 +539,8 @@ export function createUniverse(
 
   return {
     flyTo,
+    updateWorlds,
+    stopInput,
     setStick(x, forward) {
       stick.set(x, forward);
     },

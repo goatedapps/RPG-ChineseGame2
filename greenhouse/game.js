@@ -5,8 +5,8 @@ import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=correct-answer';
-import { playComic } from './comic.js';
+import { createGreenhouseAudio } from './sounds.js?v=shared-comic-score';
+import { playComic } from './comic.js?v=shared-comic-score';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=note-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
@@ -986,15 +986,16 @@ function showFinale() {
   phone.close();
   engine?.setActive(false);
   voice.stop();
-  audio.setMusic('comic');
+  const startLabel = audio.startComic(true);
   playComic($('#comic-overlay'), () => {
     state.endingSeen = true;
     save();
+    audio.setMusic(null);
     audio.setMusic('game');
     audio.cue('finish');
     openFinalMessage();
   }, {
-    ending: true,
+    ending: true, startLabel,
     onPage(page) { if (page > 1) audio.cue('page'); },
   });
 }
@@ -1332,15 +1333,17 @@ function beginWithComic() {
     return;
   }
   $('#splash').hidden = true;
-  audio.setMusic('comic');
+  const startLabel = audio.startComic();
   void prepareRoom();
   playComic($('#comic-overlay'), () => {
     if (!state.introSeen) {
       state.introSeen = true;
       save();
     }
+    audio.setMusic(null);
     begin();
   }, {
+    startLabel,
     onPage(page) {
       if (page === 1) audio.prepareGameplay();
       else if (page === 2) audio.cue('storm');

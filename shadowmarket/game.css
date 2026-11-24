@@ -6,11 +6,6 @@
 }
 #app { background: #21192f url('art/square.webp') center / cover; }
 .vellum { opacity: .44; }
-.comic-start-hint {
-  margin: 0;
-  color: #e9cda8;
-  font-size: clamp(.75rem, 2.8vw, .91rem);
-}
 .identity { padding: .18rem .35rem; background: #19182bc9; border-radius: .35rem; }
 #mission-ui { background: linear-gradient(95deg, #19192bf0, #282039c9); }
 .emblem-plant { color: var(--sun); }

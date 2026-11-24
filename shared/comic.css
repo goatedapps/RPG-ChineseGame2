@@ -151,6 +151,11 @@
 .comic-progress-dot.current {
   background: #ffc477;
 }
+.comic-start-hint {
+  margin: 0;
+  color: #e9cda8;
+  font-size: clamp(.75rem, 2.8vw, .91rem);
+}
 .comic-hidden {
   position: absolute;
   width: 1px;

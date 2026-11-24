@@ -1,5 +1,6 @@
 const developerPassword = 'greenhouse';
 const sessionKey = 'rpg-chinese.developer';
+const worldsKey = 'rpg-chinese.developer.open-worlds';
 
 function makeElement(tag, text, className) {
   const element = document.createElement(tag);
@@ -17,9 +18,10 @@ function makeButton(text, className) {
 function settingsForTab() {
   try {
     const value = sessionStorage.getItem(sessionKey);
-    return { unlocked: value === 'on' || value === 'off', skip: value === 'on' };
+    const unlocked = value === 'on' || value === 'off';
+    return { unlocked, skip: value === 'on', worlds: unlocked && sessionStorage.getItem(worldsKey) === 'on' };
   } catch {
-    return { unlocked: false, skip: false };
+    return { unlocked: false, skip: false, worlds: false };
   }
 }
 
@@ -27,7 +29,11 @@ export function developerSkipEnabled() {
   return settingsForTab().skip;
 }
 
-export function createDeveloperMode({ panel, openPanel, taskCount, canJump, currentTask, onJump, onSkipDictation, onClose }) {
+export function developerWorldsEnabled() {
+  return settingsForTab().worlds;
+}
+
+export function createDeveloperMode({ panel, openPanel, taskCount = 0, canJump, currentTask, onJump, onSkipDictation, onUnlockWorlds, onClose }) {
   const settings = settingsForTab();
   function persist() {
     try { sessionStorage.setItem(sessionKey, settings.skip ? 'on' : 'off'); } catch {}
@@ -36,10 +42,12 @@ export function createDeveloperMode({ panel, openPanel, taskCount, canJump, curr
     if (!settings.unlocked || settings.skip === value) return;
     settings.skip = value;
     persist();
-    onSkipDictation(value);
+    onSkipDictation?.(value);
   }
 
   function open() {
+    const saved = settingsForTab();
+    if (saved.unlocked) Object.assign(settings, saved);
     openPanel('Developer mode');
     const content = makeElement('div', '', 'developer-menu');
     content.lang = 'en';
@@ -49,7 +57,7 @@ export function createDeveloperMode({ panel, openPanel, taskCount, canJump, curr
     close.onclick = onClose;
     content.append(close);
     panel.append(content);
-    content.querySelector(settings.unlocked ? '#developer-skip-dictation' : '#developer-password').focus({ preventScroll: true });
+    content.querySelector('input').focus({ preventScroll: true });
   }
 
   function showUnlock(content) {
@@ -92,31 +100,45 @@ export function createDeveloperMode({ panel, openPanel, taskCount, canJump, curr
     });
   }
 
-  function showControls(content) {
+  function addSwitch(content, id, title, help, checked, onChange) {
     const row = makeElement('label', '', 'developer-option');
     const checkbox = makeElement('input');
-    checkbox.id = 'developer-skip-dictation';
+    checkbox.id = id;
     checkbox.type = 'checkbox';
     checkbox.setAttribute('role', 'switch');
-    checkbox.checked = settings.skip;
+    checkbox.checked = checked;
     const copy = makeElement('span');
-    const label = makeElement('strong', 'Skip dictation');
-    label.id = 'developer-dictation-title';
-    const description = makeElement('small', 'Skips task dictation and the final test until you turn it off in this tab.', 'developer-description');
-    description.id = 'developer-dictation-description';
+    const label = makeElement('strong', title);
+    label.id = id + '-title';
+    const description = makeElement('small', help, 'developer-description');
+    description.id = id + '-description';
     checkbox.setAttribute('aria-labelledby', label.id);
     checkbox.setAttribute('aria-describedby', description.id);
     copy.append(label, description);
     const track = makeElement('span', '', 'settings-track');
-    const state = makeElement('span', settings.skip ? 'On' : 'Off', 'settings-state');
+    const state = makeElement('span', checked ? 'On' : 'Off', 'settings-state');
     track.setAttribute('aria-hidden', 'true');
     state.setAttribute('aria-hidden', 'true');
     row.append(copy, state, checkbox, track);
     checkbox.addEventListener('change', () => {
       state.textContent = checkbox.checked ? 'On' : 'Off';
-      setSkipDictation(checkbox.checked);
+      onChange(checkbox.checked);
     });
+    content.append(row);
+  }
 
+  function showControls(content) {
+    if (onUnlockWorlds) {
+      addSwitch(content, 'developer-open-worlds', 'Unlock all lessons',
+        'Open every published lesson in this tab, regardless of progress.', settings.worlds, (enabled) => {
+          settings.worlds = enabled;
+          try { sessionStorage.setItem(worldsKey, enabled ? 'on' : 'off'); } catch {}
+          onUnlockWorlds(enabled);
+        });
+    }
+    addSwitch(content, 'developer-skip-dictation', 'Skip dictation',
+      'Skips task dictation and the final test until you turn it off in this tab.', settings.skip, setSkipDictation);
+    if (!taskCount) return;
     const task = makeElement('form', '', 'developer-task');
     const taskLabel = makeElement('label', 'Jump to task');
     taskLabel.htmlFor = 'developer-task-number';
@@ -146,7 +168,7 @@ export function createDeveloperMode({ panel, openPanel, taskCount, canJump, curr
     controls.append(select, jump);
     task.append(taskLabel, controls);
     if (select.disabled) task.append(makeElement('p', 'Task jumping is unavailable on this screen.', 'developer-description'));
-    content.append(row, task);
+    content.append(task);
   }
 
   return {

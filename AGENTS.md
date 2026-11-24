@@ -14,6 +14,7 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 - Give each lesson a coherent storyline with one overarching mission and an illustrated title that fits its setting.
 - Open with a short, picture-led comic that establishes the stakes through clear, expressive action, and close with an illustrated epilogue that shows what the player achieved.
 - Use the shared [comic player](shared/comic.js) and [layout](shared/comic.css) for every prelude and epilogue. Put Simplified Chinese dialogue inside centred artwork on the dark background, with progress marks at the lower left. Tap or click the scene to advance, or use the keyboard. Keep visible navigation buttons out of the comic, and use the shared GSAP chapter reveal and reduced-motion behaviour.
+- Play [prelude.mp3](universe/audio/prelude.mp3) in every opening comic and [epilogue.mp3](universe/audio/epilogue.mp3) in every closing comic through the shared mixer.
 - Begin with a hands-on tutorial for walking, looking around, and interacting with the lesson's objects and story guidance.
 
 ## Exploration and story guidance
@@ -67,6 +68,7 @@ Use the [lesson-game skill](.agents/skills/lesson-game/SKILL.md) when planning, 
 - Advance the scene and story together when skipping, and award handwriting credit only for work the player completes.
 - Preserve unfinished assessment progress when a developer skips the final test. Leave practice tests and normal completion credit on the regular assessment flow.
 - When a developer reaches the final test with skipping enabled, let them enter the next published lesson from the star map in the same tab. Keep this access tied to the skip switch.
+- Put Developer mode on the grade picker and star map. Its **Unlock all lessons** switch opens every published world in the current tab without changing saved completion.
 
 ## Assets and delivery
 

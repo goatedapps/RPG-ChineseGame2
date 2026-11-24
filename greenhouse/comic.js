@@ -1,4 +1,4 @@
-import { playLessonComic } from '../shared/comic.js';
+import { playLessonComic } from '../shared/comic.js?v=comic-score';
 
 const openingPanels = [
   {
@@ -43,7 +43,7 @@ const closingPanels = [
   },
 ];
 
-export function playComic(container, onFinish, { onPage = () => {}, ending = false } = {}) {
+export function playComic(container, onFinish, { onPage = () => {}, ending = false, startLabel } = {}) {
   const panels = (ending ? closingPanels : openingPanels).map((panel, index) => {
     const base = './art/comic-' + (ending ? 'ending-' : 'storm-') + (index + 1);
     const image = new URL(base + '.webp', import.meta.url).href;
@@ -51,7 +51,7 @@ export function playComic(container, onFinish, { onPage = () => {}, ending = fal
     return { ...panel, image, srcset: small + ' 768w, ' + image + ' 1050w' };
   });
   return playLessonComic(container, onFinish, {
-    panels, onPage, ending,
+    panels, onPage, ending, startLabel,
     titleText: ending ? '暴雨后的温室结局' : '暴雨后的温室序幕',
     lastLabel: ending ? '回到温室' : '进入科学楼',
   });

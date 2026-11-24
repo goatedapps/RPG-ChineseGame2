@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=comic-score';
+import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=shared-comic-score';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
@@ -524,8 +524,7 @@ function showTest(mode) {
 function showComic(isEnding) {
   wrapUp();
   $('splash').hidden = true;
-  audio.setMusic(isEnding ? 'epilogue' : 'prelude');
-  const awaitingAudio = state.music && !audio.musicUnlocked && navigator.userActivation?.hasBeenActive === false;
+  const startLabel = audio.startComic(isEnding);
   playLessonComic($('comic-overlay'), () => {
     state.phase = isEnding ? 'final' : 'world';
     save();
@@ -538,7 +537,7 @@ function showComic(isEnding) {
     titleText: isEnding ? '影子集市 · 尾声' : '影子集市 · 序幕',
     panels: isEnding ? ending : opening, ending: isEnding,
     lastLabel: isEnding ? '开始课末测试' : '走进灯笼广场',
-    startLabel: awaitingAudio ? '轻触播放音乐' : undefined,
+    startLabel,
     onPage: () => play('page'),
   });
 }
