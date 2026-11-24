@@ -133,6 +133,7 @@ function untangleLantern(play, finish) {
   const rack = element('div', 'lantern-rail');
   const decorations = [prop(art('festival-lantern'), 'side-lantern left'), prop(art('painted-lantern'), 'side-lantern right')];
   const take = control('取下有两枚手印的旧灯笼', 'take-lantern');
+  take.dataset.pickup = '';
   take.append(prop(art('keepsake')));
   take.disabled = true;
   const ropes = svg('svg');
@@ -162,8 +163,10 @@ function untangleLantern(play, finish) {
     loop.style.left = hook.x / 4 + '%';
     loop.style.top = hook.y / 3.2 + '%';
     loop.append(element('i'));
+    let dragged = false;
     loop.addEventListener('pointerdown', (event) => {
       if (event.button !== 0 || pointer || settling) return;
+      dragged = false;
       const bounds = stage.getBoundingClientRect();
       pointer = { id: event.pointerId, index, x: event.clientX, y: event.clientY, bounds, dx: 0, dy: 0 };
       loop.setPointerCapture(event.pointerId);
@@ -181,7 +184,9 @@ function untangleLantern(play, finish) {
       const attempt = pointer;
       pointer = undefined;
       delete loop.dataset.held;
-      if (Math.hypot(attempt.dx, attempt.dy) < 9 || attempt.dy < -12) lift(index, attempt);
+      dragged = Math.hypot(attempt.dx, attempt.dy) >= 9;
+      if (!dragged) return;
+      if (attempt.dy < -12) lift(index, attempt);
       else reject(index, attempt, '把绳圈往上抬，离开挂钩。');
     });
     loop.addEventListener('lostpointercapture', (event) => {
@@ -192,7 +197,7 @@ function untangleLantern(play, finish) {
       settle(deform(index, ...cordOffset(attempt)), count);
     });
     loop.addEventListener('click', (event) => {
-      if (event.detail === 0 && !settling) lift(index);
+      if (!settling && (!dragged || event.detail === 0)) lift(index);
     });
     return loop;
   });

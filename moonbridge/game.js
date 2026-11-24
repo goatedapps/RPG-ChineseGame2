@@ -1,5 +1,5 @@
 import { markLessonComplete } from '../shared/lesson-progress.js';
-import { findBridgeLamps, lightMoonbridge, matchWorkshopWords } from './minigames.js';
+import { findBridgeLamps, lightMoonbridge, matchWorkshopWords } from './minigames.js?v=interaction-cues';
 import { createWorld } from './world.js?v=cockpit-race';
 import {
   opening,
@@ -14,7 +14,7 @@ import { vocabularyList } from '../shared/vocabulary.js';
 import { createClueReader, dictationButton, speakerButton } from '../shared/speaker.js?v=clue-audio';
 import { testPart } from './race.js?v=cockpit-race';
 import { mountWriting, mountTest } from './assess.js?v=numbered-tasks';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=shared-comic-score';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
@@ -325,7 +325,10 @@ function closePanel() {
 $('dialog-close').onclick = closePanel;
 dialog.addEventListener('cancel', () => { stopMeiClip(); voice.stop(); });
 dialog.addEventListener('click', (event) => {
-  if (event.target === dialog || event.target === body) closePanel();
+  if (event.target === dialog || event.target === body) {
+    play('ui');
+    closePanel();
+  }
 });
 dialog.addEventListener('close', () => {
   if (dialog.open) return;
@@ -841,9 +844,9 @@ function choosePart() {
   for (const [id, part] of Object.entries(parts)) {
     const label = part.name + '。' + part.line;
     shelf.append(objectHotspot(label, 'fitting-' + id, () => {
-      play('pickup');
       writeWorkshop('shelf', () => {
         save.part = id;
+        play('pickup');
         go(9);
         closePanel();
       });
@@ -1295,7 +1298,10 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.repeat || view !== 'hud' || dialog.open) return;
   if (event.code === 'KeyE') action();
-  if (event.code === 'KeyF') openRadio();
+  if (event.code === 'KeyF') {
+    if (!$('radio').hidden) play('ui');
+    openRadio();
+  }
   if (driving && event.code === 'ArrowLeft') world.chooseRoute('rough');
   if (driving && event.code === 'ArrowRight') world.chooseRoute('smooth');
 });
@@ -1431,12 +1437,7 @@ document.querySelectorAll('[data-settings]').forEach((control) => {
   control.onclick = settings;
 });
 
-document.addEventListener('click', (event) => {
-  if (!(event.target instanceof Element)) return;
-  const control = event.target.closest('button');
-  if (!control || control.matches('.comic-hit,#action,#accelerator,.options button')) return;
-  play('ui');
-});
+bindButtonAudio(play, (control) => control.id === 'action' && (save.stage === 2 || save.stage === 4));
 
 const developer = createDeveloperMode({
   panel: body,

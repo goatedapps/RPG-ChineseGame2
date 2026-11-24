@@ -1,6 +1,7 @@
 const clips = {
   step: { files: ['step-1', 'step-2', 'step-3', 'step-4'], volume: .42, cooldown: .28 },
-  pickup: { files: ['pickup'], volume: .38, cooldown: .12 },
+  pickup: { files: ['earn'], volume: .43, cooldown: 0 },
+  dew: { files: ['pickup'], volume: .38, cooldown: .12 },
   paper: { files: ['paper-open'], volume: .55, cooldown: .22 },
   notification: { files: ['phone-notification'], volume: .45, cooldown: .65 },
   radio: { files: ['moonbridge-radio-alert'], volume: .8, cooldown: .16 },
@@ -17,7 +18,7 @@ const clips = {
   bounce: { files: ['bounce'], volume: .54, cooldown: 0 },
   relay: { files: ['continue'], volume: .35, cooldown: .38 },
   finish: { files: ['exhibit-ready'], volume: .46, cooldown: .85 },
-  ui: { files: ['ui-click'], volume: .29, cooldown: .075 },
+  ui: { files: ['Diuup'], volume: .34, cooldown: 0 },
   page: { files: ['comic-snap'], volume: .37, cooldown: .15 },
   storm: { files: ['storm-hit'], volume: .42, cooldown: .55 },
 };
@@ -33,6 +34,7 @@ const tracks = {
 
 const universeAudio = {
   'answer-correct': 'correct', ding: 'Ding', bounce: 'bounce',
+  Diuup: 'Diuup', earn: 'earn',
   minigame: 'game-music', prelude: 'prelude', epilogue: 'epilogue',
 };
 
@@ -51,6 +53,17 @@ const sceneClips = {
 const maxEffects = 7;
 const maxCueDelay = 650;
 const resumeTimeout = 750;
+
+export function bindButtonAudio(play, takesItem = () => false) {
+  document.addEventListener('click', (event) => {
+    const control = event.target.closest?.('button, a[href], summary, input:is([type=checkbox],[type=radio]), select, [role=button]');
+    if (!control || control.matches(':disabled, [aria-disabled="true"], .comic-hit, [data-pickup]') || takesItem(control)) return;
+    play('ui');
+  }, true);
+  document.addEventListener('cancel', (event) => {
+    if (event.target instanceof HTMLDialogElement) play('ui');
+  }, true);
+}
 
 function fileURL(category, name) {
   if (Object.hasOwn(universeAudio, name)) return new URL('../universe/audio/' + universeAudio[name] + '.mp3', import.meta.url);
@@ -320,8 +333,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   window.addEventListener('keydown', startFromInput, inputOptions);
   window.addEventListener('click', startFromInput, inputOptions);
 
-  function cue(request) {
-    const name = request === 'dew' ? 'pickup' : request;
+  function cue(name) {
     const clip = Object.hasOwn(clips, name) ? clips[name] : undefined;
     if (!clip || !enabled || !context || document.hidden) return;
     const now = context.currentTime;

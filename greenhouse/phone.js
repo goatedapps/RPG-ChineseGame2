@@ -14,7 +14,7 @@ function button(cls, text, label) {
   return node;
 }
 
-export function createPhone(host, { onToggle, onNotify, contactName = '阿宁', contactInitial = '宁' } = {}) {
+export function createPhone(host, { onToggle, onNotify, onDismiss, contactName = '阿宁', contactInitial = '宁' } = {}) {
   host.classList.add('field-phone');
   host.lang = 'zh-Hans';
 
@@ -467,7 +467,10 @@ export function createPhone(host, { onToggle, onNotify, contactName = '阿宁', 
   sheet.addEventListener('click', (event) => {
     if (event.target !== sheet) return;
     const box = sheet.getBoundingClientRect();
-    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close();
+    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) {
+      onDismiss?.();
+      close();
+    }
   });
   composer.addEventListener('submit', (event) => {
     event.preventDefault();

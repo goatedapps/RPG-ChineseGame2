@@ -108,7 +108,6 @@ export function matchWorkshopWords(play, onFinish) {
     const select = () => {
       selected = word;
       for (const candidate of tiles.children) candidate.setAttribute('aria-pressed', String(candidate === tile));
-      game.feedback(tile, 'pickup');
     };
     dragPiece(tile, (event) => {
       const pair = pairs.find(({ gap }) => {

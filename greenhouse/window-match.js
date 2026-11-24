@@ -38,7 +38,6 @@ export function sealWindow(vocabulary, play, onFinish) {
     selected?.setAttribute('aria-pressed', 'false');
     selected = tile;
     selected.setAttribute('aria-pressed', 'true');
-    play('pickup');
   }
 
   function reject(tile, gap, dragOrigin) {

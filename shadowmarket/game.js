@@ -1,6 +1,6 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
-import { createPhone } from '../greenhouse/phone.js?v=shadow-market';
-import { createGreenhouseAudio } from '../greenhouse/sounds.js?v=shared-comic-score';
+import { createPhone } from '../greenhouse/phone.js?v=interaction-cues';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
 import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
@@ -15,7 +15,7 @@ import { markLessonComplete } from '../shared/lesson-progress.js';
 import { playLessonComic } from '../shared/comic.js?v=comic-score';
 import { art, arrival, chapters, ending, objects, opening } from './story.js?v=market-games';
 import { buildShadowMarket, checkpoints } from './world.js?v=districts';
-import { marketMinigames } from './minigames.js?v=cord-motion';
+import { marketMinigames } from './minigames.js?v=interaction-cues';
 
 const $ = (id) => document.getElementById(id);
 const key = 'rpg-chinese.p6.l2.shadowmarket';
@@ -62,6 +62,7 @@ function phoneNotify() {
 
 const phone = createPhone($('phone'), {
   contactName: '阿岚', contactInitial: '岚', onNotify: phoneNotify,
+  onDismiss: () => play('ui'),
   onToggle(open) {
     if (!active) return;
     engine?.setActive(!open && !desk.open);
@@ -174,6 +175,7 @@ desk.addEventListener('click', (event) => {
   const { left, right, top, bottom } = desk.getBoundingClientRect();
   if (desk.classList.contains('artifact-inspection') || event.clientX < left || event.clientX > right ||
       event.clientY < top || event.clientY > bottom) {
+    play('ui');
     voice.stop();
     desk.close();
   }
@@ -619,9 +621,13 @@ $('replay-cue').onclick = () => cueRead(true);
 $('retry-entry').onclick = () => { if (words) void startWorld(); else void initialise(); };
 bindJoystick($('joystick'), (x, y) => engine?.setVector(x, y));
 document.addEventListener('keydown', (event) => {
-  if (active && !desk.open && event.code === 'KeyF') phone.open();
+  if (active && !desk.open && !phone.isOpen && event.code === 'KeyF' && !event.repeat) {
+    if (state.phone) play('ui');
+    phone.open();
+  }
   cueRead();
 });
+bindButtonAudio(play, (control) => control.id === 'interact' && objectiveId() === 'phone');
 document.addEventListener('pointerup', () => cueRead(), { passive: true });
 
 async function initialise() {

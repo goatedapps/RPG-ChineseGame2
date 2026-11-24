@@ -40,6 +40,7 @@ Use ImageGen for player-facing artwork as described in `AGENTS.md`. For close-up
 - Loop [game-music.mp3](../../../universe/audio/game-music.mp3) while a minigame is in progress. Use the shared audio mixer so the music setting, speech ducking, and recovery after interruptions also apply. Restore the current scene’s music when the player completes or leaves the minigame.
 - Use [prelude.mp3](../../../universe/audio/prelude.mp3) for every lesson’s opening comic and [epilogue.mp3](../../../universe/audio/epilogue.mp3) for its closing comic. Call the shared mixer’s `startComic` and pass its optional start hint to the comic player. Respect the music setting and switch tracks when the comic closes.
 - Use the shared `correct` cue for successful comprehension, dictation and practice answers, including the final test. It plays [correct.mp3](../../../universe/audio/correct.mp3).
+- Use the shared `bindButtonAudio` for button presses and menu actions, including opening or closing the helper and requesting hints. The `ui` cue plays [Diuup.mp3](../../../universe/audio/Diuup.mp3). Play the `pickup` cue when the player actually takes an item. It plays [earn.mp3](../../../universe/audio/earn.mp3). Keep puzzle selections and inspections on their own cues.
 - Play [whoosh.mp3](../../../universe/audio/whoosh.mp3) when an available world opens from the star map, including with reduced motion enabled.
 
 ## 3. Playtest the affected flow

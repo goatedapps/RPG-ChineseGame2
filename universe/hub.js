@@ -1,4 +1,5 @@
 import { bindJoystick } from '../shared/joystick.js';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=interaction-cues';
 import { lessonCompleted, lessonReachedFinal } from '../shared/lesson-progress.js?v=developer-unlock';
 import { createDeveloperMode, developerSkipEnabled, developerWorldsEnabled } from '../shared/developer-mode.js?v=hub-developer';
 import { getWorlds, levels } from './catalog.js?v=hub-developer';
@@ -12,6 +13,10 @@ const music = $('hub-music');
 const whoosh = $('hub-whoosh');
 const musicControls = document.querySelectorAll('.hub-music');
 const musicKey = 'rpg-chinese.hub-music';
+const effects = createGreenhouseAudio();
+effects.setMusicEnabled(false);
+effects.setEnabled(true);
+bindButtonAudio(effects.cue);
 const statusText = {
   open: '可以进入',
   complete: '已完成',

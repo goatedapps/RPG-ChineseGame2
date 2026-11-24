@@ -5,10 +5,10 @@ import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
 import { createVoice } from './voice.js?v=clue-audio';
 import { createWriting } from './writing.js';
-import { createGreenhouseAudio } from './sounds.js?v=shared-comic-score';
+import { bindButtonAudio, createGreenhouseAudio } from './sounds.js?v=interaction-cues';
 import { playComic } from './comic.js?v=shared-comic-score';
 import { evidence } from './evidence.js?v=briefing-flow';
-import { createPhone } from './phone.js?v=note-audio';
+import { createPhone } from './phone.js?v=interaction-cues';
 import { createDeveloperMode } from '../shared/developer-mode.js?v=numbered-tasks';
 import { showSkippedFinal } from '../shared/skipped-final.js?v=developer-unlock';
 import { bindJoystick } from '../shared/joystick.js';
@@ -17,7 +17,7 @@ import { animatePhonePickup } from './phone-pickup.js';
 import { phoneStory, noteReply, screenChecks, closingMessages, fieldHints, statusReplies } from './phone-story.js?v=encounter-cues';
 import { loadLessonTest, restoreLessonTest } from './lesson-test.js';
 import { prepareExhibit } from './minigames.js?v=root-login';
-import { sealWindow } from './window-match.js?v=encounter-cues';
+import { sealWindow } from './window-match.js?v=interaction-cues';
 import { supportSeedling } from './seedling-shuffle.js?v=encounter-cues';
 import { rootLogin } from './root-login.js?v=encounter-cues';
 
@@ -127,6 +127,7 @@ let panelVoiceStatus;
 let backdropPointer = null;
 const phone = createPhone($('#phone'), {
   onToggle: togglePhone,
+  onDismiss: () => audio.cue('ui'),
   onNotify() {
     audio.cue('notification');
     releaseMouse();
@@ -583,9 +584,12 @@ function completeObject(target, inspected = false) {
   const mission = missions[state.mission];
   const action = mission.actions[state.action];
   last = { id: target.id, action: action.action, mission: state.mission, step: state.action };
-  if (action.action === 'pickup') state.held = target.id;
+  const pickedUp = action.action === 'pickup' || target.id === 'weakPlant';
+  if (pickedUp) {
+    state.held = target.id;
+    audio.cue('pickup');
+  }
   if (action.action === 'place' || (target.id === 'westWindow' && action.action === 'use') || target.id === 'rehearsalScreen') state.held = null;
-  if (target.id === 'weakPlant') state.held = 'weakPlant';
   state.action += 1;
   if (target.id === 'westNote') {
     state.notePending = true;
@@ -594,7 +598,7 @@ function completeObject(target, inspected = false) {
   if (state.action >= mission.actions.length) {
     state.phase = 'question';
     save();
-    audio.cue(target.id === 'westWindow' ? 'seal' : 'relay');
+    if (!pickedUp) audio.cue(target.id === 'westWindow' ? 'seal' : 'relay');
     sendMessage(phoneStory[mission.id].checkpoint, 'check:' + mission.id);
     releaseMouse();
     objective();
@@ -602,7 +606,7 @@ function completeObject(target, inspected = false) {
   }
   save();
   if (target.id !== 'westNote') sendStep(mission, state.action);
-  if (!inspected) audio.cue(action.action === 'pickup' ? 'dew' : (target.id === 'westWindow' ? 'seal' : 'interaction'));
+  if (!inspected && !pickedUp) audio.cue(target.id === 'westWindow' ? 'seal' : 'interaction');
   if (target.id === 'soilPot') response(action.resultCN, true);
   else hideResponse();
   objective();
@@ -659,6 +663,7 @@ desk.addEventListener('pointerup', (event) => {
   if (event.pointerId !== backdropPointer) return;
   backdropPointer = null;
   if (document.elementFromPoint(event.clientX, event.clientY) === desk) {
+    audio.cue('ui');
     voice.stop();
     desk.close();
   }
@@ -1272,8 +1277,9 @@ interact.addEventListener('click', () => engine?.interact());
 window.addEventListener('keydown', (event) => {
   if (!started || desk.open || phone.isOpen || pickingPhone || !$('#comic-overlay').hidden ||
       event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
-  if (event.code === 'KeyF') {
+  if (event.code === 'KeyF' && state.phonePicked) {
     event.preventDefault();
+    audio.cue('ui');
     phone.open();
   }
   if (event.code === 'KeyP') showBook();
@@ -1355,11 +1361,12 @@ function beginWithComic() {
 
 audio.setEnabled(effectsEnabled);
 audio.setMusicEnabled(musicEnabled);
-document.addEventListener('click', (event) => {
-  if (!(event.target instanceof Element)) return;
-  const button = event.target.closest('button');
-  if (button && !button.matches('.comic-hit,#interact,.choice,.seedling-shell,.root-login-enter')) audio.cue('ui');
-}, true);
+bindButtonAudio(audio.cue, (control) => {
+  if (control !== interact || currentTarget?.id !== nextObject()) return false;
+  if (currentTarget?.id === 'radio') return true;
+  const action = missions[state.mission]?.actions[state.action];
+  return action?.action === 'pickup' && !evidence[action.target];
+});
 
 $('#retry-entry').onclick = () => location.reload();
 if (state.finalStarted && !state.finalPassed) void openLessonTest('final');
