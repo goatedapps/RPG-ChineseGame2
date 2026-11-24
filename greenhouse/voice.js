@@ -9,9 +9,9 @@ export function createVoice(onChange) {
   function stop() {
     revision += 1;
     clearTimeout(watchdog);
-    synth?.cancel();
     const previous = activeListener;
     activeListener = undefined;
+    if (previous) synth?.cancel();
     onChange('idle');
     previous?.('idle');
   }

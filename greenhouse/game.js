@@ -3,9 +3,9 @@ import { createClueReader, dictationButton, speakerButton } from '../shared/spea
 import { markLessonComplete } from '../shared/lesson-progress.js';
 import { missions, objects, tutorial } from './story.js?v=encounter-cues';
 import { lexicon, practiceBank } from './lexicon.js';
-import { createVoice } from './voice.js?v=clue-audio';
+import { createVoice } from './voice.js?v=speech-recovery';
 import { createWriting } from './writing.js';
-import { bindButtonAudio, createGreenhouseAudio } from './sounds.js?v=audio-recovery';
+import { bindButtonAudio, createGreenhouseAudio } from './sounds.js?v=speech-recovery';
 import { playComic } from './comic.js?v=shared-comic-score';
 import { evidence } from './evidence.js?v=briefing-flow';
 import { createPhone } from './phone.js?v=interaction-cues';

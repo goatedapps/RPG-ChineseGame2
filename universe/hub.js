@@ -1,5 +1,5 @@
 import { bindJoystick } from '../shared/joystick.js';
-import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=speech-recovery';
 import { lessonCompleted, lessonReachedFinal } from '../shared/lesson-progress.js?v=developer-unlock';
 import { createDeveloperMode, developerSkipEnabled, developerWorldsEnabled } from '../shared/developer-mode.js?v=hub-developer';
 import { getWorlds, levels } from './catalog.js?v=hub-developer';

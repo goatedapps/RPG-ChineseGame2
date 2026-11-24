@@ -53,6 +53,7 @@ const sceneClips = {
 const maxEffects = 7;
 const maxCueDelay = 650;
 const resumeTimeout = 750;
+const recoveryDelay = 1000;
 
 export function bindButtonAudio(play, takesItem = () => false) {
   document.addEventListener('click', (event) => {
@@ -81,6 +82,7 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   let musicScene = null;
   let playingMinigame = false;
   let rainStopTimer;
+  let recoveryTimer;
   let enabling;
   let enabled = false;
   let musicEnabled = true;
@@ -296,6 +298,28 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     refreshMix();
   }
 
+  function checkPlayback() {
+    if (recoveryTimer || !context || !hasRun || ducked || !wantsAudio() || !pageVisible()) return;
+    const checked = context;
+    const before = checked.currentTime;
+    recoveryTimer = setTimeout(() => {
+      recoveryTimer = undefined;
+      if (context !== checked || ducked || !wantsAudio() || !pageVisible()) return;
+      if (checked.state === 'running' && checked.currentTime > before) return;
+
+      // System speech can leave WebKit's output stalled even while it reports "running".
+      // Rebuild the output graph and reuse the decoded tracks and effects.
+      checked.removeEventListener('statechange', restoreAudio);
+      if (checked.state !== 'closed') void checked.close().catch(() => {});
+      context = musicVoice = rain = enabling = undefined;
+      clearTimeout(rainStopTimer);
+      rainStopTimer = undefined;
+      voices.clear();
+      lastCue.clear();
+      start();
+    }, recoveryDelay);
+  }
+
   function initialize() {
     const Audio = window.AudioContext ?? window.webkitAudioContext;
     if (!Audio) return false;
@@ -319,16 +343,6 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     room.connect(master);
     music.connect(master);
     hasRun = context.state === 'running';
-    document.addEventListener('visibilitychange', restoreAudio);
-    window.addEventListener('pagehide', () => {
-      pageActive = false;
-      refreshMix();
-    });
-    window.addEventListener('pageshow', () => {
-      pageActive = true;
-      restoreAudio();
-    });
-    window.addEventListener('focus', restoreAudio);
     context.addEventListener('statechange', restoreAudio);
     prepareSceneEffects();
     if (musicEnabled) prepareMusic(currentMusic());
@@ -352,6 +366,19 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
   function startFromInput(event) {
     if (event.isTrusted) start(navigator.userActivation?.isActive !== false);
   }
+
+  document.addEventListener('visibilitychange', () => { if (context) restoreAudio(); });
+  window.addEventListener('pagehide', () => {
+    pageActive = false;
+    clearTimeout(recoveryTimer);
+    recoveryTimer = undefined;
+    refreshMix();
+  });
+  window.addEventListener('pageshow', () => {
+    pageActive = true;
+    if (context) restoreAudio();
+  });
+  window.addEventListener('focus', () => { if (context) restoreAudio(); });
 
   // Lesson entry follows a page navigation. Catch the first interaction with the
   // new page, including joystick movement and keys handled by the comic or world.
@@ -460,8 +487,14 @@ export function createGreenhouseAudio({ radioAlerts = false, trialEffects = fals
     setDucked(value) {
       if (ducked === Boolean(value)) return;
       ducked = Boolean(value);
-      if (!ducked && context) restoreAudio();
-      else refreshMix();
+      if (!ducked && context) {
+        restoreAudio();
+        checkPlayback();
+      } else {
+        clearTimeout(recoveryTimer);
+        recoveryTimer = undefined;
+        refreshMix();
+      }
     },
     cue,
   };

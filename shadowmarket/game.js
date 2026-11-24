@@ -1,7 +1,7 @@
 import { createEngine } from '../greenhouse/engine.js?v=spatial-market';
 import { createPhone } from '../greenhouse/phone.js?v=interaction-cues';
-import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=audio-recovery';
-import { createVoice } from '../greenhouse/voice.js?v=clue-audio';
+import { bindButtonAudio, createGreenhouseAudio } from '../greenhouse/sounds.js?v=speech-recovery';
+import { createVoice } from '../greenhouse/voice.js?v=speech-recovery';
 import { createWriting } from '../greenhouse/writing.js?v=dictation-outline';
 import { createLessonTestView } from '../greenhouse/lesson-test-view.js?v=numbered-tasks';
 import { createLessonTest, restoreLessonTest } from '../greenhouse/lesson-test.js';
